@@ -57,7 +57,7 @@ class MultiprocessTest extends PHPUnit_Framework_TestCase
     */
    public function testSetSubDFD_GetSubDFD_invalidInput()
    {
-      $element = new Element;
+      $element =new Process;
       $this->object->setSubDFD($element);
    }
 
@@ -84,7 +84,7 @@ class MultiprocessTest extends PHPUnit_Framework_TestCase
     */
    public function testAddLink_invalidInput()
    {
-      $aNode = new Node;
+      $aNode =new Process;
       $this->object->addLink($aNode);
    }
 

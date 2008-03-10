@@ -6,7 +6,7 @@ require_once 'Entity.php';
  *
  * @author Josh Clark
  */
-class Element extends Entity
+ abstract class Element extends Entity
 {
    //<editor-fold desc="Attributes" defaultstate="collapsed">
    protected $x;

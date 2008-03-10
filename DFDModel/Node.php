@@ -5,7 +5,7 @@ require_once 'Element.php';
  *
  * @author Josh Clark
  */
-class Node extends Element
+ abstract class Node extends Element
 {
    //<editor-fold desc="Attributes" defaultstate="collapsed">
    protected $links;

@@ -72,8 +72,8 @@ class DataFlowDiagramTest extends PHPUnit_Framework_TestCase
     */
    public function testAddExternalLink_invalidInput()
    {
-      $aNode = new Node;
-      $this->object->addExternalLink($aNode);
+      $aProcess = new Process;
+      $this->object->addExternalLink($aProcess);
    }
 
    /**
@@ -372,8 +372,8 @@ class DataFlowDiagramTest extends PHPUnit_Framework_TestCase
       $this->object->addElement($process);
       for($i = 0; $i < 10; $i++)
       {
-         $someElement = new Element;
-         $this->object->addElement($someElement);
+         $someProcess = new Process;
+         $this->object->addElement($someProcess);
       }
       $this->assertEquals($process, $this->object->getElementById($process->getId()));
    }

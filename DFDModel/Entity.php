@@ -4,7 +4,7 @@
  *
  * @author Josh Clark
  */
-class Entity 
+abstract class Entity 
 {
    //<editor-fold desc="Attributes" defaultstate="collapsed">
    protected $label;
