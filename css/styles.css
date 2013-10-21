@@ -21,6 +21,11 @@ html, body
   border-top: 3px double gray;
 }
 
+#sidebar1Container
+{
+  overflow: hidden;
+}
+
 /* Overriding jQuery accordion padding */
 .ui-accordion .ui-accordion-content
 {
