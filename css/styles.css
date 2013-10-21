@@ -6,3 +6,17 @@ html, body
   margin: 0;
   overflow: auto;
 }
+
+#headerContainer
+{
+  background: lightgray;
+  border-bottom: 3px double gray;
+}
+
+#footerContainer
+{
+  text-align: right;
+  font-size: 0.75em;
+  background: lightgray;
+  border-top: 3px double gray;
+}
