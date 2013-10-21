@@ -20,3 +20,8 @@ html, body
   background: lightgray;
   border-top: 3px double gray;
 }
+
+/* Overriding jQuery accordion padding */
+.ui-accordion .ui-accordion-content {
+	padding: 0.25em 0.25em;
+}
