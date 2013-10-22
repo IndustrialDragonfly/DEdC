@@ -7,13 +7,13 @@ html, body
   overflow: auto;
 }
 
-#headerContainer
+#header
 {
   background: lightgray;
   border-bottom: 3px double gray;
 }
 
-#footerContainer
+#footer
 {
   text-align: right;
   font-size: 0.75em;
