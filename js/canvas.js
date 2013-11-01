@@ -22,6 +22,16 @@ Canvas.prototype.setBackground = function(color) {
 	this.paper.canvas.style.backgroundColor = color;
 }
 
+/**
+ * Style a shape with the default styling
+ * shape The shape to be styled
+ */
+Canvas.prototype.styleShape = function(shape) {
+	shape.attr("fill", "#FFF");
+	shape.attr("stroke", "#000");
+	shape.attr("stroke-width", "1px");
+}
+
 /** 
  * Add a process element to the canvas at the given location
  * x Coordinate in pixels
@@ -29,8 +39,7 @@ Canvas.prototype.setBackground = function(color) {
  */
 Canvas.prototype.addProcess = function(x,y) {
 	var c = this.paper.circle(x,y,25);
-	c.attr("fill", "#FFF");
-	c.attr("stroke", "#000");
+	this.styleShape(c);
 
 	c.drag(onMove, onStart, onEnd);
 	return c;
@@ -44,14 +53,11 @@ Canvas.prototype.addProcess = function(x,y) {
 Canvas.prototype.addMultiProcess = function(x,y) {
 	var st = this.paper.set();
 	var c1 = this.paper.circle(x,y,25);
-	c1.attr("fill", "#FFF");
-	c1.attr("stroke", "#000");
 	
 	var c2 = this.paper.circle(x,y,18);
-	c2.attr("fill", "#FFF");
-	c2.attr("stroke", "#000");
 	
 	st.push(c1,c2);
+	this.styleShape(st);
 	
 	return st;
 }
@@ -66,10 +72,10 @@ Canvas.prototype.addDatastore = function(x,y) {
 	y = y - 25;
 	var st = this.paper.set();
 	var p1 = this.paper.path("M" + x + " " + y + " L" + (x+50) + " " + y + " Z");
-	p1.attr("stroke", "#000");
+	this.styleShape(p1);
 	
 	var p2 = this.paper.path("M" + x + " " + (y+50) + " L" + (x+50) + " " + (y+50) + " Z");
-	p2.attr("stroke", "#000");
+	this.styleShape(p2);
 	
 	var rec = this.paper.rect((x), (y+1), 50, 48);
 	rec.attr("stroke-width", 0);
@@ -87,8 +93,7 @@ Canvas.prototype.addDatastore = function(x,y) {
  */
 Canvas.prototype.addExtInteractor = function(x,y) {
 	var r = this.paper.rect(x - 25,y - 25,50,50);
-	r.attr("fill", "#FFF");
-	r.attr("stroke", "#000");
+	this.styleShape(r);
 
 	r.drag(onMove, onStart, onEnd);
 	return r;
@@ -97,7 +102,7 @@ Canvas.prototype.addExtInteractor = function(x,y) {
 // onMove, onStart, and onEnd are outside until I know how to make work as private
 // !Important! They should not be called manually
 /**
- * Move an object
+ * Move an shape
  */ 
 onMove = function(dx,dy) {
 	var att = this.type == "rect" ? {x: this.ox + dx, y: this.oy + dy} : {cx: this.ox + dx, cy: this.oy + dy};
@@ -105,21 +110,24 @@ onMove = function(dx,dy) {
 }
 
 /**
- * Executed when an object's drag starts
+ * Executed when an shape's drag starts
  */
 onStart = function() {
 	// Mark starting position
 	this.ox = this.type == "rect" ? this.attr("x") : this.attr("cx");
 	this.oy = this.type == "rect" ? this.attr("y") : this.attr("cy");
 
-	// Fade out the object
+	// Bring the shape to the front
+	this.toFront();
+
+	// Fade out the shape
 	this.animate({"fill-opacity": 0.2}, 100);
 }
 
 /**
- * Executed when an object's drag ends
+ * Executed when an shape's drag ends
  */
 onEnd = function() {
-	// Fade in the object
+	// Fade in the shape
 	this.animate({"fill-opacity": 1}, 100);
 }
