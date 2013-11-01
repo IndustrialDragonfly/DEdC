@@ -13,7 +13,7 @@
     <script type="text/javascript" src="js/lib/raphael-2.1.2.js"></script>
     <script type="text/javascript" src="js/canvas.js"></script>
     <script>
-      $(document).ready(function () {	
+      $(document).ready(function () {
 		$("#content").tabs({
 		  heightStyle:"fill"
 		});
@@ -39,6 +39,8 @@
 		canvas.addMultiProcess(200,100);
 		canvas.addDatastore(100,200);
 		canvas.addExtInteractor(200,200);
+
+		canvas.setBackground('#A8A8A8');
       });
     </script>
 

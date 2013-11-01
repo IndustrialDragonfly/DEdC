@@ -1,3 +1,9 @@
+/**
+ * Create a canvas
+ * container HTML element that the canvas will go in
+ * width Width of the canvas in pixels
+ * height Height of the canvas in pixels
+ */
 function Canvas(container, width, height) {
 	// Set internal variables
 	this.container = container;
@@ -6,10 +12,21 @@ function Canvas(container, width, height) {
 	
 	// Create canvas with Raphael
 	this.paper = Raphael("tab1", 640, 480);
-	this.paper.canvas.style.backgroundColor = '#A8A8A8';
 }
 
-// Add a process element to the canvas
+/**
+ * Set the background color of the canvas
+ * color Hex value of the color, i.e., '#A8A8A8'
+ */
+Canvas.prototype.setBackground = function(color) {
+	this.paper.canvas.style.backgroundColor = color;
+}
+
+/** 
+ * Add a process element to the canvas at the given location
+ * x Coordinate in pixels
+ * y Coordinate in pixels
+ */
 Canvas.prototype.addProcess = function(x,y) {
 	var c = this.paper.circle(x,y,25);
 	c.attr("fill", "#FFF");
@@ -17,7 +34,11 @@ Canvas.prototype.addProcess = function(x,y) {
 	return c;
 }
 
-// Add a multi-process element to the canvas
+/** 
+ * Add a multi-process element to the canvas at the given location
+ * x Coordinate in pixels
+ * y Coordinate in pixels
+ */
 Canvas.prototype.addMultiProcess = function(x,y) {
 	var st = this.paper.set();
 	var c1 = this.paper.circle(x,y,25);
@@ -33,7 +54,11 @@ Canvas.prototype.addMultiProcess = function(x,y) {
 	return st;
 }
 
-// Add a datastore element to the canvas
+/** 
+ * Add a datastore element to the canvas at the given location
+ * x Coordinate in pixels
+ * y Coordinate in pixels
+ */
 Canvas.prototype.addDatastore = function(x,y) {
 	x = x - 25;
 	y = y - 25;
@@ -48,12 +73,16 @@ Canvas.prototype.addDatastore = function(x,y) {
 	rec.attr("stroke-width", 0);
 	rec.attr("fill", "#FFF");
 	
-	/*st.push(p1,p2,rec);*/
+	st.push(p1,p2,rec);
 	
-	return p1;
+	return st;
 }
 
-// Add a external interactor element to the canvas
+/** 
+ * Add a external interactor element to the canvas at the given location
+ * x Coordinate in pixels
+ * y Coordinate in pixels
+ */
 Canvas.prototype.addExtInteractor = function(x,y) {
 	var c = this.paper.rect(x - 25,y - 25,50,50);
 	c.attr("fill", "#FFF");
