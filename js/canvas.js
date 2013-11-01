@@ -31,6 +31,8 @@ Canvas.prototype.addProcess = function(x,y) {
 	var c = this.paper.circle(x,y,25);
 	c.attr("fill", "#FFF");
 	c.attr("stroke", "#000");
+
+	c.drag(onMove, onStart, onEnd);
 	return c;
 }
 
@@ -84,8 +86,40 @@ Canvas.prototype.addDatastore = function(x,y) {
  * y Coordinate in pixels
  */
 Canvas.prototype.addExtInteractor = function(x,y) {
-	var c = this.paper.rect(x - 25,y - 25,50,50);
-	c.attr("fill", "#FFF");
-	c.attr("stroke", "#000");
-	return c;
+	var r = this.paper.rect(x - 25,y - 25,50,50);
+	r.attr("fill", "#FFF");
+	r.attr("stroke", "#000");
+
+	r.drag(onMove, onStart, onEnd);
+	return r;
+}
+
+// onMove, onStart, and onEnd are outside until I know how to make work as private
+// !Important! They should not be called manually
+/**
+ * Move an object
+ */ 
+onMove = function(dx,dy) {
+	var att = this.type == "rect" ? {x: this.ox + dx, y: this.oy + dy} : {cx: this.ox + dx, cy: this.oy + dy};
+	this.attr(att);
+}
+
+/**
+ * Executed when an object's drag starts
+ */
+onStart = function() {
+	// Mark starting position
+	this.ox = this.type == "rect" ? this.attr("x") : this.attr("cx");
+	this.oy = this.type == "rect" ? this.attr("y") : this.attr("cy");
+
+	// Fade out the object
+	this.animate({"fill-opacity": 0.2}, 100);
+}
+
+/**
+ * Executed when an object's drag ends
+ */
+onEnd = function() {
+	// Fade in the object
+	this.animate({"fill-opacity": 1}, 100);
 }
