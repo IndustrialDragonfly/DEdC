@@ -90,7 +90,7 @@ Raphael.el.draggable = function (options)
 	},options || {});
 
 	/**
-	 * Executed when shape's drag starts
+	 * Executed when the shape's drag starts
 	 */
 	var onStart = function () {
 		this.o().toFront();
