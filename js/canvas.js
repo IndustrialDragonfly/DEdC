@@ -98,7 +98,7 @@ Raphael.el.draggable = function (options)
 	};
 
 	/**
-	 * Exected when the shape moves
+	 * Executed when the shape moves
 	 */
 	var onMove = function (dx, dy, mx, my, ev) {
 		var b = this.getABBox();
@@ -148,21 +148,27 @@ Raphael.st.draggable = function (options) {
  */
 function Canvas(container, width, height) {	
 	// Create canvas with Raphael with given arguments
-	this.paper = Raphael(container, width, height);
+	var paper = Raphael(container, width, height);
+
+	var elements = new Array();
 
 	/**
 	 * Set the background color of the canvas
 	 * color Hex value of the color, i.e., '#A8A8A8'
 	 */
 	this.setBackground = function(color) {
-		this.paper.canvas.style.backgroundColor = color;
+		paper.canvas.style.backgroundColor = color;
+	}
+
+	this.getNumberOfElements = function() {
+		return elements.length;
 	}
 
 	/**
 	 * Style a shape with the default styling
 	 * shape The shape to be styled
 	 */
-	this.styleShape = function(shape) {
+	var styleShape = function(shape) {
 		shape.attr("fill", "#FFF");
 		shape.attr("stroke", "#000");
 		shape.attr("stroke-width", "1px");
@@ -174,10 +180,13 @@ function Canvas(container, width, height) {
 	 * y Coordinate in pixels
 	 */
 	this.addProcess = function(x,y) {
-		var c = this.paper.circle(x,y,25);
-		this.styleShape(c);
+		var c = paper.circle(x,y,25);
+		styleShape(c);
 
 		c.draggable();
+
+		elements.push(c);
+
 		return c;
 	}
 
@@ -187,13 +196,15 @@ function Canvas(container, width, height) {
 	 * y Coordinate in pixels
 	 */
 	this.addMultiProcess = function(x,y) {
-		var st = this.paper.set();
-		var c1 = this.paper.circle(x,y,25);
+		var st = paper.set();
+		var c1 = paper.circle(x,y,25);
 		
-		var c2 = this.paper.circle(x,y,18);
+		var c2 = paper.circle(x,y,18);
 		
 		st.push(c1,c2);
-		this.styleShape(st);
+		styleShape(st);
+
+		elements.push(st);
 		
 		return st;
 	}
@@ -206,18 +217,20 @@ function Canvas(container, width, height) {
 	this.addDatastore = function(x,y) {
 		x = x - 25;
 		y = y - 25;
-		var st = this.paper.set();
-		var p1 = this.paper.path("M" + x + " " + y + " L" + (x+50) + " " + y + " Z");
-		this.styleShape(p1);
+		var st = paper.set();
+		var p1 = paper.path("M" + x + " " + y + " L" + (x+50) + " " + y + " Z");
+		styleShape(p1);
 		
-		var p2 = this.paper.path("M" + x + " " + (y+50) + " L" + (x+50) + " " + (y+50) + " Z");
-		this.styleShape(p2);
+		var p2 = paper.path("M" + x + " " + (y+50) + " L" + (x+50) + " " + (y+50) + " Z");
+		styleShape(p2);
 		
-		var rec = this.paper.rect((x), (y+1), 50, 48);
+		var rec = paper.rect((x), (y+1), 50, 48);
 		rec.attr("stroke-width", 0);
 		rec.attr("fill", "#FFF");
 		
 		st.push(p1,p2,rec);
+
+		elements.push(st);
 		
 		return st;
 	}
@@ -228,10 +241,13 @@ function Canvas(container, width, height) {
 	 * y Coordinate in pixels
 	 */
 	this.addExtInteractor = function(x,y) {
-		var r = this.paper.rect(x - 25,y - 25,50,50);
-		this.styleShape(r);
+		var r = paper.rect(x - 25,y - 25,50,50);
+		styleShape(r);
 
 		r.draggable();
+
+		elements.push(r);
+
 		return r;
 	}
 }
