@@ -6,11 +6,19 @@ test("Canvas Creation", function() {
 });
 
 test("Add Process", function() {
-	var p = canvas.addProcess(10, 10);
-	equal(p.x(), 10, "Test process x location");
-	equal(p.y(), 10, "Test process y location");
+	var p = canvas.addProcess(100, 100);
+	equal(p.x(), 100, "Test process x location");
+	equal(p.y(), 100, "Test process y location");
 	ok(!p.is('rect'), "Test if process is a rectangle");
 	ok(p.is('circle'), "Test if process is a circle");
+});
+
+test("Add External Interactor", function() {
+	var p = canvas.addExtInteractor(100, 100);
+	equal(p.x(), 75, "Test process x location");
+	equal(p.y(), 75, "Test process y location");
+	ok(p.is('rect'), "Test if process is a rectangle");
+	ok(!p.is('circle'), "Test if process is a circle");
 });
 
 test("Advanced Bounding Box", function() {
