@@ -124,7 +124,7 @@ class Node extends Element
     */
    public function getLinkbyPosition($index)
    {
-      if ($index <= count($this->links) -1 )
+      if ($index <= count($this->links) -1 && $index >= 0)
       {
          return $this->links[$index];
       }

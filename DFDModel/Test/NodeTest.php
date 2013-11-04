@@ -39,16 +39,6 @@ class NodeTest extends PHPUnit_Framework_TestCase
    
    /**
     * @covers Node::getNumberOfLinks
-    * @expectedException BadFunctionCallException
-    */
-   public function testGetNumberOfLinks_invalidInput()
-   {
-      $aNode = new Node;
-      $this->object->addLink($aNode);
-   }
-   
-   /**
-    * @covers Node::getNumberOfLinks
     */
    public function testGetNumberOfLinks_smoke()
    {
@@ -59,7 +49,6 @@ class NodeTest extends PHPUnit_Framework_TestCase
 
    /**
     * @covers Node::addLink
-    * @todo   Implement testAddLink().
     */
    public function testAddLink_smoke()
    {
@@ -116,9 +105,18 @@ class NodeTest extends PHPUnit_Framework_TestCase
     * @covers Node::getLinkbyPosition
     * @expectedException BadFunctionCallException
     */
-   public function testGetLinkbyPosition_null()
+   public function testGetLinkbyPosition_overrun()
    {
       $this->object->getLinkbyPosition(0);
+   }
+   
+   /**
+    * @covers Node::getLinkbyPosition
+    * @expectedException BadFunctionCallException
+    */
+   public function testGetLinkbyPosition_negativeOverrun()
+   {
+      $this->object->getLinkbyPosition(-1);
    }
 
    /**
@@ -158,7 +156,6 @@ class NodeTest extends PHPUnit_Framework_TestCase
 
    /**
     * @covers Node::removeAllLinks
-    * @todo   Implement testRemoveAllLinks().
     */
    public function testRemoveAllLinks()
    {

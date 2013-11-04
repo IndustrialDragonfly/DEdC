@@ -1,5 +1,5 @@
 <?php
-include_once 'Entity.php';
+require_once '../Entity.php';
 /**
  * Description of DataFlowDiagram
  *
@@ -17,8 +17,8 @@ class DataFlowDiagram extends Entity
    public function __construct()
    {
       parent::__construct();
-      $externalLinks = array();
-      $elementList = array();
+      $this->externalLinks = array();
+      $this->elementList = array();
    }
 
    //</editor-fold>
@@ -31,7 +31,7 @@ class DataFlowDiagram extends Entity
     */
    public function getNumberOfExternalLinks()
    {
-      return count($externalLinks);
+      return count($this->externalLinks);
    }
    
    /**
@@ -39,11 +39,11 @@ class DataFlowDiagram extends Entity
     * @param type $newlink 
     * @throws BadFunctionCallException
     */
-   public function addExternalLink($newlink)
+   public function addExternalLink($newLink)
    {
       if($newLink instanceof DataFlow)
       {
-         array_push($externalLinks, $newLink);
+         array_push($this->externalLinks, $newLink);
       }
       else
       {
@@ -63,13 +63,13 @@ class DataFlowDiagram extends Entity
       if($link instanceof DataFlow)
       {
          //find if the link is in the list and get its location if it is
-         $loc = array_search($link, $externalLinks);
-         if ($loc != false)
+         $loc = array_search($link, $this->externalLinks);
+         if ($loc !== false)
          {
             //remove the link from the list
-            unset($externalLinks($loc));
+            unset($this->externalLinks[$loc]);
             //normalize the indexes of the list
-            $externalLinks = array_values($externalLinks);
+            $this->externalLinks = array_values($this->externalLinks);
             return true;
          }
          else
@@ -91,9 +91,9 @@ class DataFlowDiagram extends Entity
     */
    public function getExternalLinkByPosition($index)
    {
-      if ($index <= count($externalLinks) )
+      if ($index <= count($this->externalLinks) - 1 && $index >= 0)
       {
-         return $externalLinks[$index];
+         return $this->externalLinks[$index];
       }
       else
       {
@@ -108,11 +108,11 @@ class DataFlowDiagram extends Entity
     */
    public function getExternalLinkbyId($linkId)
    {
-      for ($i = 0; $i < count($externalLinks); $i++)
+      for ($i = 0; $i < count($this->externalLinks); $i++)
       {
-         if($externalLinks[$i]->getId() == $linkId)
+         if($this->externalLinks[$i]->getId() == $linkId)
          {
-            return $externalLinks[$i];
+            return $this->externalLinks[$i];
          }
       }
       return null;
@@ -126,7 +126,7 @@ class DataFlowDiagram extends Entity
     */
    public function getNumberOfElements()
    {
-      return count($elementList);
+      return count($this->elementList);
    }
    
    /**
@@ -138,7 +138,7 @@ class DataFlowDiagram extends Entity
    {
       if($newElement instanceof Element)
       {
-         array_push($elementList, $newElement);
+         array_push($this->elementList, $newElement);
       }
       else
       {
@@ -158,8 +158,8 @@ class DataFlowDiagram extends Entity
       if($element instanceof Element)
       {
          //find if the element is in the list and get its location if it is
-         $loc = array_search($element, $elementList);
-         if ($loc != false)
+         $loc = array_search($element, $this->elementList);
+         if ($loc !== false)
          {
             if($element instanceof DataFlow)
             {
@@ -170,9 +170,9 @@ class DataFlowDiagram extends Entity
                $element->removeAllLinks();
             }
             //remove the element from the list
-            unset($elementList($loc));
+            unset($this->elementList[$loc]);
             //normalize the indexes of the list
-            $elementList = array_values($elementList);
+            $this->elementList = array_values($this->elementList);
             return true;
          }
          else
@@ -189,9 +189,9 @@ class DataFlowDiagram extends Entity
    
    public function getElementByPosition($index)
    {
-      if ($index <= count($elementList) )
+      if ($index <= count($this->elementList) -1 && $index >= 0)
       {
-         return $elementList[$index];
+         return $this->elementList[$index];
       }
       else
       {
@@ -202,11 +202,11 @@ class DataFlowDiagram extends Entity
    
    public function getElementById($elementId)
    {
-      for ($i = 0; $i < count($elementList); $i++)
+      for ($i = 0; $i < count($this->elementList); $i++)
       {
-         if($elementList[$i]->getId() == $elementId)
+         if($this->elementList[$i]->getId() == $elementId)
          {
-            return $elementList[$i];
+            return $this->elementList[$i];
          }
       }
       return null;

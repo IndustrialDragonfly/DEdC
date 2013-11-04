@@ -15,7 +15,7 @@ class Multiprocess extends Node
    public function __construct()
    {
       parent::__construct();
-      $subDataFlowDiagram = new DataFlowDiagram;
+      $this->subDataFlowDiagram = new DataFlowDiagram;
    }
 
    //</editor-fold>
@@ -23,7 +23,7 @@ class Multiprocess extends Node
    //<editor-fold desc="Accessor functions" defaultstate="collapsed">
    public function getSubDFD()
    {
-      return $subDataFlowDiagram;
+      return $this->subDataFlowDiagram;
    }
    /**
     * 
@@ -34,7 +34,7 @@ class Multiprocess extends Node
    {
       if($aDiagram instanceof DataFlowDiagram)
       {
-         $subDataFlowDiagram = $aDiagram;
+         $this->subDataFlowDiagram = $aDiagram;
       }
       else
       {
@@ -53,8 +53,8 @@ class Multiprocess extends Node
    {
       if($newLink instanceof DataFlow)
       {
-         array_push($links, $newLink);
-         $subDataFlowDiagram->addExternalLink($newLink);
+         array_push($this->links, $newLink);
+         $this->subDataFlowDiagram->addExternalLink($newLink);
       }
       else
       {
@@ -73,14 +73,14 @@ class Multiprocess extends Node
       if($newLink instanceof DataFlow)
       {
          //find if the link is in the list and get its location if it is
-         $loc = array_search($link, $links);
-         if ($loc != false)
+         $loc = array_search($link, $this->links);
+         if ($loc !== false)
          {
             //remove the link from the list
-            unset(links($loc));
+            unset($this->links[$loc]);
             //normalize the indexes of the list
-            $links = array_values($links);
-            $subDataFlowDiagram->removeExternalLink($link);
+            $this->links = array_values($this->links);
+            $this->subDataFlowDiagram->removeExternalLink($link);
             return true;
          }
          else
