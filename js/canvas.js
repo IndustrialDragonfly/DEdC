@@ -143,7 +143,7 @@ Raphael.st.draggable = function (options) {
 /**
  * Create a canvas
  * @constructor
- * @param {string} container - DOM element's ID for the that will be the parent for the canvas
+ * @param {string} container - DOM element's ID for the parent element of the canvas
  * @param {number} width - The width of the canvas in pixels
  * @param {number} height - The height of the canvas in pixels
  */
