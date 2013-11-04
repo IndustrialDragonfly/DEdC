@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The User class models regular users, without admin rights.
  *
@@ -6,6 +7,7 @@
  */
 class User
 {
+
     //<editor-fold desc="Attributes" defaultstate="collapsed">
     private $Name;
     private $ID;
@@ -24,7 +26,7 @@ class User
         $this->Name = $Name;
         $this->Organization = $Org;
         // Generate random ID
-        $this->ID = bin2hex(openssl_random_pseudo_bytes(127));
+        $this->ID = $this->generateId();
     }
 
     //</editor-fold>
@@ -73,6 +75,7 @@ class User
     {
         return $this->Organization;
     }
+
     /**
      * Returns whether the user is an admin. For a regular user, is hardcoded
      * to return false.
@@ -82,6 +85,19 @@ class User
     {
         return FALSE;
     }
+
 //</editor-fold>
+    /**
+     * Generates an ID of a given bit size using the OpenSSL PRNG.
+     * @return String
+     */
+    private function generateId()
+    {
+        $length = 256;
+        $numberOfBytes = $length / 8;
+        return strtr(base64_encode(openssl_random_pseudo_bytes($numberOfBytes)), "+/=", "xxx");
+    }
+
 }
+
 ?>
