@@ -134,7 +134,7 @@ class DataFlow extends Element
    {
       if($this->destinationNode != NULL)
       {
-         $destinationnNode->removeLink($this);
+         $this->destinationNode->removeLink($this);
          $this->destinationNode = NULL;
       }
    }
@@ -145,8 +145,8 @@ class DataFlow extends Element
     */
    public function removeAllLinks()
    {
-      clearOriginNode();
-      clearDestinationNode();
+      $this->clearOriginNode();
+      $this->clearDestinationNode();
    }
    //</editor-fold>
 }
