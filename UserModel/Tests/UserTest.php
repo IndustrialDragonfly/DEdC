@@ -121,7 +121,7 @@ class UserTest extends PHPUnit_Framework_TestCase
      */
     public function testIsAdmin()
     {
-        $this->assertEquals($this->user->isAdmin(), FALSE);
+        $this->assertFalse($this->user->isAdmin());
     }
 
 }

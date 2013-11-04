@@ -27,7 +27,7 @@ class AdminTest extends PHPUnit_Framework_TestCase
      */
     public function testIsAdmin()
     {
-        $this->assertEquals($this->admin->isAdmin(), TRUE);
+        $this->assertTrue($this->admin->isAdmin());
     }
 
 }
