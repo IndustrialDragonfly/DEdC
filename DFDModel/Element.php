@@ -1,5 +1,5 @@
 <?php
-include_once 'Entity.php';
+require_once 'Entity.php';
 
 /**
  * Description of Element
@@ -9,8 +9,8 @@ include_once 'Entity.php';
 class Element extends Entity
 {
    //<editor-fold desc="Attributes" defaultstate="collapsed">
-   protected $x = 0;
-   protected $y = 0;
+   protected $x;
+   protected $y;
    //</editor-fold>
    
    //<editor-fold desc="Constructor" defaultstate="collapsed">
@@ -20,6 +20,8 @@ class Element extends Entity
    public function __construct()
    {
       parent::__construct();
+      $this->x = 0;
+      $this->y = 0;
    }
 
    //</editor-fold>
@@ -27,19 +29,19 @@ class Element extends Entity
    //<editor-fold desc="Accessor functions" defaultstate="collapsed">
    public function setX($newX)
    {
-      $x = $newX;
+      $this->x = $newX;
    }
    public function getX()
    {
-      return $x;
+      return $this->x;
    }
    public function setY($newY)
    {
-      $y = $newY;
+      $this->y = $newY;
    }
    public function getY()
    {
-      return $y;
+      return $this->y;
    }
    /**
     * function that sets both the X and Y values at the same time
@@ -48,8 +50,8 @@ class Element extends Entity
     */
    public function setLocation($newX, $newY)
    {
-      $x = $newX;
-      $y = $newY;
+      $this->x = $newX;
+      $this->y = $newY;
    }
    /**
     * function that returns both the X and Y values
@@ -59,7 +61,7 @@ class Element extends Entity
     */
    public function getLocation()
    {
-      return array($x,$y);
+      return array($this->x,$this->y);
    }
    //</editor-fold>
 }

@@ -7,9 +7,9 @@
 class Entity 
 {
    //<editor-fold desc="Attributes" defaultstate="collapsed">
-   protected $label = "";
-   protected $id = "";
-   protected $owner = "";
+   protected $label;
+   protected $id;
+   protected $owner;
    
    //</editor-fold>
    
@@ -19,16 +19,21 @@ class Entity
     */
    public function __construct()
    {
-      $id = generateId();
+      $this->id = $this->generateId();
+      $this->label = '';
+      $this->owner = '';
+      
    }
    
    /**
-    * function that generates an UUID of length 128 bits
-    * @return type a random 128 bit value
+    * function that generates an UUID of length 256 bits
+    * @return type a random 256 bit value
     */
    private function generateId()
    {
-      return strtr(base64_encode(openssl_random_pseudo_bytes(128)), "+/=", "xxx");
+      $length = 256;
+      $numberOfBytes = $length/8;
+      return strtr(base64_encode(openssl_random_pseudo_bytes($numberOfBytes)), "+/=", "xxx");
    }
    //</editor-fold>
    
@@ -36,28 +41,28 @@ class Entity
    //<editor-fold desc="label Accessors" defaultstate="collapsed">
    public function setLabel($newLabel)
    {
-      $label = $newLabel;
+      $this->label = $newLabel;
    }
    
    public function getLabel()
    {
-      return $label;
+      return $this->label;
    }
    //</editor-fold>
    //<editor-fold desc="id Accessors" defaultstate="collapsed">
    public function getId()
    {
-      return $id;
+      return $this->id;
    }
    //</editor-fold>
    //<editor-fold desc="owner Accessors" defaultstate="collapsed">
    public function setOwner($newOwner)
    {
-      $owner = $newOwner;
+      $this->owner = $newOwner;
    }
    public function getOwner()
    {
-      return $owner;
+      return $this->owner;
    }
    //</editor-fold>
    

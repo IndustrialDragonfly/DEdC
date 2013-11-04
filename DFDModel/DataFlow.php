@@ -17,8 +17,8 @@ class DataFlow extends Element
    public function __construct()
    {
       parent::__construct();
-      $originNode = NULL;
-      $destinationNode = NULL;
+      $this->originNode = NULL;
+      $this->destinationNode = NULL;
    }
 
    //</editor-fold>
@@ -31,11 +31,11 @@ class DataFlow extends Element
     */
    public function getOriginNode()
    {
-      return $originNode;
+      return $this->originNode;
    }
    
    /**
-    * function that sets the orgin node to the specified node and adds itself to thats nodes list of links,
+    * function that sets the origin node to the specified node and adds itself to thats nodes list of links,
     * if the origin node was already set it will first remove itself from that Nodes list of Links
     * @param Node $aNode 
     * @throws BadFunctionCallException if the input was not a Node object
@@ -46,10 +46,10 @@ class DataFlow extends Element
       if($aNode instanceof Node)
       {
          //if origin has not been set yet
-         if ($orginNode = NULL)
+         if ($this->originNode == NULL)
          {
             //set the origin node and add this DataFlow to its list of Links
-            $originNode = $aNode;
+            $this->originNode = $aNode;
             $aNode->addLink($this);
          }
          //if the origin node has already been set
@@ -58,8 +58,8 @@ class DataFlow extends Element
             //remove this DataFlow from the old origin nodes list of links and 
             //thenset the origin node to the new node and add this DataFlow to 
             //its list of Links
-            $originNode->removeLink($this);
-            $originNode = $aNode;
+            $this->originNode->removeLink($this);
+            $this->originNode = $aNode;
             $aNode->addLink($this);
          }
       }
@@ -72,12 +72,12 @@ class DataFlow extends Element
    /**
     * function that clears the origin node and removes it from the list of links of its old origin node
     */
-   public function clearOrginNode()
+   public function clearOriginNode()
    {
-      if($orginNode != NULL)
+      if($this->originNode != NULL)
       {
-         $originNode->removeLink($this);
-         $orginNode = NULL;
+         $this->originNode->removeLink($this);
+         $this->originNode = NULL;
       }
    }
    //</editor-fold>
@@ -89,7 +89,7 @@ class DataFlow extends Element
     */
    public function getDestinationNode()
    {
-      return $destinationNode;
+      return $this->destinationNode;
    }
    
    /**
@@ -104,10 +104,10 @@ class DataFlow extends Element
       if($aNode instanceof Node)
       {
          //if destination has not been set yet
-         if ($destinationNode = NULL)
+         if ($this->destinationNode == NULL)
          {
             //set the destination node and add this DataFlow to its list of Links
-            $destinationNode = $aNode;
+            $this->destinationNode = $aNode;
             $aNode->addLink($this);
          }
          //if the destination node has already been set
@@ -116,8 +116,8 @@ class DataFlow extends Element
             //remove this DataFlow from the old destination nodes list of links and 
             //then set the destination node to the new node and add this DataFlow to 
             //its list of Links
-            $destinationNode->removeLink($this);
-            $destinationNode = $aNode;
+            $this->destinationNode->removeLink($this);
+            $this->destinationNode = $aNode;
             $aNode->addLink($this);
          }
       }
@@ -132,10 +132,10 @@ class DataFlow extends Element
     */
    public function clearDestinationNode()
    {
-      if($destinationNode != NULL)
+      if($this->destinationNode != NULL)
       {
          $destinationnNode->removeLink($this);
-         $destinationNode = NULL;
+         $this->destinationNode = NULL;
       }
    }
    //</editor-fold>
@@ -145,7 +145,7 @@ class DataFlow extends Element
     */
    public function removeAllLinks()
    {
-      clearOrginNode();
+      clearOriginNode();
       clearDestinationNode();
    }
    //</editor-fold>

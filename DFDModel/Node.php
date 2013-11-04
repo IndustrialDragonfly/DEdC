@@ -1,5 +1,5 @@
 <?php
-include_once 'Element.php';
+require_once 'Element.php';
 /**
  * Description of Node
  *
@@ -15,7 +15,7 @@ class Node extends Element
    public function __construct()
    {
       parent::__construct();
-      $links = array();
+      $this->links = array();
    }
 
    //</editor-fold>
@@ -28,7 +28,7 @@ class Node extends Element
     */
    public function getNumberOfLinks()
    {
-      return count($links);
+      return count($this->links);
    }
    
    /**
@@ -40,7 +40,7 @@ class Node extends Element
    {
       if($newLink instanceof DataFlow)
       {
-         array_push($links, $newLink);
+         array_push($this->links, $newLink);
       }
       else
       {
@@ -59,14 +59,16 @@ class Node extends Element
       if($link instanceof DataFlow)
       {
          //find if the link is in the list and get its location if it is
-         $loc = array_search($link, $links);
-         if ($loc != false)
+         $loc = array_search($link, $this->links, true);
+         echo $loc;
+         echo 'asdfaiujbaer';
+         if ($loc !== false)
          {
             //code to find if this Node is the DataFlows orgin or destination
-            if(isOrigin() == true)
+            if($this->isOrigin($link) == true)
             {
                //clear the origin of the link
-               $link->clearOrginNode();
+               $link->clearOriginNode();
             }
             else
             {
@@ -74,9 +76,9 @@ class Node extends Element
                $link->clearDestinationNode();
             }
             //remove the link from the list
-            unset($links($loc));
+            unset($this->links[$loc]);
             //normalize the indexes of the list
-            $links = array_values($links);
+            $this->links = array_values($this->links);
             return true;
          }
          else
@@ -90,7 +92,7 @@ class Node extends Element
       }
    }
    
-   private function isOrgin($link)
+   private function isOrigin($link)
    {
       if($link instanceof DataFlow)
       {
@@ -121,9 +123,9 @@ class Node extends Element
     */
    public function getLinkbyPosition($index)
    {
-      if ($index <= count($links) )
+      if ($index <= count($this->links) )
       {
-         return $links[$index];
+         return $this->links[$index];
       }
       else
       {
@@ -138,11 +140,11 @@ class Node extends Element
     */
    public function getLinkbyId($linkId)
    {
-      for ($i = 0; $i < count($links); $i++)
+      for ($i = 0; $i < count($this->links); $i++)
       {
-         if($links[$i]->getId() == $linkId)
+         if($this->links[$i]->getId() == $linkId)
          {
-            return $links[$i];
+            return $this->links[$i];
          }
       }
       return null;
@@ -153,9 +155,9 @@ class Node extends Element
     */
    public function removeAllLinks()
    {
-      while(count($links) != 0)
+      while(count($this->links) != 0)
       {
-         removeLink($links[0]);
+         removeLink($this->links[0]);
       }
    }
    //</editor-fold>
