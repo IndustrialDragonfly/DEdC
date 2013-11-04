@@ -142,9 +142,10 @@ Raphael.st.draggable = function (options) {
 
 /**
  * Create a canvas
- * container HTML element that the canvas will go in
- * width Width of the canvas in pixels
- * height Height of the canvas in pixels
+ * @constructor
+ * @param {string} container - DOM element's ID for the that will be the parent for the canvas
+ * @param {number} width - The width of the canvas in pixels
+ * @param {number} height - The height of the canvas in pixels
  */
 function Canvas(container, width, height) {	
 	// Create canvas with Raphael with given arguments
@@ -154,19 +155,23 @@ function Canvas(container, width, height) {
 
 	/**
 	 * Set the background color of the canvas
-	 * color Hex value of the color, i.e., '#A8A8A8'
+	 * @param {string} color - Hex value of the color, i.e., '#A8A8A8'
 	 */
 	this.setBackground = function(color) {
 		paper.canvas.style.backgroundColor = color;
 	}
 
+	/**
+	 * Get number of elements on the canvas
+	 * @return {number} Number of elements
+	 */
 	this.getNumberOfElements = function() {
 		return elements.length;
 	}
 
 	/**
 	 * Style a shape with the default styling
-	 * shape The shape to be styled
+	 * @param {Element} shape - The shape to be styled
 	 */
 	var styleShape = function(shape) {
 		shape.attr("fill", "#FFF");
@@ -176,8 +181,9 @@ function Canvas(container, width, height) {
 
 	/** 
 	 * Add a process element to the canvas at the given location
-	 * x Coordinate in pixels
-	 * y Coordinate in pixels
+	 * @param {number} x - Coordinate in pixels
+	 * @param {number} y - Coordinate in pixels
+	 * @return {Element} Element on canvas
 	 */
 	this.addProcess = function(x,y) {
 		var c = paper.circle(x,y,25);
@@ -192,8 +198,9 @@ function Canvas(container, width, height) {
 
 	/** 
 	 * Add a multi-process element to the canvas at the given location
-	 * x Coordinate in pixels
-	 * y Coordinate in pixels
+	 * @param {number} x - Coordinate in pixels
+	 * @param {number} y - Coordinate in pixels
+	 * @return {Element} Element on canvas
 	 */
 	this.addMultiProcess = function(x,y) {
 		var st = paper.set();
@@ -211,8 +218,9 @@ function Canvas(container, width, height) {
 
 	/** 
 	 * Add a datastore element to the canvas at the given location
-	 * x Coordinate in pixels
-	 * y Coordinate in pixels
+	 * @param {number} x - Coordinate in pixels
+	 * @param {number} y - Coordinate in pixels
+	 * @return {Element} Element on canvas
 	 */
 	this.addDatastore = function(x,y) {
 		x = x - 25;
@@ -237,8 +245,9 @@ function Canvas(container, width, height) {
 
 	/** 
 	 * Add a external interactor element to the canvas at the given location
-	 * x Coordinate in pixels
-	 * y Coordinate in pixels
+	 * @param {number} x - Coordinate in pixels
+	 * @param {number} y - Coordinate in pixels
+	 * @return {Element} Element on canvas
 	 */
 	this.addExtInteractor = function(x,y) {
 		var r = paper.rect(x - 25,y - 25,50,50);
