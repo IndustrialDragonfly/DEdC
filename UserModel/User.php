@@ -23,6 +23,10 @@ class User
      */
     public function __construct($Name, $Org)
     {
+        if ($Name == "" || $Org == "")
+        {
+            throw new InvalidArgumentException("Constructor requires a value for name and organization");
+        }
         $this->Name = $Name;
         $this->Organization = $Org;
         // Generate random ID
@@ -37,7 +41,13 @@ class User
      */
     public function setName($newName)
     {
-        $this->Name = $newName;
+        if ($newName == "")
+        {
+            throw new InvalidArgumentException("setName requires a value for name");
+        } else
+        {
+            $this->Name = $newName;
+        }
     }
 
     /**
@@ -64,7 +74,13 @@ class User
      */
     public function setOrganization($newOrg)
     {
-        $this->Organization = $newOrg;
+        if ($newOrg == "")
+        {
+            throw new InvalidArgumentException("setOrganization requires a value for organization");
+        } else
+        {
+            $this->Organization = $newOrg;
+        }
     }
 
     /**

@@ -12,7 +12,7 @@ class UserTest extends PHPUnit_Framework_TestCase
     protected $user;
 
     /**
-     * Sets up the fixture, for example, opens a network connection.
+     * Initializes default object for use
      * This method is called before a test is executed.
      */
     protected function setUp()
@@ -21,14 +21,47 @@ class UserTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
+     * @covers User::__construct
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Constructor requires a value for name and organization
+     * Tests that a null user throws an InvalidArgumentException
      */
-    protected function tearDown()
+    public function testNullUserConstruct()
     {
-        
+        $user_tmp = new User("", "TestOrg");
     }
-
+    
+     /**
+     * @covers User::__construct
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Constructor requires a value for name and organization
+     * Tests that a null organization throws an InvalidArgumentException
+     */
+    public function testNullOrgConstruct()
+    {
+        $user_tmp = new User("TestUser", "");
+    }
+    
+    /**
+     * @covers User::setName()
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage setName requires a value for name
+     */
+    public function testNullSetName()
+    {
+        $this->user->setName("");
+    }
+    
+    /**
+     * @covers User::setOrganization
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage setOrganization requires a value for organization
+     */
+    public function testNullSetOrganization()
+    {
+        $this->user->setOrganization("");
+    }
+    
     /**
      * @covers User::setName
      * Checks that new username can be set, and that when fetched
