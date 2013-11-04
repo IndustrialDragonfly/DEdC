@@ -1,11 +1,13 @@
 module("Canvas");
 
-test("Canvas Creation", function() {
+test("Canvas Creation", function()
+{
 	notEqual(canvas, undefined, "Test if canvas is undefined");
 	notEqual(canvas, null, "Test if canvas is null");
 });
 
-test("Add Process", function() {
+test("Add Process", function() 
+{
 	var p = canvas.addProcess(100, 100);
 	equal(p.x(), 100, "Test process x location");
 	equal(p.y(), 100, "Test process y location");
@@ -15,7 +17,8 @@ test("Add Process", function() {
 	p.remove();
 });
 
-test("Add External Interactor", function() {
+test("Add External Interactor", function() 
+{
 	var p = canvas.addExtInteractor(100, 100);
 	equal(p.x(), 75, "Test process x location");
 	equal(p.y(), 75, "Test process y location");
@@ -25,7 +28,8 @@ test("Add External Interactor", function() {
 	p.remove();
 });
 
-test("Advanced Bounding Box", function() {
+test("Advanced Bounding Box", function() 
+{
 	var x = 50;
 	var y = 50;
 	var p = canvas.addExtInteractor(50,50);
@@ -56,4 +60,4 @@ test("Advanced Bounding Box", function() {
 	deepEqual(b.right, {x: 75, y: 50}, "right middle point");
 
 	p.remove();
-})
+});

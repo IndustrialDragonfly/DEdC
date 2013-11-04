@@ -2,28 +2,32 @@
 /**
  * Make determining a shape's type more simple
  */ 
-Raphael.el.is = function (type) {
+Raphael.el.is = function (type)
+{
 	return this.type == (''+type).toLowerCase();
 };
 
 /**
  * Get shape's y position no matter which type it is
  */
-Raphael.el.x = function () {
+Raphael.el.x = function ()
+{
 	return this.is('circle') ? this.attr('cx') : this.attr('x');
 };
 
 /**
  * Get shape's x position no matter which type it is
  */
-Raphael.el.y = function () {
+Raphael.el.y = function ()
+{
 	return this.is('circle') ? this.attr('cy') : this.attr('y');
 };
 
 /**
  * Store shape's current position
  */
-Raphael.el.o = function () {
+Raphael.el.storeCurrentPosition = function ()
+{
 	this.ox = this.x();
 	this.oy = this.y();
 	return this;
@@ -38,7 +42,8 @@ Raphael.el.getABBox = function ()
 	// Get regular bounding box
 	var b = this.getBBox();
 
-	var o = {
+	var o = 
+	{
 		x: b.x,
 		y: b.y,
 		width: b.width,
@@ -56,22 +61,63 @@ Raphael.el.getABBox = function ()
 		yBottom: b.y + b.height
 	};
 
-
 	// produce a 3x3 combination of the above to derive 9 x,y coordinates
 	// center
-	o.center = {x: o.xCenter, y: o.yMiddle };
+	o.center = 
+	{
+		x: o.xCenter,
+		y: o.yMiddle
+	};
 
 	// edges
-	o.topLeft = {x: o.xLeft, y: o.yTop };
-	o.topRight = {x: o.xRight, y: o.yTop };
-	o.bottomLeft = {x: o.xLeft, y: o.yBottom };
-	o.bottomRight = {x: o.xRight, y: o.yBottom };
+	o.topLeft = 
+	{
+		x: o.xLeft,
+		y: o.yTop
+	};
+	
+	o.topRight = 
+	{
+		x: o.xRight, 
+		y: o.yTop 
+	};
+	
+	o.bottomLeft = 
+	{
+		x: o.xLeft,
+		y: o.yBottom
+	};
+	
+	o.bottomRight =
+	{
+		x: o.xRight,
+		y: o.yBottom 
+	};
 
 	// corners
-	o.top = {x: o.xCenter, y: o.yTop };
-	o.bottom = {x: o.xCenter, y: o.yBottom };
-	o.left = {x: o.xLeft, y: o.yMiddle };
-	o.right = {x: o.xRight, y: o.yMiddle };
+	o.top = 
+	{
+		x: o.xCenter,
+		y: o.yTop
+	};
+	
+	o.bottom = 
+	{
+		x: o.xCenter,
+		y: o.yBottom
+	};
+
+	o.left = 
+	{
+		x: o.xLeft,
+		y: o.yMiddle 
+	};
+	
+	o.right = 
+	{
+		x: o.xRight, 
+		y: o.yMiddle 
+	};
 
 	// shortcuts to get the offset of paper's canvas
 	o.offset = $(this.paper.canvas).parent().offset();
@@ -83,24 +129,24 @@ Raphael.el.getABBox = function ()
 /**
  * Make Element draggable
  */
-Raphael.el.draggable = function (options)
+Raphael.el.draggable = function (options) 
 {
-	$.extend(true, this, {
-		margin: 0
-	},options || {});
+	$.extend(true, this, {margin: 0}, options || {});
 
 	/**
 	 * Executed when the shape's drag starts
 	 */
-	var onStart = function () {
-		this.o().toFront();
+	var onStart = function () 
+	{
+		this.storeCurrentPosition().toFront();
 		this.animate({"fill-opacity": 0.7}, 100);
 	};
 
 	/**
 	 * Executed when the shape moves
 	 */
-	var onMove = function (dx, dy, mx, my, ev) {
+	var onMove = function (dx, dy, mx, my, ev) 
+	{
 		var b = this.getABBox();
 		var px = mx - b.offset.left,
 		py = my - b.offset.top,
@@ -122,7 +168,8 @@ Raphael.el.draggable = function (options)
 	/**
 	 * Executed when the shape's drag ends
 	 */
-	var onEnd = function () {
+	var onEnd = function () 
+	{
 		this.animate({"fill-opacity": 1.0}, 100);
 	};
 
@@ -135,8 +182,10 @@ Raphael.el.draggable = function (options)
 /**
  * Make Set draggable
  */
-Raphael.st.draggable = function (options) { 
-    for (var i in this.items) this.items[i].draggable(options); 
+Raphael.st.draggable = function (options) 
+{ 
+    for (var i in this.items)
+    	this.items[i].draggable(options); 
     return this;
 };
 
@@ -147,7 +196,8 @@ Raphael.st.draggable = function (options) {
  * @param {number} width - The width of the canvas in pixels
  * @param {number} height - The height of the canvas in pixels
  */
-function Canvas(container, width, height) {	
+function Canvas(container, width, height)
+{	
 	// Create canvas with Raphael with given arguments
 	var paper = Raphael(container, width, height);
 
@@ -157,7 +207,8 @@ function Canvas(container, width, height) {
 	 * Set the background color of the canvas
 	 * @param {string} color - Hex value of the color, i.e., '#A8A8A8'
 	 */
-	this.setBackground = function(color) {
+	this.setBackground = function(color) 
+	{
 		paper.canvas.style.backgroundColor = color;
 	}
 
@@ -165,7 +216,8 @@ function Canvas(container, width, height) {
 	 * Get number of elements on the canvas
 	 * @return {number} Number of elements
 	 */
-	this.getNumberOfElements = function() {
+	this.getNumberOfElements = function() 
+	{
 		return elements.length;
 	}
 
@@ -173,7 +225,8 @@ function Canvas(container, width, height) {
 	 * Style a shape with the default styling
 	 * @param {Element} shape - The shape to be styled
 	 */
-	var styleShape = function(shape) {
+	var styleShape = function(shape) 
+	{
 		shape.attr("fill", "#FFF");
 		shape.attr("stroke", "#000");
 		shape.attr("stroke-width", "1px");
@@ -185,7 +238,8 @@ function Canvas(container, width, height) {
 	 * @param {number} y - Coordinate in pixels
 	 * @return {Element} Element on canvas
 	 */
-	this.addProcess = function(x,y) {
+	this.addProcess = function(x,y) 
+	{
 		var c = paper.circle(x,y,25);
 		styleShape(c);
 
@@ -202,7 +256,8 @@ function Canvas(container, width, height) {
 	 * @param {number} y - Coordinate in pixels
 	 * @return {Element} Element on canvas
 	 */
-	this.addMultiProcess = function(x,y) {
+	this.addMultiProcess = function(x,y) 
+	{
 		var st = paper.set();
 		var c1 = paper.circle(x,y,25);
 		
@@ -222,7 +277,8 @@ function Canvas(container, width, height) {
 	 * @param {number} y - Coordinate in pixels
 	 * @return {Element} Element on canvas
 	 */
-	this.addDatastore = function(x,y) {
+	this.addDatastore = function(x,y) 
+	{
 		x = x - 25;
 		y = y - 25;
 		var st = paper.set();
@@ -249,7 +305,8 @@ function Canvas(container, width, height) {
 	 * @param {number} y - Coordinate in pixels
 	 * @return {Element} Element on canvas
 	 */
-	this.addExtInteractor = function(x,y) {
+	this.addExtInteractor = function(x,y) 
+	{
 		var r = paper.rect(x - 25,y - 25,50,50);
 		styleShape(r);
 
@@ -260,4 +317,3 @@ function Canvas(container, width, height) {
 		return r;
 	}
 }
-
