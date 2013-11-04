@@ -61,9 +61,14 @@ class Node extends Element
          //find if the link is in the list and get its location if it is
          $loc = array_search($link, $this->links, true);
          echo $loc;
-         echo 'asdfaiujbaer';
          if ($loc !== false)
          {
+            
+            //remove the link from the list
+            unset($this->links[$loc]);
+            //normalize the indexes of the list
+            $this->links = array_values($this->links);
+            
             //code to find if this Node is the DataFlows orgin or destination
             if($this->isOrigin($link) == true)
             {
@@ -75,10 +80,6 @@ class Node extends Element
                // clear the destination of the link
                $link->clearDestinationNode();
             }
-            //remove the link from the list
-            unset($this->links[$loc]);
-            //normalize the indexes of the list
-            $this->links = array_values($this->links);
             return true;
          }
          else
@@ -123,7 +124,7 @@ class Node extends Element
     */
    public function getLinkbyPosition($index)
    {
-      if ($index <= count($this->links) )
+      if ($index <= count($this->links) -1 )
       {
          return $this->links[$index];
       }
@@ -157,7 +158,7 @@ class Node extends Element
    {
       while(count($this->links) != 0)
       {
-         removeLink($this->links[0]);
+         $this->removeLink($this->links[0]);
       }
    }
    //</editor-fold>

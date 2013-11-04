@@ -82,40 +82,78 @@ class NodeTest extends PHPUnit_Framework_TestCase
 
    /**
     * @covers Node::removeLink
-    * @todo   Implement testRemoveLink().
     */
    public function testRemoveLink_smoke()
    {
       $aDF = new DataFlow;
       $aDF->setOriginNode($this->object);
-      //$this->object->addLink($aDF);
       $this->assertEquals(1, $this->object->getNumberOfLinks());
       $this->assertTrue($this->object->removeLink($aDF));
       $this->assertEquals(0, $this->object->getNumberOfLinks());
+      $this->assertNull($aDF->getOriginNode());
+   }
+   
+   /**
+    * @covers Node::removeLink
+    */
+   public function testRemoveLink_empty()
+   {
+      $aDF = new DataFlow;
+      $this->assertFalse($this->object->removeLink($aDF));
    }
 
    /**
     * @covers Node::getLinkbyPosition
-    * @todo   Implement testGetLinkbyPosition().
     */
-   public function testGetLinkbyPosition()
+   public function testGetLinkbyPosition_smoke()
    {
-      // Remove the following lines when you implement this test.
-      $this->markTestIncomplete(
-              'This test has not been implemented yet.'
-      );
+      $aDF = new DataFlow;
+      $aDF->setOriginNode($this->object);
+      $this->assertEquals($this->object->getLinkbyPosition(0), $aDF);
+   }
+   
+   /**
+    * @covers Node::getLinkbyPosition
+    * @expectedException BadFunctionCallException
+    */
+   public function testGetLinkbyPosition_null()
+   {
+      $this->object->getLinkbyPosition(0);
    }
 
    /**
     * @covers Node::getLinkbyId
-    * @todo   Implement testGetLinkbyId().
     */
-   public function testGetLinkbyId()
+   public function testGetLinkbyId_smoke()
    {
-      // Remove the following lines when you implement this test.
-      $this->markTestIncomplete(
-              'This test has not been implemented yet.'
-      );
+      $aDF = new DataFlow;
+      $aDF->setOriginNode($this->object);
+      $this->assertEquals($aDF, $this->object->getLinkbyId($aDF->getId()));
+   }
+   
+   /**
+    * @covers Node::getLinkbyId
+    * looking for something not in the list
+    */
+   public function testGetLinkbyId_null()
+   {
+      $aDF = new DataFlow;
+      $this->assertNull($this->object->getLinkbyId($aDF->getId()));
+   }
+   
+   /**
+    * @covers Node::getLinkbyId
+    */
+   public function testGetLinkbyId_BiggerSmoke()
+   {
+      $aDF = new DataFlow;
+      $aDF->setOriginNode($this->object);
+      for($i = 0; $i<10; $i++)
+      {
+         $annotherDF = new DataFlow;
+         $annotherDF->setOriginNode($this->object);
+      }
+      $this->assertEquals($aDF, $this->object->getLinkbyId($aDF->getId()));
    }
 
    /**
@@ -124,10 +162,15 @@ class NodeTest extends PHPUnit_Framework_TestCase
     */
    public function testRemoveAllLinks()
    {
-      // Remove the following lines when you implement this test.
-      $this->markTestIncomplete(
-              'This test has not been implemented yet.'
-      );
+      for($i = 0; $i<10; $i++)
+      {
+         $annotherDF = new DataFlow;
+         $annotherDF->setOriginNode($this->object);
+      }
+      $this->assertEquals(10, $this->object->getNumberOfLinks());
+      $this->object->removeAllLinks();
+      $this->assertEquals(0, $this->object->getNumberOfLinks());
+      $this->assertNull($annotherDF->getOriginNode());
    }
 
 }
