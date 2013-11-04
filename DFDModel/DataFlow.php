@@ -1,5 +1,5 @@
 <?php
-include_once 'Element.php';
+require_once 'Element.php';
 /**
  * Description of DataFlow
  *

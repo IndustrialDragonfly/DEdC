@@ -1,5 +1,6 @@
 <?php
-include_once 'Node.php';
+require_once 'Node.php';
+require_once 'DataFlowDiagram.php';
 /**
  * Description of Multiprocess
  *
@@ -70,10 +71,10 @@ class Multiprocess extends Node
     */
    public function removeLink($link)
    {
-      if($newLink instanceof DataFlow)
+      if($link instanceof DataFlow)
       {
          //find if the link is in the list and get its location if it is
-         $loc = array_search($link, $this->links);
+         $loc = array_search($link, $this->links, true);
          if ($loc !== false)
          {
             //remove the link from the list
@@ -81,6 +82,17 @@ class Multiprocess extends Node
             //normalize the indexes of the list
             $this->links = array_values($this->links);
             $this->subDataFlowDiagram->removeExternalLink($link);
+            //code to find if this Node is the DataFlows orgin or destination
+            if($this->isOrigin($link) == true)
+            {
+               //clear the origin of the link
+               $link->clearOriginNode();
+            }
+            else
+            {
+               // clear the destination of the link
+               $link->clearDestinationNode();
+            }
             return true;
          }
          else
@@ -89,6 +101,29 @@ class Multiprocess extends Node
          }
       }
       else
+      {
+         throw new BadFunctionCallException("input parameter was not a DataFlow");
+      }
+   }
+   
+   private function isOrigin($link)
+   {
+      if($link instanceof DataFlow)
+      {
+         if ($this == $link->getOriginNode())
+         {
+            return TRUE;
+         }
+         elseif ($this == $link->getDestinationNode())
+         {
+            return FALSE;
+         }
+         else
+         {
+            throw new BadFunctionCallException("This DataFlow is not connected to this Node");
+         }
+      }
+      else 
       {
          throw new BadFunctionCallException("input parameter was not a DataFlow");
       }

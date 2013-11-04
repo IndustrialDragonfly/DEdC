@@ -1,5 +1,5 @@
 <?php
-include_once 'Node.php';
+require_once 'Node.php';
 /**
  * Description of ExternalInteractor
  *

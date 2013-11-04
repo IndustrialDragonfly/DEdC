@@ -60,7 +60,6 @@ class Node extends Element
       {
          //find if the link is in the list and get its location if it is
          $loc = array_search($link, $this->links, true);
-         echo $loc;
          if ($loc !== false)
          {
             
