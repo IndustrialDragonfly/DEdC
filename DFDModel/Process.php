@@ -5,7 +5,7 @@ include_once 'Node.php';
  *
  * @author Josh Clark
  */
-class Process
+class Process extends Node
 {
 
    //<editor-fold desc="Attributes" defaultstate="collapsed">
