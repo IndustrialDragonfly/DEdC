@@ -1,192 +1,42 @@
-// Additions to Raphael
 /**
- * Make determining a shape's type more simple
- */ 
-Raphael.el.is = function (type)
-{
-	return this.type == (''+type).toLowerCase();
-};
-
-/**
- * Get shape's y position no matter which type it is
+ * Make Raphael Set draggable
  */
-Raphael.el.x = function ()
+Raphael.st.draggable = function()
 {
-	return this.is('circle') ? this.attr('cx') : this.attr('x');
-};
+	// Cache Set so elements can use it
+	var parent = this;
 
-/**
- * Get shape's x position no matter which type it is
- */
-Raphael.el.y = function ()
-{
-	return this.is('circle') ? this.attr('cy') : this.attr('y');
-};
+	// Transform location
+	var tx = 0,
+		ty = 0;
 
-/**
- * Store shape's current position
- */
-Raphael.el.storeCurrentPosition = function ()
-{
-	this.ox = this.x();
-	this.oy = this.y();
-	return this;
-};
+	// Drag origin
+	var ox = 0,
+		oy = 0;
 
-/**
- * Get Advanced Bounding Box
- * returns Regular BBox with a few extra calculations
- */
-Raphael.el.getABBox = function ()
-{
-	// Get regular bounding box
-	var b = this.getBBox();
-
-	var o = 
+	var onMove = function(dx, dy)
 	{
-		x: b.x,
-		y: b.y,
-		width: b.width,
-		height: b.height,
-
-		// x coordinates: left edge, center, and right edge
-		xLeft: b.x,
-		xCenter: b.x + b.width / 2,
-		xRight: b.x + b.width,
-
-
-		// y coordinates: top edge, middle, and bottom edge
-		yTop: b.y,
-		yMiddle: b.y + b.height / 2,
-		yBottom: b.y + b.height
-	};
-
-	// produce a 3x3 combination of the above to derive 9 x,y coordinates
-	// center
-	o.center = 
-	{
-		x: o.xCenter,
-		y: o.yMiddle
-	};
-
-	// edges
-	o.topLeft = 
-	{
-		x: o.xLeft,
-		y: o.yTop
+		// Add delta to transform location
+		tx = dx + ox;
+		ty = dy + oy;
+		parent.transform('t' + tx + ',' + ty);
 	};
 	
-	o.topRight = 
+	var onStart = function()
 	{
-		x: o.xRight, 
-		y: o.yTop 
+		parent.toFront();
 	};
 	
-	o.bottomLeft = 
+	var onEnd = function() 
 	{
-		x: o.xLeft,
-		y: o.yBottom
-	};
-	
-	o.bottomRight =
-	{
-		x: o.xRight,
-		y: o.yBottom 
-	};
-
-	// corners
-	o.top = 
-	{
-		x: o.xCenter,
-		y: o.yTop
-	};
-	
-	o.bottom = 
-	{
-		x: o.xCenter,
-		y: o.yBottom
-	};
-
-	o.left = 
-	{
-		x: o.xLeft,
-		y: o.yMiddle 
-	};
-	
-	o.right = 
-	{
-		x: o.xRight, 
-		y: o.yMiddle 
-	};
-
-	// shortcuts to get the offset of paper's canvas
-	o.offset = $(this.paper.canvas).parent().offset();
-
-	return o;
-};
-
-
-/**
- * Make Element draggable
- */
-Raphael.el.draggable = function (options) 
-{
-	$.extend(true, this, {margin: 0}, options || {});
-
-	/**
-	 * Executed when the shape's drag starts
-	 */
-	var onStart = function () 
-	{
-		this.storeCurrentPosition().toFront();
-		this.animate({"fill-opacity": 0.7}, 100);
-	};
-
-	/**
-	 * Executed when the shape moves
-	 */
-	var onMove = function (dx, dy, mx, my, ev) 
-	{
-		var b = this.getABBox();
-		var px = mx - b.offset.left,
-		py = my - b.offset.top,
-		x = this.ox + dx,
-		y = this.oy + dy,
-		r = this.is('circle') ? b.width / 2 : 0;
-
-		// Clamp shape to canvas
-		var x = Math.min(Math.max(0 + this.margin + (this.is('circle') ? r : 0), x),
-			this.paper.width - (this.is('circle') ? r : b.width) - this.margin);
-		
-		var y = Math.min(Math.max(0 + this.margin + (this.is('circle') ? r : 0), y),
-			this.paper.height - (this.is('circle') ? r : b.height) - this.margin);
-
-		var pos = { x: x, y: y, cx: x, cy: y };
-			this.attr(pos);
-	};
-
-	/**
-	 * Executed when the shape's drag ends
-	 */
-	var onEnd = function () 
-	{
-		this.animate({"fill-opacity": 1.0}, 100);
+		// Store for next drag origin
+		ox = tx;
+		oy = ty;
 	};
 
 	this.drag(onMove, onStart, onEnd);
 
 	return this;
-};
-
-
-/**
- * Make Set draggable
- */
-Raphael.st.draggable = function (options) 
-{ 
-    for (var i in this.items)
-    	this.items[i].draggable(options); 
-    return this;
 };
 
 /**
@@ -210,7 +60,7 @@ function Canvas(container, width, height)
 	this.setBackground = function(color) 
 	{
 		paper.canvas.style.backgroundColor = color;
-	}
+	};
 
 	/**
 	 * Get number of elements on the canvas
@@ -219,7 +69,7 @@ function Canvas(container, width, height)
 	this.getNumberOfElements = function() 
 	{
 		return elements.length;
-	}
+	};
 
 	/**
 	 * Style a shape with the default styling
@@ -230,7 +80,7 @@ function Canvas(container, width, height)
 		shape.attr("fill", "#FFF");
 		shape.attr("stroke", "#000");
 		shape.attr("stroke-width", "1px");
-	}
+	};
 
 	/** 
 	 * Add a process element to the canvas at the given location
@@ -240,15 +90,16 @@ function Canvas(container, width, height)
 	 */
 	this.addProcess = function(x,y) 
 	{
-		var c = paper.circle(x,y,25);
-		styleShape(c);
+		var st = paper.set();
+		st.push(paper.circle(x,y,25));
+		styleShape(st);
 
-		c.draggable();
+		st.draggable();
 
-		elements.push(c);
+		elements.push(st);
 
-		return c;
-	}
+		return st;
+	};
 
 	/** 
 	 * Add a multi-process element to the canvas at the given location
@@ -266,10 +117,12 @@ function Canvas(container, width, height)
 		st.push(c1,c2);
 		styleShape(st);
 
+		st.draggable();
+
 		elements.push(st);
 		
 		return st;
-	}
+	};
 
 	/** 
 	 * Add a datastore element to the canvas at the given location
@@ -294,10 +147,12 @@ function Canvas(container, width, height)
 		
 		st.push(p1,p2,rec);
 
+		st.draggable();
+
 		elements.push(st);
 		
 		return st;
-	}
+	};
 
 	/** 
 	 * Add a external interactor element to the canvas at the given location
@@ -307,13 +162,14 @@ function Canvas(container, width, height)
 	 */
 	this.addExtInteractor = function(x,y) 
 	{
-		var r = paper.rect(x - 25,y - 25,50,50);
-		styleShape(r);
+		var st = paper.set();
+		st.push(paper.rect(x - 25,y - 25,50,50));
+		styleShape(st);
 
-		r.draggable();
+		st.draggable();
 
-		elements.push(r);
+		elements.push(st);
 
-		return r;
-	}
-}
+		return st;
+	};
+};
