@@ -20,6 +20,7 @@ class User
      * a regular User object.
      * @param String $Name
      * @param String $Org
+     * @throws InvalidArgumentException if empty string passed for name or organization
      */
     public function __construct($Name, $Org)
     {
@@ -38,6 +39,7 @@ class User
     /**
      * Sets the name of the user
      * @param String $newName
+     * @throw InvalidArgumentException thrown when newName is an empty string
      */
     public function setName($newName)
     {
@@ -71,6 +73,7 @@ class User
     /**
      * Sets a new organization for the user
      * @param String $newOrg
+     * @throws InvalidArgumentException when newOrg is empty string
      */
     public function setOrganization($newOrg)
     {
