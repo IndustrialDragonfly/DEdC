@@ -66,7 +66,7 @@ function Canvas(container, width, height)
 	 * Get number of elements on the canvas
 	 * @return {number} Number of elements
 	 */
-	this.getNumberOfElements = function() 
+	this.getNumberOfElements = function()
 	{
 		return elements.length;
 	};
@@ -75,7 +75,7 @@ function Canvas(container, width, height)
 	 * Style a shape with the default styling
 	 * @param {Element} shape - The shape to be styled
 	 */
-	var styleShape = function(shape) 
+	var styleShape = function(shape)
 	{
 		shape.attr("fill", "#FFF");
 		shape.attr("stroke", "#000");
@@ -86,90 +86,146 @@ function Canvas(container, width, height)
 	 * Add a process element to the canvas at the given location
 	 * @param {number} x - Coordinate in pixels
 	 * @param {number} y - Coordinate in pixels
-	 * @return {Element} Element on canvas
+	 * @return {Process} Element on canvas
 	 */
-	this.addProcess = function(x,y) 
+	this.addProcess = function(x,y)
 	{
-		var st = paper.set();
-		st.push(paper.circle(x,y,25));
-		styleShape(st);
+		var e = new Process(x,y);
+		elements.push(e);
 
-		st.draggable();
-
-		elements.push(st);
-
-		return st;
+		return e;
 	};
 
 	/** 
 	 * Add a multi-process element to the canvas at the given location
 	 * @param {number} x - Coordinate in pixels
 	 * @param {number} y - Coordinate in pixels
-	 * @return {Element} Element on canvas
+	 * @return {MultiProcess} Element on canvas
 	 */
-	this.addMultiProcess = function(x,y) 
+	this.addMultiProcess = function(x,y)
 	{
-		var st = paper.set();
-		var c1 = paper.circle(x,y,25);
-		
-		var c2 = paper.circle(x,y,18);
-		
-		st.push(c1,c2);
-		styleShape(st);
+		var e = new MultiProcess(x,y);
+		elements.push(e);
 
-		st.draggable();
-
-		elements.push(st);
-		
-		return st;
+		return e;
 	};
 
 	/** 
 	 * Add a datastore element to the canvas at the given location
 	 * @param {number} x - Coordinate in pixels
 	 * @param {number} y - Coordinate in pixels
-	 * @return {Element} Element on canvas
+	 * @return {Datastore} Element on canvas
 	 */
-	this.addDatastore = function(x,y) 
+	this.addDatastore = function(x,y)
 	{
-		x = x - 25;
-		y = y - 25;
-		var st = paper.set();
-		var p1 = paper.path("M" + x + " " + y + " L" + (x+50) + " " + y + " Z");
-		styleShape(p1);
-		
-		var p2 = paper.path("M" + x + " " + (y+50) + " L" + (x+50) + " " + (y+50) + " Z");
-		styleShape(p2);
-		
-		var rec = paper.rect((x), (y+1), 50, 48);
-		rec.attr("stroke-width", 0);
-		rec.attr("fill", "#FFF");
-		
-		st.push(p1,p2,rec);
+		var e = new Datastore(x,y);
+		elements.push(e);
 
-		st.draggable();
-
-		elements.push(st);
-		
-		return st;
+		return e;
 	};
 
 	/** 
 	 * Add a external interactor element to the canvas at the given location
 	 * @param {number} x - Coordinate in pixels
 	 * @param {number} y - Coordinate in pixels
-	 * @return {Element} Element on canvas
+	 * @return {ExtInteractor} Element on canvas
 	 */
-	this.addExtInteractor = function(x,y) 
+	this.addExtInteractor = function(x,y)
 	{
-		var st = paper.set();
-		st.push(paper.rect(x - 25,y - 25,50,50));
-		styleShape(st);
+		var e = new ExtInteractor(x,y);
+		elements.push(e);
 
-		st.draggable();
+		return e;
+	};
 
-		elements.push(st);
+	/**
+	 * Remove an element from the canvas
+	 * @param {Element} element - Element to remove from the canvas
+	 * @return {boolean} TRUE if the element was removed, FALSE otherwise
+	 */
+	this.remove = function(element)
+	{
+		var index = elements.indexOf(element);
+		if (index > -1)
+		{
+			elements.splice(index, 1);
+			return true;
+		}
+		return false;
+	};
+	
+	/**
+	 * Create a Process element
+	 * @constructor
+	 * @param {number} x - Coordinate in pixels
+	 * @param {number} y - Coordinate in pixels
+	 */
+	var Process = function(x,y)
+	{
+		var set = paper.set();
 
-		return st;
+		set.push(paper.circle(x,y,25));
+		styleShape(set);
+
+		set.draggable();
+	};
+
+	/**
+	 * Create a MultiProcess element
+	 * @constructor
+	 * @param {number} x - Coordinate in pixels
+	 * @param {number} y - Coordinate in pixels
+	 */
+	var MultiProcess = function(x,y)
+	{
+		var set = paper.set();
+
+		set.push(paper.circle(x,y,25),paper.circle(x,y,18));
+		styleShape(set);
+
+		set.draggable();
+	};
+
+	/**
+	 * Create a Datastore element
+	 * @constructor
+	 * @param {number} x - Coordinate in pixels
+	 * @param {number} y - Coordinate in pixels
+	 */
+	var Datastore = function(x,y)
+	{
+		var set = paper.set();
+
+		x = x - 25;
+		y = y - 25;
+
+		set.push(
+			paper.path("M" + x + " " + y + " L" + (x+50) + " " + y + " Z"),
+			paper.path("M" + x + " " + (y+50) + " L" + (x+50) + " " + (y+50) + " Z")
+			);
+		styleShape(set);
+		
+		var rec = paper.rect((x), (y+1), 50, 48);
+		rec.attr("stroke-width", 0);
+		rec.attr("fill", "#FFF");
+		set.push(rec);
+		
+		set.draggable();
+	};
+
+	/**
+	 * Create a External-interactor element
+	 * @constructor
+	 * @param {number} x - Coordinate in pixels
+	 * @param {number} y - Coordinate in pixels
+	 */
+	var ExtInteractor = function(x,y)
+	{
+		var set = paper.set();
+
+		set.push(paper.rect(x - 25,y - 25,50,50));
+		styleShape(set);
+				
+		set.draggable();
 	};
 };
