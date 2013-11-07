@@ -20,6 +20,9 @@ Raphael.st.draggable = function()
 		tx = dx + ox;
 		ty = dy + oy;
 		parent.transform('t' + tx + ',' + ty);
+
+		// Recalculate all of the Dataflows for the moved element
+		canvas.calcDataflows();
 	};
 	
 	var onStart = function()
@@ -52,6 +55,7 @@ function Canvas(container, width, height)
 	var paper = Raphael(container, width, height);
 
 	var elements = new Array();
+	var dataflows = new Array();
 
 	/**
 	 * Set the background color of the canvas
@@ -63,12 +67,21 @@ function Canvas(container, width, height)
 	};
 
 	/**
-	 * Get number of elements on the canvas
-	 * @return {number} Number of elements
+	 * Get number of Elements on the canvas
+	 * @return {number} Number of Elements
 	 */
 	this.getNumberOfElements = function()
 	{
 		return elements.length;
+	};
+
+	/**
+	 * Get number of Dataflows on the canvas
+	 * @return {number} Number of Dataflows
+	 */
+	this.getNumberOfDataflows = function()
+	{
+		return dataflows.length;
 	};
 
 	/**
@@ -139,11 +152,25 @@ function Canvas(container, width, height)
 	};
 
 	/**
+	 * Add a dataflow to the cavas between the two elements
+	 * @param {Element} source - Source of the Dataflow
+	 * @param {Element} target - Target of the Dataflow
+	 * @return {Dataflow} Dataflow on the canvas
+	 */
+	this.addDataflow = function(source, target)
+	{
+		var d = new Dataflow(source,target);
+		dataflows.push(d);
+
+		return d;
+	}
+
+	/**
 	 * Remove an element from the canvas
 	 * @param {Element} element - Element to remove from the canvas
 	 * @return {boolean} TRUE if the element was removed, FALSE otherwise
 	 */
-	this.remove = function(element)
+	this.removeElement = function(element)
 	{
 		var index = elements.indexOf(element);
 		if (index > -1)
@@ -153,6 +180,33 @@ function Canvas(container, width, height)
 		}
 		return false;
 	};
+
+	/**
+	 * Remove a Dataflow from the canvas
+	 * @param {Dataflow} dataflow - Dataflow to remove from the canvas
+	 * @return {boolean} TRUE if the element was removed, FALSE otherwise
+	 */
+	this.removeDataflow = function(dataflow)
+	{
+		var index = dataflows.indexOf(dataflow);
+		if (index > -1)
+		{
+			dataflows.splice(index, 1);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Recalculate all Dataflows in the canvas
+	 */
+	this.calcDataflows = function()
+	{
+		for (var i = 0; i < dataflows.length; i++)
+		{
+			dataflows[i].calcPath();
+		}
+	}
 	
 	/**
 	 * Create a Process element
@@ -168,6 +222,15 @@ function Canvas(container, width, height)
 		styleShape(set);
 
 		set.draggable();
+
+		/**
+		 * Get the bounding box for the Element
+		 * @returns {Raphael.BBox}
+		 */
+		this.getBBox = function()
+		{
+			return set.getBBox();
+		};
 	};
 
 	/**
@@ -211,6 +274,15 @@ function Canvas(container, width, height)
 		set.push(rec);
 		
 		set.draggable();
+
+		/**
+		 * Get the bounding box for the Element
+		 * @returns {Raphael.BBox}
+		 */
+		this.getBBox = function()
+		{
+			return set.getBBox();
+		};
 	};
 
 	/**
@@ -227,5 +299,89 @@ function Canvas(container, width, height)
 		styleShape(set);
 				
 		set.draggable();
+	};
+
+	/**
+	 * Create a Dataflow from source to target
+	 * @constructor
+	 * @param {Element} source - Source of the Dataflow
+	 * @param {Element} target - Target of the Dataflow
+	 */
+	var Dataflow = function(source,target)
+	{
+		var source = source;
+		var target = target;
+		var path;
+
+		/**
+		 * Get the attach points for an Element
+		 * @param {Element} element - The element to get the attach points off
+		 * @returns {Array} Array of four points (x,y)
+		 */
+		var getAttachPoints = function(element)
+		{
+			var bb = element.getBBox();
+			var sP = new Array();
+			sP.push({x: bb.x, y: bb.y + bb.height / 2});
+			sP.push({x: bb.x + bb.width / 2, y: bb.y});
+			sP.push({x: bb.x + bb.width, y: bb.y + bb.height / 2});
+			sP.push({x: bb.x + bb.width / 2, y: bb.y + bb.height});
+
+			return sP;
+		};
+
+		/**
+		 * Calculate Dataflow's path as the minium between the two Elements
+		 */
+		this.calcPath = function() {
+			var sP = getAttachPoints(source);
+			var tP = getAttachPoints(target);
+			var sIndex = 0; // Shortest point index for source
+			var tIndex = 0; // Shortest point index for source
+			var min; // Minimum length
+
+			// Loop through all of the attach points for both Elements
+			for (var i = 0; i < sP.length; i++)
+			{
+				for (var j = 0; j < tP.length; j++)
+				{
+					// Calculate vector's length (sqrt(a^2 + b^2))
+					var dx = Math.abs(sP[i].x - tP[j].x);
+					var dy = Math.abs(sP[i].y - tP[j].y);
+					var length = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+					if (min)
+					{
+						// Check if new vector is minimum
+						if (length < min)
+						{
+							sIndex = i;
+							tIndex = j;
+							min = length;
+						}
+					} 
+					else // No previous minimum existed
+					{
+						sIndex = i;
+						tIndex = j;
+						min = length;
+					}
+				}
+			}
+			var pathString = "M" + sP[sIndex].x + " " + sP[sIndex].y + " L" + tP[tIndex].x + " " + tP[tIndex].y + " Z";
+
+			if (path)
+			{
+				// Path existed, update
+				path.attr({path: pathString});
+			}
+			else
+			{
+				// Path did not exist, create
+				path = paper.path(pathString);
+			}
+		};
+
+		// Initially calculate the path
+		this.calcPath();
 	};
 };
