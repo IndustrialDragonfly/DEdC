@@ -84,17 +84,6 @@ function Canvas(container, width, height)
 		return dataflows.length;
 	};
 
-	/**
-	 * Style a shape with the default styling
-	 * @param {Element} shape - The shape to be styled
-	 */
-	var styleShape = function(shape)
-	{
-		shape.attr("fill", "#FFF");
-		shape.attr("stroke", "#000");
-		shape.attr("stroke-width", "1px");
-	};
-
 	/** 
 	 * Add a process element to the canvas at the given location
 	 * @param {number} x - Coordinate in pixels
@@ -206,7 +195,62 @@ function Canvas(container, width, height)
 		{
 			dataflows[i].calcPath();
 		}
-	}
+	};
+
+	/**
+	 * Base Class for all Elements
+	 * @constructor
+	 */
+	var Element = function()
+	{
+		var set = paper.set();
+
+		/**
+		 * Add a shape to the Element
+		 * @param {Raphael.Shape} shape - Shape to add
+		 */
+		this.push = function(shape)
+		{
+			set.push(shape);
+		};
+
+		/**
+		 * Get Set of Shapes
+		 * @returns {Raphael.Set} Set of Shapes
+		 */
+		this.getSet = function()
+		{
+			return set;
+		};
+
+		/**
+		 * Make the Element draggable, any elements added after 
+		 * draggable is called will not function properly
+		 */
+		this.draggable = function()
+		{
+			set.draggable();
+		};
+
+		/**
+		 * Style all of the Shapes with the default styling
+		 */
+		this.applyDefaultStyle = function()
+		{
+			set.attr("fill", "#FFF");
+			set.attr("stroke", "#000");
+			set.attr("stroke-width", "1px");
+		};
+
+		/**
+		 * Get the bounding box for the Element
+		 * @returns {Raphael.BBox}
+		 */
+		this.getBBox = function()
+		{
+			return set.getBBox();
+		};
+	};
 	
 	/**
 	 * Create a Process element
@@ -216,22 +260,14 @@ function Canvas(container, width, height)
 	 */
 	var Process = function(x,y)
 	{
-		var set = paper.set();
+		Element.call(this); // Call parent constructor
 
-		set.push(paper.circle(x,y,25));
-		styleShape(set);
-
-		set.draggable();
-
-		/**
-		 * Get the bounding box for the Element
-		 * @returns {Raphael.BBox}
-		 */
-		this.getBBox = function()
-		{
-			return set.getBBox();
-		};
+		this.push(paper.circle(x,y,25));
+		this.applyDefaultStyle();
+		this.draggable();
 	};
+	Process.prototype = new Element(); // Inherit Element
+	Process.prototype.constructor = Process; // Fix the constructor pointer
 
 	/**
 	 * Create a MultiProcess element
@@ -241,13 +277,14 @@ function Canvas(container, width, height)
 	 */
 	var MultiProcess = function(x,y)
 	{
-		var set = paper.set();
+		Element.call(this);
 
-		set.push(paper.circle(x,y,25),paper.circle(x,y,18));
-		styleShape(set);
-
-		set.draggable();
+		this.push(paper.circle(x,y,25),paper.circle(x,y,18));
+		this.applyDefaultStyle();
+		this.draggable();
 	};
+	MultiProcess.prototype = new Element();
+	MultiProcess.prototype.constructor = MultiProcess;
 
 	/**
 	 * Create a Datastore element
@@ -257,33 +294,26 @@ function Canvas(container, width, height)
 	 */
 	var Datastore = function(x,y)
 	{
-		var set = paper.set();
+		Element.call(this);
 
 		x = x - 25;
 		y = y - 25;
 
-		set.push(
+		this.push(
 			paper.path("M" + x + " " + y + " L" + (x+50) + " " + y + " Z"),
 			paper.path("M" + x + " " + (y+50) + " L" + (x+50) + " " + (y+50) + " Z")
 			);
-		styleShape(set);
+		this.applyDefaultStyle();
 		
 		var rec = paper.rect((x), (y+1), 50, 48);
 		rec.attr("stroke-width", 0);
 		rec.attr("fill", "#FFF");
-		set.push(rec);
+		this.push(rec);
 		
-		set.draggable();
-
-		/**
-		 * Get the bounding box for the Element
-		 * @returns {Raphael.BBox}
-		 */
-		this.getBBox = function()
-		{
-			return set.getBBox();
-		};
+		this.draggable();
 	};
+	Datastore.prototype = new Element();
+	Datastore.prototype.constructor = Datastore;
 
 	/**
 	 * Create a External-interactor element
@@ -293,13 +323,14 @@ function Canvas(container, width, height)
 	 */
 	var ExtInteractor = function(x,y)
 	{
-		var set = paper.set();
+		Element.call(this);
 
-		set.push(paper.rect(x - 25,y - 25,50,50));
-		styleShape(set);
-				
-		set.draggable();
+		this.push(paper.rect(x - 25,y - 25,50,50));
+		this.applyDefaultStyle();		
+		this.draggable();
 	};
+	ExtInteractor.prototype = new Element();
+	ExtInteractor.prototype.constructor = ExtInteractor;
 
 	/**
 	 * Create a Dataflow from source to target
@@ -321,13 +352,13 @@ function Canvas(container, width, height)
 		var getAttachPoints = function(element)
 		{
 			var bb = element.getBBox();
-			var sP = new Array();
-			sP.push({x: bb.x, y: bb.y + bb.height / 2});
-			sP.push({x: bb.x + bb.width / 2, y: bb.y});
-			sP.push({x: bb.x + bb.width, y: bb.y + bb.height / 2});
-			sP.push({x: bb.x + bb.width / 2, y: bb.y + bb.height});
+			var points = new Array();
+			points.push({x: bb.x, y: bb.y + bb.height / 2}); // Left
+			points.push({x: bb.x + bb.width / 2, y: bb.y}); // Top
+			points.push({x: bb.x + bb.width, y: bb.y + bb.height / 2}); // Right
+			points.push({x: bb.x + bb.width / 2, y: bb.y + bb.height}); // Bottom
 
-			return sP;
+			return points;
 		};
 
 		/**
