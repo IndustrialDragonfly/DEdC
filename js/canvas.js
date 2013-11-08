@@ -1,10 +1,13 @@
 /**
  * Make Raphael Set draggable
+ * @param {Function} callback - Function to call when an object has been moved
  */
-Raphael.st.draggable = function()
+Raphael.st.draggable = function(callback)
 {
 	// Cache Set so elements can use it
 	var parent = this;
+
+	var canvas = canvas;
 
 	// Transform location
 	var tx = 0,
@@ -21,8 +24,9 @@ Raphael.st.draggable = function()
 		ty = dy + oy;
 		parent.transform('t' + tx + ',' + ty);
 
-		// Recalculate all of the Dataflows for the moved element
-		canvas.calcDataflows();
+		// Recalculate all of the Dataflows
+		// TODO: Optimize, only affected Dataflows should be calculated
+		callback();
 	};
 	
 	var onStart = function()
@@ -54,6 +58,7 @@ function Canvas(container, width, height)
 	// Create canvas with Raphael with given arguments
 	var paper = Raphael(container, width, height);
 
+	// Element and Dataflow arrays
 	var elements = new Array();
 	var dataflows = new Array();
 
@@ -92,7 +97,7 @@ function Canvas(container, width, height)
 	 */
 	this.addProcess = function(x,y)
 	{
-		var e = new Process(x,y);
+		var e = new Process(this,x,y);
 		elements.push(e);
 
 		return e;
@@ -106,7 +111,7 @@ function Canvas(container, width, height)
 	 */
 	this.addMultiProcess = function(x,y)
 	{
-		var e = new MultiProcess(x,y);
+		var e = new MultiProcess(this,x,y);
 		elements.push(e);
 
 		return e;
@@ -120,7 +125,7 @@ function Canvas(container, width, height)
 	 */
 	this.addDatastore = function(x,y)
 	{
-		var e = new Datastore(x,y);
+		var e = new Datastore(this,x,y);
 		elements.push(e);
 
 		return e;
@@ -134,7 +139,7 @@ function Canvas(container, width, height)
 	 */
 	this.addExtInteractor = function(x,y)
 	{
-		var e = new ExtInteractor(x,y);
+		var e = new ExtInteractor(this,x,y);
 		elements.push(e);
 
 		return e;
@@ -152,7 +157,7 @@ function Canvas(container, width, height)
 		dataflows.push(d);
 
 		return d;
-	}
+	};
 
 	/**
 	 * Remove an element from the canvas
@@ -184,7 +189,7 @@ function Canvas(container, width, height)
 			return true;
 		}
 		return false;
-	}
+	};
 
 	/**
 	 * Recalculate all Dataflows in the canvas
@@ -200,10 +205,12 @@ function Canvas(container, width, height)
 	/**
 	 * Base Class for all Elements
 	 * @constructor
+	 * @param {Cavas} canvas - Canvas Object
 	 */
-	var Element = function()
+	var Element = function(canvas)
 	{
-		var set = paper.set();
+		var set = paper.set(); // Raphael.Set for shapes
+		var canvas = canvas; // Internal reference to canvas
 
 		/**
 		 * Add a shape to the Element
@@ -229,7 +236,7 @@ function Canvas(container, width, height)
 		 */
 		this.draggable = function()
 		{
-			set.draggable();
+			set.draggable(canvas.calcDataflows);
 		};
 
 		/**
@@ -255,12 +262,13 @@ function Canvas(container, width, height)
 	/**
 	 * Create a Process element
 	 * @constructor
+	 * @param {Cavas} canvas - Canvas Object
 	 * @param {number} x - Coordinate in pixels
 	 * @param {number} y - Coordinate in pixels
 	 */
-	var Process = function(x,y)
+	var Process = function(canvas,x,y)
 	{
-		Element.call(this); // Call parent constructor
+		Element.call(this, canvas); // Call parent constructor
 
 		this.push(paper.circle(x,y,25));
 		this.applyDefaultStyle();
@@ -272,12 +280,13 @@ function Canvas(container, width, height)
 	/**
 	 * Create a MultiProcess element
 	 * @constructor
+	 * @param {Cavas} canvas - Canvas Object
 	 * @param {number} x - Coordinate in pixels
 	 * @param {number} y - Coordinate in pixels
 	 */
-	var MultiProcess = function(x,y)
+	var MultiProcess = function(canvas,x,y)
 	{
-		Element.call(this);
+		Element.call(this, canvas);
 
 		this.push(paper.circle(x,y,25),paper.circle(x,y,18));
 		this.applyDefaultStyle();
@@ -289,12 +298,13 @@ function Canvas(container, width, height)
 	/**
 	 * Create a Datastore element
 	 * @constructor
+	 * @param {Cavas} canvas - Canvas Object
 	 * @param {number} x - Coordinate in pixels
 	 * @param {number} y - Coordinate in pixels
 	 */
-	var Datastore = function(x,y)
+	var Datastore = function(canvas,x,y)
 	{
-		Element.call(this);
+		Element.call(this, canvas);
 
 		x = x - 25;
 		y = y - 25;
@@ -318,12 +328,13 @@ function Canvas(container, width, height)
 	/**
 	 * Create a External-interactor element
 	 * @constructor
+	 * @param {Cavas} canvas - Canvas Object
 	 * @param {number} x - Coordinate in pixels
 	 * @param {number} y - Coordinate in pixels
 	 */
-	var ExtInteractor = function(x,y)
+	var ExtInteractor = function(canvas,x,y)
 	{
-		Element.call(this);
+		Element.call(this, canvas);
 
 		this.push(paper.rect(x - 25,y - 25,50,50));
 		this.applyDefaultStyle();		
