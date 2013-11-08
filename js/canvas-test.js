@@ -23,7 +23,7 @@ test("Add Process", function()
 	notEqual(p, undefined, "Test if element is undefined");
 	notEqual(p, null, "Test if element is null")
 
-	canvas.remove(p);
+	canvas.removeElement(p);
 	equal(canvas.getNumberOfElements(), 0, "Test after remove");
 });
 
@@ -41,7 +41,7 @@ test("Add Multi-process", function()
 	notEqual(p, undefined, "Test if element is undefined");
 	notEqual(p, null, "Test if element is null")
 
-	canvas.remove(p);
+	canvas.removeElement(p);
 	equal(canvas.getNumberOfElements(), 0, "Test after remove");
 });
 
@@ -59,7 +59,7 @@ test("Add Datastore", function()
 	notEqual(p, undefined, "Test if element is undefined");
 	notEqual(p, null, "Test if element is null")
 
-	canvas.remove(p);
+	canvas.removeElement(p);
 	equal(canvas.getNumberOfElements(), 0, "Test after remove");
 });
 
@@ -77,7 +77,7 @@ test("Add External Interactor", function()
 	notEqual(p, undefined, "Test if element is undefined");
 	notEqual(p, null, "Test if element is null")
 
-	canvas.remove(p);
+	canvas.removeElement(p);
 	equal(canvas.getNumberOfElements(), 0, "Test after remove");
 });
 
@@ -100,16 +100,15 @@ test("Num Elements", function()
 	var e4 = canvas.addProcess(100, 100);
 	equal(canvas.getNumberOfElements(), 4, "Test with 4 elements");
 
-	canvas.remove(e4);
+	canvas.removeElement(e4);
 	equal(canvas.getNumberOfElements(), 3, "Test with 3 elements");
 	
-	canvas.remove(e3);
+	canvas.removeElement(e3);
 	equal(canvas.getNumberOfElements(), 2, "Test with 2 elements");
 
-	canvas.remove(e2);
+	canvas.removeElement(e2);
 	equal(canvas.getNumberOfElements(), 1, "Test with 1 elements");
 	
-	canvas.remove(e1);
+	canvas.removeElement(e1);
 	equal(canvas.getNumberOfElements(), 0, "Test with 0 elements");
-
 });
