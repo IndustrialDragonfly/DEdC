@@ -1,0 +1,4 @@
+USE DATABASE dedc;
+
+# Wipes everything with it, due to foreign keys
+TRUNCATE TABLE entity; 
