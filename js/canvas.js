@@ -228,7 +228,10 @@ function Canvas(container, width, height)
 		 */
 		this.push = function(shape)
 		{
-			set.push(shape);
+			for (var i = 0; i < arguments.length; i++)
+			{
+				set.push(arguments[i]);
+			}
 		};
 
 		/**
