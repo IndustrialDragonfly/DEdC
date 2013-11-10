@@ -112,3 +112,35 @@ test("Num Elements", function()
 	canvas.removeElement(e1);
 	equal(canvas.getNumberOfElements(), 0, "Test with 0 elements");
 });
+
+test("Add Dataflow", function()
+{
+	equal(canvas.getNumberOfDataflows(), 0, "Test with 0 dataflows");
+
+	var e1 = canvas.addProcess(100,100);
+	var e2 = canvas.addProcess(200,200);
+
+	var d1 = canvas.addDataflow(e1,e2);
+	notEqual(d1, undefined, "Test if dataflow is undefined");
+	notEqual(d1, null, "Test if dataflow is null");
+	equal(canvas.getNumberOfDataflows(), 1, "Test with 1 dataflow");
+
+	canvas.removeDataflow(d1);
+	equal(canvas.getNumberOfDataflows(), 0, "Test with 0 dataflows");
+
+	canvas.removeElement(e1);
+	canvas.removeElement(e2);
+});
+
+test("Add Dataflow Same Source/Target", function()
+{
+	equal(canvas.getNumberOfDataflows(), 0, "Test with 0 dataflows");
+
+	var e1 = canvas.addProcess(100,100);
+
+	var d1 = canvas.addDataflow(e1,e1);
+	equal(d1, null, "Test if dataflow is null");
+	equal(canvas.getNumberOfDataflows(), 0, "Test with 0 dataflows");
+
+	canvas.removeElement(e1);
+});

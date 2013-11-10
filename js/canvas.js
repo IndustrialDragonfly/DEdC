@@ -162,6 +162,9 @@ function Canvas(container, width, height)
 	 */
 	this.addDataflow = function(source, target)
 	{
+		if (source == target)
+			return null;
+		
 		var d = new Dataflow(source,target);
 		dataflows.push(d);
 
