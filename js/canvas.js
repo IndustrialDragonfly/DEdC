@@ -89,6 +89,16 @@ function Canvas(container, width, height)
 		return dataflows.length;
 	};
 
+	/**
+	 * Set the size of the canvas
+	 * @param {number} width - New width of the canvas in pixels
+	 * @param {number} height - New height of the canvas in pixels
+	 */
+	this.setSize = function(width,height)
+	{
+		paper.setSize(width,height);
+	}
+
 	/** 
 	 * Add a process element to the canvas at the given location
 	 * @param {number} x - Coordinate in pixels

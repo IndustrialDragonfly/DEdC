@@ -14,14 +14,21 @@
 	<script type="text/javascript" src="js/canvas.js"></script>
 	<script>
 		$(document).ready(function () {
-			$("#content").tabs({
-				heightStyle:"fill"
-			});
+			// Function to resize the canvas to fit in the tab
+			var resizeCanvas = function()
+			{
+				var width = $('#tabsContainer').width();
+				var height = $('#tabsContainer').height();
+				canvas.setSize(width,height);
+			};
+
+			$("#content").tabs();
 
 			// Needs to be created after tabs, but before accordions
 			myLayout = $('body').layout({
 				west__size: 200,
-				west__onresize: $.layout.callbacks.resizePaneAccordions 
+				west__onresize: $.layout.callbacks.resizePaneAccordions,
+				center__onresize: resizeCanvas
 			});
 
 			$("#sidebar1").accordion({
@@ -34,6 +41,7 @@
 				collapsible: true
 			});
 
+			// Create the canvas, and add some sample elements
 			var canvas = new Canvas("tab1", 640, 480);
 			var p = canvas.addProcess(100,100);
 			canvas.addMultiProcess(200,100);
@@ -43,6 +51,9 @@
 			canvas.addDataflow(p,d);
 
 			canvas.setBackground('#A8A8A8');
+
+			// Initial resize to fit
+			resizeCanvas();
 		});
 	</script>
 
@@ -125,13 +136,13 @@
 			<li><a href="#tab2">Firing Control</a></li>
 		</ul>
 
-		<div class="ui-layout-content ui-widget-content">
+		<div id="tabsContainer" class="ui-layout-content ui-widget-content">
 			<div id="tab1"></div>
 
-		<div id="tab2">
-			<p>Firing Control View<p>
+			<div id="tab2">
+				<p>Firing Control View<p>
+			</div>
 		</div>
-	</div>
 	</div>
 
 	<div id="footer" class="ui-layout-south">
