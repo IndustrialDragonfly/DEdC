@@ -22,6 +22,10 @@ class Multiprocess extends Node
    //</editor-fold>
    
    //<editor-fold desc="Accessor functions" defaultstate="collapsed">
+   /**
+    * 
+    * @return DataFlowDiagram
+    */
    public function getSubDFD()
    {
       return $this->subDataFlowDiagram;

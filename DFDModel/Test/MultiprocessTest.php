@@ -42,7 +42,7 @@ class MultiprocessTest extends PHPUnit_Framework_TestCase
     * @covers Multiprocess::setSubDFD
     * @covers Multiprocess::getSubDFD
     */
-   public function testSetSubDFD_GetSubDFD_smoke()
+   public function testSetSubDFDGetSubDFD_smoke()
    {
       $dfd = new DataFlowDiagram;
       $oldDFD = $this->object->getSubDFD();
@@ -55,7 +55,7 @@ class MultiprocessTest extends PHPUnit_Framework_TestCase
     * @covers Multiprocess::getSubDFD
     * @expectedException BadFunctionCallException
     */
-   public function testSetSubDFD_GetSubDFD_invalidInput()
+   public function testSetSubDFDGetSubDFD_invalidInput()
    {
       $element =new Process;
       $this->object->setSubDFD($element);

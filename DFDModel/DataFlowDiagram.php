@@ -9,11 +9,15 @@ class DataFlowDiagram extends Entity
 {
 
    //<editor-fold desc="Attributes" defaultstate="collapsed">
-   protected $externalLinks;
-   protected $elementList;
+   protected $externalLinks;  // array of DataFlows
+   protected $elementList;    //array of Elements that make up the DFD
    //</editor-fold>
    
    //<editor-fold desc="Constructor" defaultstate="collapsed">
+   /**
+    * constructor that creates a new DFD object with empty arrays for 
+    * externalLinks and elementList
+    */
    public function __construct()
    {
       parent::__construct();
@@ -36,7 +40,7 @@ class DataFlowDiagram extends Entity
    
    /**
     * function that adds a new extenal Link to the list
-    * @param type $newlink 
+    * @param DataFlow $newlink 
     * @throws BadFunctionCallException
     */
    public function addExternalLink($newLink)
@@ -85,7 +89,7 @@ class DataFlowDiagram extends Entity
    
    /**
     * function that returns an external link based uppon its position in the list
-    * @param type $index integer
+    * @param integer $index 
     * @return DataFlow 
     * @throws BadFunctionCallException if the input parameter was out of bounds
     */
@@ -103,8 +107,8 @@ class DataFlowDiagram extends Entity
    
    /**
     * function that returns an external link based uppon it id
-    * @param type $linkId
-    * @return DataFlow will return the 
+    * @param string $linkId
+    * @return DataFlow will return the specified link
     */
    public function getExternalLinkbyId($linkId)
    {
@@ -187,9 +191,9 @@ class DataFlowDiagram extends Entity
    }
    
    /**
-    * 
-    * @param type $index
-    * @return type
+    * retrieves and element from the list of objects, use getby ID instead
+    * @param integer $index
+    * @return Element
     * @throws BadFunctionCallException
     */
    public function getElementByPosition($index)
@@ -205,9 +209,9 @@ class DataFlowDiagram extends Entity
    }
    
    /**
-    * 
-    * @param type $elementId
-    * @return null
+    * fuction the returns a specific element from the list if it present, will return null if the element was not present
+    * @param string $elementId
+    * @return the specified element or null if not present
     */
    public function getElementById($elementId)
    {

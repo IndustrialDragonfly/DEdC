@@ -102,3 +102,8 @@ ON UPDATE CASCADE
 CREATE USER 'dedc_user'@'localhost' IDENTIFIED BY 'dedc';
 GRANT SELECT, INSERT, UPDATE ON dedc.* TO 'dedc_user'@'localhost';
 GRANT DELETE ON dedc.entity TO 'dedc_user'@'localhost';
+
+#Grant proper privileges - don't use these on anything but testing DB
+CREATE USER 'tester'@'localhost' IDENTIFIED BY 'test';
+GRANT ALL ON dedc.* TO 'tester'@'localhost';
+

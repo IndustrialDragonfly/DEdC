@@ -9,7 +9,7 @@ abstract class Entity
    //<editor-fold desc="Attributes" defaultstate="collapsed">
    protected $label;
    protected $id;
-   protected $owner;
+   protected $originator;
    protected $organization;
    //</editor-fold>
    
@@ -21,13 +21,13 @@ abstract class Entity
    {
       $this->id = $this->generateId();
       $this->label = '';
-      $this->owner = '';
+      $this->originator = '';
       $this->organization = '';
    }
    
    /**
     * function that generates an UUID of length 256 bits
-    * @return type a random 256 bit value
+    * @return string a random 256 bit value
     */
    private function generateId()
    {
@@ -56,13 +56,13 @@ abstract class Entity
    }
    //</editor-fold>
    //<editor-fold desc="owner Accessors" defaultstate="collapsed">
-   public function setOwner($newOwner)
+   public function setOriginator($newOriginator)
    {
-      $this->owner = $newOwner;
+      $this->originator = $newOriginator;
    }
-   public function getOwner()
+   public function getOriginator()
    {
-      return $this->owner;
+      return $this->originator;
    }
    //</editor-fold>
    //<editor-fold desc="Organization Accessors" defaultstate="collapsed">

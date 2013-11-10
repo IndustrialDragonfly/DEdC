@@ -33,7 +33,7 @@ class ElementTest extends PHPUnit_Framework_TestCase
     * @covers Element::setX
     * @covers Element::getX
     */
-   public function test_SetX_GetX_smoke()
+   public function testSetXGetX_smoke()
    {
       $testval = 57;
       $this->object->setX($testval);
@@ -44,7 +44,7 @@ class ElementTest extends PHPUnit_Framework_TestCase
     * @covers Element::setX
     * @covers Element::getX
     */
-   public function test_SetX_GetX_empty()
+   public function testSetXGetX_empty()
    {
       $testval = 0;
       //$this->object->setX($testval);
@@ -55,7 +55,7 @@ class ElementTest extends PHPUnit_Framework_TestCase
     * @covers Element::setY
     * @covers Element::getY
     */
-   public function test_SetY_GetY_smoke()
+   public function testSetYGetY_smoke()
    {
       $testval = 57;
       $this->object->setY($testval);
@@ -66,7 +66,7 @@ class ElementTest extends PHPUnit_Framework_TestCase
     * @covers Element::setY
     * @covers Element::getY
     */
-   public function test_SetY_GetY_empty()
+   public function testSetYGetY_empty()
    {
       $testval = 0;
       //$this->object->setY($testval);
@@ -77,7 +77,7 @@ class ElementTest extends PHPUnit_Framework_TestCase
     * @covers Element::setLocation
     * @covers Element::getLocation
     */
-   public function test_SetLocation_GetLocation_smoke()
+   public function testSetLocationGetLocation_smoke()
    {
       $testX_Y = array(2345, 12345);
       $this->object->setLocation($testX_Y[0], $testX_Y[1]);
@@ -88,7 +88,7 @@ class ElementTest extends PHPUnit_Framework_TestCase
     * @covers Element::setLocation
     * @covers Element::getLocation
     */
-   public function test_SetLocation_GetLocation_empty()
+   public function testSetLocationGetLocation_empty()
    {
       $testX_Y = array(0, 0);
       //$this->object->setLocation($testX_Y[0], $testX_Y[1]);

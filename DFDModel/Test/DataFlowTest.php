@@ -42,7 +42,7 @@ class DataFlowTest extends PHPUnit_Framework_TestCase
     * @covers DataFlow::getOriginNode
     * @covers DataFlow::setOriginNode
     */
-   public function testGetOriginNode_SetOriginNode_smoke()
+   public function testGetOriginNodeSetOriginNode_smoke()
    {
       $aNode = new Process;
       $this->object->setOriginNode($aNode);
@@ -105,7 +105,7 @@ class DataFlowTest extends PHPUnit_Framework_TestCase
     * @covers DataFlow::getDestinationNode
     * @covers DataFlow::setDestinationNode
     */
-   public function testGetDestinationNode_SetDestinationNode_smoke()
+   public function testGetDestinationNodeSetDestinationNode_smoke()
    {
       $aNode =new Process;
       $this->object->setDestinationNode($aNode);

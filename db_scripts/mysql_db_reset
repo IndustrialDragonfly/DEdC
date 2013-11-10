@@ -1,4 +1,13 @@
-USE DATABASE dedc;
+USE dedc;
 
+SET foreign_key_checks=0;
 # Wipes everything with it, due to foreign keys
 TRUNCATE TABLE entity; 
+TRUNCATE TABLE element; 
+TRUNCATE TABLE dataflow; 
+TRUNCATE TABLE external_links; 
+TRUNCATE TABLE element_list; 
+TRUNCATE TABLE multiprocess; 
+
+SET foreign_key_checks=1;
+

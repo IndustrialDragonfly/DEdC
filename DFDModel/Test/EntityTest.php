@@ -31,9 +31,10 @@ class EntityTest extends PHPUnit_Framework_TestCase
    }
 
    /**
-    * @covers Entity::setLabel and Entity::getLabel
+    * @covers Entity::setLabel
+    * @covers Entity::getLabel
     */
-   public function test_Set_get_Label_empty()
+   public function testSetLabelgetLabel_empty()
    {
       $testStr = '';
       //$this->object->setLabel($testStr);
@@ -41,9 +42,10 @@ class EntityTest extends PHPUnit_Framework_TestCase
    }
    
    /**
-    * @covers Entity::setLabel and Entity::getLabel
+    * @covers Entity::setLabel
+    * @covers Entity::getLabel
     */
-   public function test_Set_get_Label_smoke()
+   public function testSetLabelgetLabel_smoke()
    {
       $testStr = 'something';
       $this->object->setLabel($testStr);
@@ -56,7 +58,6 @@ class EntityTest extends PHPUnit_Framework_TestCase
    public function testGetId_smoke()
    {
       $this->assertTrue( $this->object->getId() != '');
-      //echo $this->object->getId();
    }
    
    /**
@@ -69,31 +70,32 @@ class EntityTest extends PHPUnit_Framework_TestCase
    }
 
    /**
-    * @covers Entity::setOwner
-    * @todo   Implement testSetOwner().
+    * @covers Entity::setOriginator
+    * @covers Entity::getOriginator
     */
-   public function testSet_Get_Owner_smoke()
+   public function testSetOriginatorGetOriginator_smoke()
    {
       $testStr = 'something';
-      $this->object->setOwner($testStr);
-      $this->assertEquals($testStr, $this->object->getOwner());
+      $this->object->setOriginator($testStr);
+      $this->assertEquals($testStr, $this->object->getOriginator());
    }
    
    /**
-    * @covers Entity::setOwner
-    * @todo   Implement testSetOwner().
+    * @covers Entity::setOriginator
+    * @covers Entity::getOriginator
     */
-   public function testSet_Get_Owner_empty()
+   public function testSetOriginatorGetOriginator_empty()
    {
       $testStr = '';
-      //$this->object->setOwner($testStr);
-      $this->assertEquals($testStr, $this->object->getOwner());
+      //$this->object->setOriginator($testStr);
+      $this->assertEquals($testStr, $this->object->getOriginator());
    }
    
    /**
-    * @covers Entity::setOrganization and Entity::getOrganization
+    * @covers Entity::setOrganization
+    * @covers Entity::getOrganization
     */
-   public function test_Set_get_Organization_empty()
+   public function testSetOrganizationgetOrganization_empty()
    {
       $testStr = '';
       //$this->object->setLabel($testStr);
@@ -101,9 +103,10 @@ class EntityTest extends PHPUnit_Framework_TestCase
    }
    
    /**
-    * @covers Entity::setOrganization and Entity::getOrganization
+    * @covers Entity::setOrganization
+    * @covers Entity::getOrganization
     */
-   public function test_Set_get_Organization_smoke()
+   public function testSetOrganizationgetOrganization_smoke()
    {
       $testStr = 'something';
       $this->object->setOrganization($testStr);
