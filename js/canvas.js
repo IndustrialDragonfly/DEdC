@@ -25,7 +25,6 @@ Raphael.st.draggable = function(callback)
 		parent.transform('t' + tx + ',' + ty);
 
 		// Recalculate all of the Dataflows
-		// TODO: Optimize, only affected Dataflows should be calculated
 		callback();
 	};
 	
@@ -203,6 +202,7 @@ function Canvas(container, width, height)
 
 	/**
 	 * Recalculate all Dataflows in the canvas
+	 * This is a performance killer at this time
 	 */
 	this.calcDataflows = function()
 	{
@@ -275,6 +275,7 @@ function Canvas(container, width, height)
 	/**
 	 * Create a Process element
 	 * @constructor
+	 * @augments Element
 	 * @param {Cavas} canvas - Canvas Object
 	 * @param {number} x - Coordinate in pixels
 	 * @param {number} y - Coordinate in pixels
@@ -293,6 +294,7 @@ function Canvas(container, width, height)
 	/**
 	 * Create a MultiProcess element
 	 * @constructor
+	 * @augments Element
 	 * @param {Cavas} canvas - Canvas Object
 	 * @param {number} x - Coordinate in pixels
 	 * @param {number} y - Coordinate in pixels
@@ -311,6 +313,7 @@ function Canvas(container, width, height)
 	/**
 	 * Create a Datastore element
 	 * @constructor
+	 * @augments Element
 	 * @param {Cavas} canvas - Canvas Object
 	 * @param {number} x - Coordinate in pixels
 	 * @param {number} y - Coordinate in pixels
@@ -341,6 +344,7 @@ function Canvas(container, width, height)
 	/**
 	 * Create a External-interactor element
 	 * @constructor
+	 * @augments Element
 	 * @param {Cavas} canvas - Canvas Object
 	 * @param {number} x - Coordinate in pixels
 	 * @param {number} y - Coordinate in pixels
