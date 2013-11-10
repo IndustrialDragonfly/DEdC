@@ -196,16 +196,13 @@ class DataFlow extends Element
       
       //<editor-fold desc="save to DataFlow table" defaultstate="collapsed">
       // Prepare the statement
-      for ($i = 0; $i < $this->getNumberOfLinks(); $i++)
-      {
-         $insert_stmt = $pdo->prepare("INSERT INTO element (id, origin_id, dest_id) VALUES(?,?,?)");
-         // Bind the parameters of the prepared statement
-         $insert_stmt->bindParam(1, $this->id);      
-         $insert_stmt->bindParam(2, $this->originNode->getId());
-         $insert_stmt->bindParam(2, $this->destinationNode->getId());
-         // Execute, catch any errors resulting
-         $insert_stmt->execute();
-      }
+      $insert_stmt = $pdo->prepare("INSERT INTO dataflow (id, origin_id, dest_id) VALUES(?,?,?)");
+      // Bind the parameters of the prepared statement
+      $insert_stmt->bindParam(1, $this->id);      
+      $insert_stmt->bindParam(2, $this->originNode->getId());
+      $insert_stmt->bindParam(3, $this->destinationNode->getId());
+      // Execute, catch any errors resulting
+      $insert_stmt->execute();
       //</editor-fold>
    }
    //</editor-fold>
