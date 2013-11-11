@@ -9,7 +9,15 @@ class DataFlow extends Element
 {
 
    //<editor-fold desc="Attributes" defaultstate="collapsed">
+   /**
+    * this will be a Node object
+    * @var Node
+    */
    protected $originNode;
+   /**
+    * this will be a node object
+    * @var Node
+    */
    protected $destinationNode;
    //</editor-fold>
    

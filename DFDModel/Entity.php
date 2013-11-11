@@ -64,7 +64,8 @@ class Entity
    {
       return $this->owner;
    }
-   
+   //</editor-fold>
+   //<editor-fold desc="Organization Accessors" defaultstate="collapsed">
    public function setOrganization($newOrg)
    {
        $this->organization = $newOrg;

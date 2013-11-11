@@ -92,7 +92,13 @@ class Node extends Element
       }
    }
    
-   private function isOrigin($link)
+   /**
+    * Function that check to see if this Node is the origin or the destination 
+    * of the specified dataflow, it will throw an exception if this node was 
+    * not associated with that dataflow
+    * @throws BadFunctionCallException
+    */
+   protected function isOrigin($link)
    {
       if($link instanceof DataFlow)
       {
@@ -116,7 +122,7 @@ class Node extends Element
    }
    
    /**
-    * Returns a specified link based uppon where it is in the list
+    * Returns a specified link based upon where it is in the list
     * @param type $index integer
     * @return type DataFlow
     * @throws BadFunctionCallException if the value was out of bounds

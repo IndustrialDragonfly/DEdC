@@ -186,7 +186,12 @@ class DataFlowDiagram extends Entity
       }
    }
    
-   
+   /**
+    * 
+    * @param type $index
+    * @return type
+    * @throws BadFunctionCallException
+    */
    public function getElementByPosition($index)
    {
       if ($index <= count($this->elementList) -1 && $index >= 0)
@@ -199,7 +204,11 @@ class DataFlowDiagram extends Entity
       }
    }
    
-   
+   /**
+    * 
+    * @param type $elementId
+    * @return null
+    */
    public function getElementById($elementId)
    {
       for ($i = 0; $i < count($this->elementList); $i++)

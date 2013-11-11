@@ -106,28 +106,7 @@ class Multiprocess extends Node
       }
    }
    
-   private function isOrigin($link)
-   {
-      if($link instanceof DataFlow)
-      {
-         if ($this == $link->getOriginNode())
-         {
-            return TRUE;
-         }
-         elseif ($this == $link->getDestinationNode())
-         {
-            return FALSE;
-         }
-         else
-         {
-            throw new BadFunctionCallException("This DataFlow is not connected to this Node");
-         }
-      }
-      else 
-      {
-         throw new BadFunctionCallException("input parameter was not a DataFlow");
-      }
-   }
+   
    //</editor-fold>
 }
 ?>

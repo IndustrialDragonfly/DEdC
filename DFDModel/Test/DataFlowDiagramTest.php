@@ -346,7 +346,6 @@ class DataFlowDiagramTest extends PHPUnit_Framework_TestCase
 
    /**
     * @covers DataFlowDiagram::getElementById
-    * @todo   Implement testGetElementById().
     */
    public function testGetElementById_smoke()
    {
@@ -357,7 +356,6 @@ class DataFlowDiagramTest extends PHPUnit_Framework_TestCase
    
    /**
     * @covers DataFlowDiagram::getElementById
-    * @todo   Implement testGetElementById().
     */
    public function testGetElementById_null()
    {
@@ -367,7 +365,6 @@ class DataFlowDiagramTest extends PHPUnit_Framework_TestCase
    
    /**
     * @covers DataFlowDiagram::getElementById
-    * @todo   Implement testGetElementById().
     */
    public function testGetElementById_biggerSmoke()
    {
