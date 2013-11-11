@@ -52,6 +52,48 @@
 
 			canvas.setBackground('#A8A8A8');
 
+			// Setup drag and drop
+			var draggableHelper = function(event,ui)
+			{
+				return $(this).clone().appendTo('body').css('zIndex',5).show();
+			};
+
+			$("#process").draggable({
+				helper: draggableHelper
+			}).data("type", "process");
+
+			$("#multiprocess").draggable({
+				helper: draggableHelper
+			}).data("type", "multiprocess");
+
+			$("#datastore").draggable({
+				helper: draggableHelper
+			}).data("type", "datastore");
+
+			$("#extinteractor").draggable({
+				helper: draggableHelper
+			}).data("type", "extinteractor");
+
+			// Setup drag/drop
+			$("#tab1").droppable({
+				drop: function(event,ui) {
+					// Add to canvas
+					var posx = event.pageX - $('#tab1').offset().left;
+					var posy = event.pageY - $('#tab1').offset().top;
+
+					if ($(ui.draggable).data("type") == "process")
+						canvas.addProcess(posx,posy);
+					else if ($(ui.draggable).data("type") == "multiprocess")
+						canvas.addMultiProcess(posx,posy);
+					else if ($(ui.draggable).data("type") == "datastore")
+						canvas.addDatastore(posx,posy);
+					else if ($(ui.draggable).data("type") == "extinteractor")
+						canvas.addExtInteractor(posx,posy);
+					else
+						alert("Draggable Element was malformed.");
+				}
+			});
+
 			// Initial resize to fit
 			resizeCanvas();
 		});
@@ -67,39 +109,39 @@
 		<h3>Elements</h3>
 		<ul id="elements">
 			<li>
-				<center>
+				<div id="process">
 					<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52">
 						<circle cx="26" cy="26" r="25" fill="white" stroke="black" stroke-width="1px"></circle>
 					</svg>
 					<p>Process</p>
-				</center>
+				</div>
 			</li>
 			<li>
-				<center>
+				<div id="multiprocess">
 					<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52">
 						<circle cx="26" cy="26" r="25" fill="white" stroke="black" stroke-width="1px"></circle>
 						<circle cx="26" cy="26" r="18" fill="white" stroke="black" stroke-width="1px"></circle>
 					</svg>
 					<p>Multi-process</p>
-				</center>
+				</div>
 			</li>
 			<li>
-				<center>
+				<div id="datastore">
 					<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52">
 						<path d="M0 0 L52 0 Z" stroke="black" stroke-width="1px"></path>
 						<path d="M0 52 L52 52 Z" stroke="black" stroke-width="1px"></path>
 						<rect x="0" y="1" width="52" height="50" fill="white"></rect>
 					</svg>
 					<p>Datastore</p>
-				</center>
+				</div>
 			</li>
 			<li>
-				<center>
+				<div id="extinteractor">
 					<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52">
 						<rect x="1" y="1" width="50" height="50" fill="white" stroke="black" stroke-width="1px"></rect>
 					</svg>
 					<p>External Interactor</p>
-				</center>
+				</div>
 			</li>
 		</ul>
 		<h3>Layers</h3>
