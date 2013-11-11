@@ -226,5 +226,70 @@ class DataFlowDiagram extends Entity
    }
    //</editor-fold>
    //</editor-fold>
+   
+   //<editor-fold desc="DB functions" defaultstate="collapsed">
+   /**
+    * function that will save this object to the database
+    * @param PDO $pdo this is the connection to the Database
+    */
+   public function save($pdo)
+   {
+      //<editor-fold desc="save to Entity table" defaultstate="collapsed">
+      // Prepare the statement
+      $insert_stmt = $pdo->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
+
+      // Bind the parameters of the prepared statement
+      $type = Constants::DataFlowDiagram;
+      $insert_stmt->bindParam(1, $this->id);      
+      $insert_stmt->bindParam(2, $this->label);
+      $insert_stmt->bindParam(3, $type);
+      $insert_stmt->bindParam(4, $this->originator);
+
+      // Execute, catch any errors resulting
+      $insert_stmt->execute();
+      //</editor-fold>
+      
+      //remove
+      //<editor-fold desc="save to Element table" defaultstate="collapsed">
+      // Prepare the statement
+      $insert_stmt = $pdo->prepare("INSERT INTO element (id, x, y) VALUES(?,?,?)");
+
+      // Bind the parameters of the prepared statement
+      $insert_stmt->bindParam(1, $this->id);      
+      $insert_stmt->bindParam(2, $this->x);
+      $insert_stmt->bindParam(3, $this->y);
+
+      // Execute, catch any errors resulting
+      $insert_stmt->execute();
+      //</editor-fold>
+      
+      //<editor-fold desc="save to Element List table" defaultstate="collapsed">
+      // Prepare the statement
+      for ($i = 0; $i < $this->getNumberOfElements(); $i++)
+      {
+         $this->elementList[$i]->save($pdo);
+         $insert_stmt = $pdo->prepare("INSERT INTO element_list (dfd_id, el_id) VALUES(?,?)");
+         // Bind the parameters of the prepared statement
+         $insert_stmt->bindParam(1, $this->id);      
+         $insert_stmt->bindParam(2, $this->elementList[$i]->getId());
+         // Execute, catch any errors resulting
+         $insert_stmt->execute();
+      }
+      //</editor-fold>
+      
+      //<editor-fold desc="save to External link List table" defaultstate="collapsed">
+      // Prepare the statement
+      for ($i = 0; $i < $this->getNumberOfExternalLinks(); $i++)
+      {
+         $insert_stmt = $pdo->prepare("INSERT INTO external_links (dfd_id, df_id) VALUES(?,?)");
+         // Bind the parameters of the prepared statement
+         $insert_stmt->bindParam(1, $this->id);      
+         $insert_stmt->bindParam(2, $this->externalLinks[$i]->getId());
+         // Execute, catch any errors resulting
+         $insert_stmt->execute();
+      }
+      //</editor-fold>
+   }
+   //</editor-fold>
 }
 ?>

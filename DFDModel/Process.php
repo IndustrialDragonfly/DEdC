@@ -21,7 +21,7 @@ class Process extends Node
    //<editor-fold desc="Accessor functions" defaultstate="collapsed">
    //</editor-fold>
    
-   //<editor-fold desc=""DB functions defaultstate="collapsed">
+   //<editor-fold desc="DB functions" defaultstate="collapsed">
    /**
     * function that will save this object to the database
     * @param PDO $pdo this is the connection to the Database
@@ -60,7 +60,7 @@ class Process extends Node
       // Prepare the statement
       for ($i = 0; $i < $this->getNumberOfLinks(); $i++)
       {
-         $insert_stmt = $pdo->prepare("INSERT INTO element (id, df_id) VALUES(?,?)");
+         $insert_stmt = $pdo->prepare("INSERT INTO node (id, df_id) VALUES(?,?)");
          // Bind the parameters of the prepared statement
          $insert_stmt->bindParam(1, $this->id);      
          $insert_stmt->bindParam(2, $this->links[$i]->getId());
