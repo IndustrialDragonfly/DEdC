@@ -230,6 +230,7 @@ class DataFlowDiagram extends Entity
    //<editor-fold desc="DB functions" defaultstate="collapsed">
    /**
     * function that will save this object to the database
+    * this will also save every element in the element list 
     * @param PDO $pdo this is the connection to the Database
     */
    public function save($pdo)
@@ -267,7 +268,7 @@ class DataFlowDiagram extends Entity
       // Prepare the statement
       for ($i = 0; $i < $this->getNumberOfElements(); $i++)
       {
-         $this->elementList[$i]->save($pdo);
+         //$this->elementList[$i]->save($pdo);
          $insert_stmt = $pdo->prepare("INSERT INTO element_list (dfd_id, el_id) VALUES(?,?)");
          // Bind the parameters of the prepared statement
          $insert_stmt->bindParam(1, $this->id);      

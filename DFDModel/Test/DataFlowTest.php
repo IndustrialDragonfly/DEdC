@@ -24,6 +24,11 @@ class DataFlowTest extends PHPUnit_Framework_TestCase
    protected function setUp()
    {
       $this->object = new DataFlow;
+      
+      if($this->pdo == null)
+      {
+         $this->pdo = testDB_functions::getConnection();
+      }
    }
 
    /**
@@ -32,7 +37,7 @@ class DataFlowTest extends PHPUnit_Framework_TestCase
     */
    protected function tearDown()
    {
-      
+      testDB_functions::resetDB($this->pdo);
    }
 
    /**
@@ -190,7 +195,7 @@ class DataFlowTest extends PHPUnit_Framework_TestCase
    /**
     * @covers DataFlow::save
     */
-   public function testSave()
+   public function testSave_smoke()
    {
       $node = new Process;
       $node->setLabel('someNode');
@@ -202,14 +207,24 @@ class DataFlowTest extends PHPUnit_Framework_TestCase
       $this->object->setOriginNode($node);
       $this->object->setDestinationNode($node);
       
-      
-      $this->pdo = testDB_functions::getConnection();
-      testDB_functions::resetDB($this->pdo);
       $this->object->save($this->pdo);
       $node->save($this->pdo);
       
+      //check that the DF stored correctly
+      $row = $this->pdo->query("SELECT * FROM entity WHERE id = '".$this->object->getId()."'")->fetch();
+      $this->assertEquals($this->object->getId(), $row['id'] );
+      $this->assertEquals($this->object->getLabel(), $row['label'] );
+      $this->assertEquals($this->object->getOriginator(), $row['originator'] );
+      $this->assertEquals(Constants::DataFlow, $row['type'] );
       
-      //$this->resetDB($pdo);
+      $row = $this->pdo->query("SELECT * FROM element WHERE id = '".$this->object->getId()."'")->fetch();
+      $this->assertEquals($this->object->getX(), $row['x'] );
+      $this->assertEquals($this->object->getY(), $row['y'] );
+      
+      $row = $this->pdo->query("SELECT * FROM dataflow WHERE id = '".$this->object->getId()."'")->fetch();
+      $this->assertEquals($this->object->getOriginNode()->getId(), $row['origin_id'] );
+      $this->assertEquals($this->object->getDestinationNode()->getId(), $row['dest_id'] );
+
    }
    
    

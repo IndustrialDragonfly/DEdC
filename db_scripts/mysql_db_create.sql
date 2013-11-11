@@ -3,7 +3,7 @@ USE dedc;
 
 CREATE TABLE entity
 (
-id CHAR(32) NOT NULL,
+id CHAR(44) NOT NULL,
 label VARCHAR(100) NOT NULL,
 type SMALLINT NOT NULL, # Could be an enum, maps to types
 originator VARCHAR(100), # Username
@@ -12,7 +12,7 @@ PRIMARY KEY (id)
 
 CREATE TABLE element
 (
-id CHAR(32) NOT NULL,
+id CHAR(44) NOT NULL,
 x INT,
 y INT,
 PRIMARY KEY (id),
@@ -24,9 +24,9 @@ ON UPDATE CASCADE
 
 CREATE TABLE dataflow 
 ( 
-id CHAR(32) NOT NULL, 
-origin_id CHAR(32), 
-dest_id CHAR(32), 
+id CHAR(44) NOT NULL, 
+origin_id CHAR(44), 
+dest_id CHAR(44), 
 PRIMARY KEY (id), 
 FOREIGN KEY (id) 
 REFERENCES entity(id) 
@@ -36,8 +36,8 @@ ON UPDATE CASCADE
 
 CREATE TABLE node
 (
-id CHAR(32) NOT NULL,
-df_id CHAR(32) NOT NULL,
+id CHAR(44) NOT NULL,
+df_id CHAR(44) NOT NULL,
 FOREIGN KEY (id)
 REFERENCES entity(id)
 ON DELETE CASCADE
@@ -50,8 +50,8 @@ ON UPDATE CASCADE
 
 CREATE TABLE external_links
 (
-dfd_id CHAR(32) NOT NULL,
-df_id CHAR(32) NOT NULL,
+dfd_id CHAR(44) NOT NULL,
+df_id CHAR(44) NOT NULL,
 FOREIGN KEY (dfd_id)
 REFERENCES entity(id)
 ON DELETE CASCADE
@@ -64,8 +64,8 @@ ON UPDATE CASCADE
 
 CREATE TABLE element_list
 (
-dfd_id CHAR(32) NOT NULL,
-el_id CHAR(32) NOT NULL,
+dfd_id CHAR(44) NOT NULL,
+el_id CHAR(44) NOT NULL,
 FOREIGN KEY (dfd_id)
 REFERENCES entity(id)
 ON DELETE CASCADE
@@ -78,8 +78,8 @@ ON UPDATE CASCADE
 
 CREATE TABLE multiprocess
 (
-dfd_id CHAR(32) NOT NULL,
-mp_id CHAR(32) NOT NULL,
+dfd_id CHAR(44) NOT NULL,
+mp_id CHAR(44) NOT NULL,
 FOREIGN KEY (dfd_id)
 REFERENCES entity(id)
 ON DELETE CASCADE

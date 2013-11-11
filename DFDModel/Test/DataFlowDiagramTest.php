@@ -30,6 +30,11 @@ class DataFlowDiagramTest extends PHPUnit_Framework_TestCase
    protected function setUp()
    {
       $this->object = new DataFlowDiagram;
+      if($this->pdo == null)
+      {
+         $this->pdo = testDB_functions::getConnection();
+      }
+      //testDB_functions::resetDB($this->pdo);
    }
 
    /**
@@ -38,7 +43,7 @@ class DataFlowDiagramTest extends PHPUnit_Framework_TestCase
     */
    protected function tearDown()
    {
-      
+      testDB_functions::resetDB($this->pdo);
    }
 
    /**
@@ -386,16 +391,19 @@ class DataFlowDiagramTest extends PHPUnit_Framework_TestCase
    /**
     * @covers DataFlowDiagram::save
     */
-   public function testSave()
+   public function testSave_smoke()
    {
+      //create a process connected to a dataStore
       $node1 = new Process;
       $node1->setLabel('node1');
       $node1->setOriginator('Josh');
       $node1->setLocation(0, 0);
+      
       $node2 = new DataStore;
       $node2->setLabel('node2');
       $node2->setOriginator('Josh');
       $node2->setLocation(20, 0);
+      
       $df = new DataFlow;
       $df->setLabel('connection');
       $df->setOriginator('Josh');
@@ -403,16 +411,38 @@ class DataFlowDiagramTest extends PHPUnit_Framework_TestCase
       $df->setOriginNode($node1);
       $df->setDestinationNode($node2);
       
+      //add these elements to the DFD
       $this->object->addElement($df);
       $this->object->addElement($node1);
       $this->object->addElement($node2);
       
-      
-      
-      $this->pdo = testDB_functions::getConnection();
-      testDB_functions::resetDB($this->pdo);
+      //save everything
+      $df->save($this->pdo);
+      $node1->save($this->pdo);
+      $node2->save($this->pdo);
       $this->object->save($this->pdo);
       
+      //retrieve values from the DB and check them against the set values
+      $row = $this->pdo->query("SELECT * FROM entity WHERE id = '".$this->object->getId()."'")->fetch();
+      $this->assertEquals($this->object->getId(), $row['id'] );
+      $this->assertEquals($this->object->getLabel(), $row['label'] );
+      $this->assertEquals($this->object->getOriginator(), $row['originator'] );
+      $this->assertEquals(Constants::DataFlowDiagram, $row['type'] );
+      
+      $rows = $this->pdo->query("SELECT * FROM element_list WHERE dfd_id = '".$this->object->getId()."'");
+      for($i= 0; $i < $this->object->getNumberOfElements(); $i++)
+      {
+      $row = $rows->fetch();
+      $this->assertEquals($this->object->getElementByPosition($i)->getId(), $row['el_id']);
+      }
+   }
+   
+   /**
+    * @covers DataFlowDiagram::save
+    */
+   public function testSave_empty()
+   {
+      $this->object->save($this->pdo);
    }
 
 }

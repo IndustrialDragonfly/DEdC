@@ -33,7 +33,7 @@ abstract class Entity
    {
       $length = 256;
       $numberOfBytes = $length/8;
-      return strtr(base64_encode(openssl_random_pseudo_bytes($numberOfBytes)), "+/=", "xxx");
+      return strtr(base64_encode(openssl_random_pseudo_bytes($numberOfBytes)), "+/=", "x");
    }
    //</editor-fold>
    
