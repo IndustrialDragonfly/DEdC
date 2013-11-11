@@ -10,7 +10,7 @@ class Entity
    protected $label;
    protected $id;
    protected $owner;
-   
+   protected $organization;
    //</editor-fold>
    
    //<editor-fold desc="Constructor" defaultstate="collapsed">
@@ -22,7 +22,7 @@ class Entity
       $this->id = $this->generateId();
       $this->label = '';
       $this->owner = '';
-      
+      $this->organization = '';
    }
    
    /**
@@ -63,6 +63,16 @@ class Entity
    public function getOwner()
    {
       return $this->owner;
+   }
+   
+   public function setOrganization($newOrg)
+   {
+       $this->organization = $newOrg;
+   }
+   
+   public function getOrganization()
+   {
+       return $this->organization;
    }
    //</editor-fold>
    

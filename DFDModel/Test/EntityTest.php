@@ -87,5 +87,25 @@ class EntityTest extends PHPUnit_Framework_TestCase
       //$this->object->setOwner($testStr);
       $this->assertEquals($testStr, $this->object->getOwner());
    }
+   
+   /**
+    * @covers Entity::setOrganization and Entity::getOrganization
+    */
+   public function test_Set_get_Organization_empty()
+   {
+      $testStr = '';
+      //$this->object->setLabel($testStr);
+      $this->assertEquals($testStr, $this->object->getOrganization());
+   }
+   
+   /**
+    * @covers Entity::setOrganization and Entity::getOrganization
+    */
+   public function test_Set_get_Organization_smoke()
+   {
+      $testStr = 'something';
+      $this->object->setOrganization($testStr);
+      $this->assertEquals($testStr, $this->object->getOrganization());
+   }
 
 }
