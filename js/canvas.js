@@ -374,6 +374,7 @@ function Canvas(container, width, height)
 		var source = source;
 		var target = target;
 		var path;
+		var arrow;
 
 		/**
 		 * Get the attach points for an Element
@@ -431,15 +432,29 @@ function Canvas(container, width, height)
 			}
 			var pathString = "M" + sP[sIndex].x + " " + sP[sIndex].y + " L" + tP[tIndex].x + " " + tP[tIndex].y + " Z";
 
-			if (path)
+			var angle = Math.atan2(tP[tIndex].x - sP[sIndex].x, tP[tIndex].y - sP[sIndex].y);
+			angle = (angle / (2 * Math.PI)) * 360;
+			var arrowString = "M" + tP[tIndex].x + " " + tP[tIndex].y + " L" + (tP[tIndex].x - 5) + " " + (tP[tIndex].y - 5) + " L" + (tP[tIndex].x - 5) + " " + (tP[tIndex].y + 5) + " L" + tP[tIndex].x + " " + tP[tIndex].y;
+			var arrowRotationString = "r" + ((-90+angle)*-1) + "," + tP[tIndex].x + "," + tP[tIndex].y;
+
+			if (path && arrow)
 			{
 				// Path existed, update
 				path.attr({path: pathString});
+				arrow.attr({path: arrowString});
+				arrow.transform(arrowRotationString);
 			}
 			else
 			{
+				if (path)
+					path.remove();
+				if (arrow)
+					arrow.remove();
+
 				// Path did not exist, create
 				path = paper.path(pathString);
+				arrow = paper.path(arrowString).attr("fill","black");
+				arrow.transform(arrowRotationString);
 			}
 		};
 
