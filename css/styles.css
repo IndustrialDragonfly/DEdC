@@ -31,6 +31,11 @@ html, body
   overflow: hidden;
 }
 
+#toolbar
+{
+  padding: 0.25em;
+  margin-bottom: 0.25em;
+}
 /* Overriding jQuery accordion padding */
 .ui-accordion .ui-accordion-content
 {

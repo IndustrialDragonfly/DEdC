@@ -61,6 +61,33 @@ function Canvas(container, width, height)
 	var elements = new Array();
 	var dataflows = new Array();
 
+	var selection = new Array();
+
+	this.elementClicked = function(element)
+	{
+		var index = selection.indexOf(element);
+		if (index < 0) // Not in selection, add it
+		{
+			selection.push(element);
+			element.setSelected();
+		}
+		else // Element was selected, remove it
+		{
+			selection.splice(index, 1);
+			element.setUnselected();
+		}
+	};
+
+	this.unselectAll = function(element)
+	{
+		var e = selection.pop();
+		while(e)
+		{
+			e.setUnselected();
+			e = selection.pop();
+		}
+	};
+
 	/**
 	 * Set the background color of the canvas
 	 * @param {string} color - Hex value of the color, i.e., '#A8A8A8'
@@ -162,13 +189,27 @@ function Canvas(container, width, height)
 	 */
 	this.addDataflow = function(source, target)
 	{
+		// Cannot connect to self
 		if (source == target)
 			return null;
-		
+
+		// Already connected		
 		var d = new Dataflow(source,target);
 		dataflows.push(d);
-
 		return d;
+
+		return null;
+	};
+
+	this.addDataflowFromSelection = function()
+	{
+		for (var i = 0; i < selection.length; i++)
+		{
+			if (selection[i+1])
+				this.addDataflow(selection[i], selection[i+1]);
+		}
+
+		this.unselectAll();
 	};
 
 	/**
@@ -222,6 +263,7 @@ function Canvas(container, width, height)
 	 */
 	var Element = function(canvas)
 	{
+		var me = this;
 		var set = paper.set(); // Raphael.Set for shapes
 		var canvas = canvas; // Internal reference to canvas
 
@@ -234,6 +276,7 @@ function Canvas(container, width, height)
 			for (var i = 0; i < arguments.length; i++)
 			{
 				set.push(arguments[i]);
+				arguments[i].click(onMouseClick);
 			}
 		};
 
@@ -272,6 +315,22 @@ function Canvas(container, width, height)
 		this.getBBox = function()
 		{
 			return set.getBBox();
+		};
+
+		this.setSelected = function()
+		{
+			set.animate({"fill-opacity": 0.2}, 100);
+		};
+
+		this.setUnselected = function()
+		{
+			set.animate({"fill-opacity": 1.0}, 100);
+		};
+
+		var onMouseClick = function()
+		{
+			// Using "this" would result in the wrong object being used
+			canvas.elementClicked(me);
 		};
 	};
 	

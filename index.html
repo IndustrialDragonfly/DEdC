@@ -94,6 +94,10 @@
 				}
 			});
 
+			$("#connect").button().click(function(){
+				canvas.addDataflowFromSelection();
+			});
+
 			// Initial resize to fit
 			resizeCanvas();
 		});
@@ -173,6 +177,9 @@
 	</div>
 
 	<div id="content" class="ui-layout-center">
+		<div id="toolbar" class="ui-widget-header ui-conrner-all">
+			<button id="connect">Create Dataflow</button>
+		</div>
 		<ul id="menu">
 			<li><a href="#tab1">DFD</a></li>
 			<li><a href="#tab2">Firing Control</a></li>
