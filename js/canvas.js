@@ -61,8 +61,14 @@ function Canvas(container, width, height)
 	var elements = new Array();
 	var dataflows = new Array();
 
+	// Curent selection
 	var selection = new Array();
 
+	/**
+	 * Event called when an Element on the canvas is clicked
+	 * It handles the selection of elements;
+	 * @param {Element} element - Element that was clicked
+	 */
 	this.elementClicked = function(element)
 	{
 		var index = selection.indexOf(element);
@@ -78,6 +84,10 @@ function Canvas(container, width, height)
 		}
 	};
 
+	/**
+	 * Unselect all of the elements on the canvas
+	 * @param {Element} element - Element that was clicked
+	 */
 	this.unselectAll = function(element)
 	{
 		var e = selection.pop();
@@ -201,6 +211,9 @@ function Canvas(container, width, height)
 		return null;
 	};
 
+	/**
+	 * Connect the current selection with Dataflows
+	 */
 	this.addDataflowFromSelection = function()
 	{
 		for (var i = 0; i < selection.length; i++)
@@ -317,16 +330,25 @@ function Canvas(container, width, height)
 			return set.getBBox();
 		};
 
+		/**
+		 * Called when the Element is selected
+		 */
 		this.setSelected = function()
 		{
 			set.animate({"fill-opacity": 0.2}, 100);
 		};
 
+		/**
+		 * Called when the Element is unselected
+		 */
 		this.setUnselected = function()
 		{
 			set.animate({"fill-opacity": 1.0}, 100);
 		};
 
+		/**
+		 * Called when any Shape in the set is clicked
+		 */
 		var onMouseClick = function()
 		{
 			// Using "this" would result in the wrong object being used
