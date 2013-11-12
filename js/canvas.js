@@ -93,14 +93,14 @@ function Canvas(container, width, height)
 	 */
 	this.elementClicked = function(element)
 	{
-		if (ctrlState == KEYSTATE.UP)
+		if (ctrlState == KEYSTATE.UP) // CTRL is not pressed
 		{
 			// Replace selection
 			this.unselectAll();
 			selection.push(element);
 			element.setSelected();
 		}
-		else
+		else // CTRL is pressed
 		{
 			var index = selection.indexOf(element);
 			if (index < 0) // Not in selection, add it
@@ -110,7 +110,6 @@ function Canvas(container, width, height)
 			}
 			else // Element was selected, remove it
 			{
-				alert("test");
 				selection.splice(index, 1);
 				element.setUnselected();
 			}
@@ -311,6 +310,7 @@ function Canvas(container, width, height)
 		var me = this;
 		var set = paper.set(); // Raphael.Set for shapes
 		var canvas = canvas; // Internal reference to canvas
+		this.hasMoved = true;
 
 		/**
 		 * Add a shape to the Element
@@ -510,6 +510,9 @@ function Canvas(container, width, height)
 		 * Calculate Dataflow's path as the minium between the two Elements
 		 */
 		this.calcPath = function() {
+			if (!source.hasMoved || !target.hasMoved)
+				return;
+			
 			var sP = getAttachPoints(source);
 			var tP = getAttachPoints(target);
 			var sIndex = 0; // Shortest point index for source
