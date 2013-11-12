@@ -64,6 +64,30 @@ function Canvas(container, width, height)
 	// Curent selection
 	var selection = new Array();
 
+	// Keyboard events
+	var KEYSTATE = {
+		DOWN : {value: 0, name: "Down", code: "D"},
+		UP: {value:1, name: "Up", code: "U"}
+	};
+
+	var ctrlState = KEYSTATE.UP;
+
+	$("body").keydown(function(e) {
+		if (e.which == 17) // CTRL
+		{
+			alert("ctrl down");
+			ctrlState = KEYSTATE.DOWN;
+		}
+	});
+
+	$("body").keyup(function(e) {
+		if (e.which == 17) // CTRL
+		{
+			alert("ctrl up");
+			ctrlState = KEYSTATE.UP;
+		}
+	});
+
 	/**
 	 * Event called when an Element on the canvas is clicked
 	 * It handles the selection of elements;
@@ -71,24 +95,34 @@ function Canvas(container, width, height)
 	 */
 	this.elementClicked = function(element)
 	{
-		var index = selection.indexOf(element);
-		if (index < 0) // Not in selection, add it
+		if (ctrlState == KEYSTATE.UP)
 		{
+			// Replace selection
+			this.unselectAll();
 			selection.push(element);
 			element.setSelected();
 		}
-		else // Element was selected, remove it
+		else
 		{
-			selection.splice(index, 1);
-			element.setUnselected();
+			var index = selection.indexOf(element);
+			if (index < 0) // Not in selection, add it
+			{
+				selection.push(element);
+				element.setSelected();
+			}
+			else // Element was selected, remove it
+			{
+				alert("test");
+				selection.splice(index, 1);
+				element.setUnselected();
+			}
 		}
 	};
 
 	/**
 	 * Unselect all of the elements on the canvas
-	 * @param {Element} element - Element that was clicked
 	 */
-	this.unselectAll = function(element)
+	this.unselectAll = function()
 	{
 		var e = selection.pop();
 		while(e)
