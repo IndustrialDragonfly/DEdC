@@ -321,7 +321,7 @@ function Canvas(container, width, height)
 			for (var i = 0; i < arguments.length; i++)
 			{
 				set.push(arguments[i]);
-				arguments[i].click(onMouseClick);
+				arguments[i].mouseup(onMouseClick);
 			}
 		};
 
@@ -512,7 +512,7 @@ function Canvas(container, width, height)
 		this.calcPath = function() {
 			if (!source.hasMoved || !target.hasMoved)
 				return;
-			
+
 			var sP = getAttachPoints(source);
 			var tP = getAttachPoints(target);
 			var sIndex = 0; // Shortest point index for source
