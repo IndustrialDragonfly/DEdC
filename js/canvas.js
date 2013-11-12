@@ -75,7 +75,6 @@ function Canvas(container, width, height)
 	$("body").keydown(function(e) {
 		if (e.which == 17) // CTRL
 		{
-			alert("ctrl down");
 			ctrlState = KEYSTATE.DOWN;
 		}
 	});
@@ -83,7 +82,6 @@ function Canvas(container, width, height)
 	$("body").keyup(function(e) {
 		if (e.which == 17) // CTRL
 		{
-			alert("ctrl up");
 			ctrlState = KEYSTATE.UP;
 		}
 	});
