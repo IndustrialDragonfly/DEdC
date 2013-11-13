@@ -34,7 +34,7 @@ class Process extends Node
         $insert_stmt = $pdo->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
 
         // Bind the parameters of the prepared statement
-        $type = Constants::Process;
+        $type = Types::Process;
         $insert_stmt->bindParam(1, $this->id);
         $insert_stmt->bindParam(2, $this->label);
         $insert_stmt->bindParam(3, $type);
