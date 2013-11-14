@@ -148,7 +148,7 @@ class MultiprocessTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->object->getId(), $row['id']);
         $this->assertEquals($this->object->getLabel(), $row['label']);
         $this->assertEquals($this->object->getOriginator(), $row['originator']);
-        $this->assertEquals(Types::Mulitprocess, $row['type']);
+        $this->assertEquals(Types::Multiprocess, $row['type']);
 
         $row = $this->pdo->query("SELECT * FROM element WHERE id = '" . $this->object->getId() . "'")->fetch();
         $this->assertEquals($this->object->getX(), $row['x']);

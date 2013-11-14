@@ -15,6 +15,7 @@ class testDB_functions
     protected static $db_type = Database::mysql;
 
     //protected static $db_type = Database::postgres;
+
     public function getConnection()
     {
         $db_hostname = 'localhost';

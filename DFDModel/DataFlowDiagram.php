@@ -20,6 +20,7 @@ class DataFlowDiagram extends Entity
      * constructor that creates a new DFD object with empty arrays for 
      * externalLinks and elementList
      */
+
     public function __construct()
     {
         parent::__construct();
@@ -241,25 +242,11 @@ class DataFlowDiagram extends Entity
         // Execute, catch any errors resulting
         $insert_stmt->execute();
         //</editor-fold>
-        //remove
-        //<editor-fold desc="save to Element table" defaultstate="collapsed">
-        // Prepare the statement
-        $insert_stmt = $pdo->prepare("INSERT INTO element (id, x, y) VALUES(?,?,?)");
-
-        // Bind the parameters of the prepared statement
-        $insert_stmt->bindParam(1, $this->id);
-        $insert_stmt->bindParam(2, $this->x);
-        $insert_stmt->bindParam(3, $this->y);
-
-        // Execute, catch any errors resulting
-        $insert_stmt->execute();
-        //</editor-fold>
         //<editor-fold desc="save to Element List table" defaultstate="collapsed">
         // Prepare the statement
+        $insert_stmt = $pdo->prepare("INSERT INTO element_list (dfd_id, el_id) VALUES(?,?)");
         for ($i = 0; $i < $this->getNumberOfElements(); $i++)
         {
-            //$this->elementList[$i]->save($pdo);
-            $insert_stmt = $pdo->prepare("INSERT INTO element_list (dfd_id, el_id) VALUES(?,?)");
             // Bind the parameters of the prepared statement
             $insert_stmt->bindParam(1, $this->id);
             $insert_stmt->bindParam(2, $this->elementList[$i]->getId());
