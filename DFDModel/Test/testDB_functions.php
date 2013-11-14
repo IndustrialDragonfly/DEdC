@@ -5,13 +5,17 @@
  *
  * @author Josh Clark
  */
+require_once "../Constants.php";
 
 class testDB_functions
-{ 
+{
+
     // Comment and uncomment the relevant ones for your prefered RDMS
     // Probably should be improved with an enum
-    protected static $db_type = "mysql";
-    //protected static $db_type = "postgres";
+    protected static $db_type = Database::mysql;
+
+    //protected static $db_type = Database::postgres;
+
     public function getConnection()
     {
         $db_hostname = 'localhost';
@@ -19,11 +23,11 @@ class testDB_functions
         $db_username = 'tester';
         $db_password = 'test';
 
-        if ("mysql" == self::$db_type)
+        if (Database::mysql === self::$db_type)
         {
             $db_id = "mysql:host=$db_hostname;dbname=$db_database";
         }
-        if ("postgres" == self::$db_type)
+        if (Database::postgres === self::$db_type)
         {
             $db_id = "pgsql:host=$db_hostname;dbname=$db_database";
         }
@@ -45,26 +49,26 @@ class testDB_functions
     {
         if ($pdo instanceof PDO)
         {
-            $pdo->query('BEGIN');           
+            $pdo->query('BEGIN');
             $pdo->query('TRUNCATE TABLE element;');
             $pdo->query('TRUNCATE TABLE dataflow;');
             $pdo->query('TRUNCATE TABLE node;');
             $pdo->query('TRUNCATE TABLE external_links;');
             $pdo->query('TRUNCATE TABLE element_list;');
             $pdo->query('TRUNCATE TABLE multiprocess;');
-            
+
             // Truncate the foreign key restricted entity table in mysql
-            if ("mysql" == self::$db_type)
+            if (Database::mysql === self::$db_type)
             {
                 $pdo->query('SET foreign_key_checks=0;');
                 $pdo->query('TRUNCATE TABLE entity;');
                 $pdo->query('SET foreign_key_checks=1;');
             }
-            
+
             // Truncate the foreign key restricted table in postgres
-            if ("postgres" == self::$db_type)
+            if (Database::postgres === self::$db_type)
             {
-               $pdo->query('TRUNCATE TABLE entity CASCADE;'); 
+                $pdo->query('TRUNCATE TABLE entity CASCADE;');
             }
             $pdo->query('COMMIT');
         } else
