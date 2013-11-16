@@ -1,13 +1,30 @@
 CREATE DATABASE dedc;
 USE dedc;
 
+CREATE TABLE types
+(
+type_id SMALLINT NOT NULL,
+type_name VARCHAR(20) NOT NULL,
+PRIMARY KEY (type_id)
+)Engine InnoDB;
+
+# Insert valid types into types table
+INSERT INTO types(type_name, type_id) VALUES('Process', 0);
+INSERT INTO types(type_name, type_id) VALUES('DataStore', 1);
+INSERT INTO types(type_name, type_id) VALUES('Multiprocess', 2);
+INSERT INTO types(type_name, type_id) VALUES('ExternalInteractor', 3);
+INSERT INTO types(type_name, type_id) VALUES('DataFlow', 4);
+INSERT INTO types(type_name, type_id) VALUES('DataFlowDiagram', 5);
+
 CREATE TABLE entity
 (
 id CHAR(44) NOT NULL,
 label VARCHAR(100) NOT NULL,
-type SMALLINT NOT NULL, # Could be an enum, maps to types
+type SMALLINT NOT NULL,
 originator VARCHAR(100), # Username
-PRIMARY KEY (id)
+PRIMARY KEY (id),
+FOREIGN KEY (type)
+REFERENCES types(type_id)
 )Engine InnoDB;
 
 CREATE TABLE element
@@ -98,4 +115,3 @@ GRANT DELETE ON dedc.entity TO 'dedc_user'@'localhost';
 #Grant proper privileges - don't use these on anything but testing DB
 CREATE USER 'tester'@'localhost' IDENTIFIED BY 'test';
 GRANT ALL ON dedc.* TO 'tester'@'localhost';
-
