@@ -11,8 +11,8 @@ class testDB_functions
 {
 
     // Comment and uncomment the relevant ones for your prefered RDMS
-    //protected static $db_type = Database::mysql;
-    protected static $db_type = Database::postgres;
+    protected static $db_type = Database::mysql;
+    //protected static $db_type = Database::postgres;
     
     public function getConnection()
     {

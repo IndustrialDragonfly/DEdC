@@ -109,7 +109,13 @@ ON UPDATE CASCADE
 
 #Grant proper privileges
 CREATE USER 'dedc_user'@'localhost' IDENTIFIED BY 'dedc';
-GRANT SELECT, INSERT, UPDATE ON dedc.* TO 'dedc_user'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON dedc.entity TO 'dedc_user'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON dedc.element TO 'dedc_user'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON dedc.dataflow TO 'dedc_user'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON dedc.multiprocess TO 'dedc_user'@'localhost';
+GRANT SELECT, INSERT, DELETE ON dedc.element_list TO 'dedc_user'@'localhost';
+GRANT SELECT, INSERT, DELETE ON dedc.external_links TO 'dedc_user'@'localhost';
+GRANT SELECT, INSERT, DELETE ON dedc.node TO 'dedc_user'@'localhost';
 GRANT DELETE ON dedc.entity TO 'dedc_user'@'localhost';
 
 #Grant proper privileges - don't use these on anything but testing DB
