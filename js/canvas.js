@@ -1,13 +1,13 @@
 /**
  * Make Raphael Set draggable
  * @param {Function} callback - Function to call when an object has been moved
+ * @param {Element} element - Element that this Set belongs to
  */
-Raphael.st.draggable = function(callback)
+Raphael.st.draggable = function(callback,element)
 {
 	// Cache Set so elements can use it
 	var parent = this;
-
-	var canvas = canvas;
+	var element = element;
 
 	// Transform location
 	var tx = 0,
@@ -23,8 +23,9 @@ Raphael.st.draggable = function(callback)
 		tx = dx + ox;
 		ty = dy + oy;
 		parent.transform('t' + tx + ',' + ty);
+		element.hasMoved = true;
 
-		// Recalculate all of the Dataflows
+		// Recalculate the Dataflows
 		callback();
 	};
 	
@@ -63,6 +64,7 @@ function Canvas(container, width, height)
 
 	// Curent selection
 	var selection = new Array();
+	var dataflowSelection = new Array();
 
 	// Keyboard events
 	var KEYSTATE = {
@@ -96,7 +98,7 @@ function Canvas(container, width, height)
 		if (ctrlState == KEYSTATE.UP) // CTRL is not pressed
 		{
 			// Replace selection
-			this.unselectAll();
+			this.unselectAllElements();
 			selection.push(element);
 			element.setSelected();
 		}
@@ -117,15 +119,58 @@ function Canvas(container, width, height)
 	};
 
 	/**
+	 * Event called when an Dataflow on the canvas is clicked
+	 * It handles the selection of elements;
+	 * @param {Dataflow} dataflow - Dataflow that was clicked
+	 */
+	this.dataflowClicked = function(dataflow)
+	{
+		if (ctrlState == KEYSTATE.UP) // CTRL is not pressed
+		{
+			// Replace selection
+			this.unselectAllDataflows();
+			dataflowSelection.push(dataflow);
+			dataflow.setSelected();
+		}
+		else // CTRL is pressed
+		{
+			var index = selection.indexOf(dataflow);
+			if (index < 0) // Not in selection, add it
+			{
+				dataflowSelection.push(dataflow);
+				dataflow.setSelected();
+			}
+			else // Element was selected, remove it
+			{
+				dataflowSelection.splice(index, 1);
+				dataflow.setUnselected();
+			}
+		}
+	};
+
+	/**
 	 * Unselect all of the elements on the canvas
 	 */
-	this.unselectAll = function()
+	this.unselectAllElements = function()
 	{
 		var e = selection.pop();
 		while(e)
 		{
 			e.setUnselected();
 			e = selection.pop();
+		}
+	};
+
+		/**
+	 * Unselect all of the elements on the canvas
+	 */
+	this.unselectAllDataflows = function()
+	{
+		var e = dataflowSelection.pop();
+		while(e)
+		{
+			e.setUnselected();
+			e = dataflowSelection.pop();
 		}
 	};
 
@@ -234,12 +279,9 @@ function Canvas(container, width, height)
 		if (source == target)
 			return null;
 
-		// Already connected		
-		var d = new Dataflow(source,target);
+		var d = new Dataflow(this,source,target);
 		dataflows.push(d);
 		return d;
-
-		return null;
 	};
 
 	/**
@@ -310,7 +352,7 @@ function Canvas(container, width, height)
 		var me = this;
 		var set = paper.set(); // Raphael.Set for shapes
 		var canvas = canvas; // Internal reference to canvas
-		this.hasMoved = true;
+		this.hasMoved = true; // Must initially be true, or dataflows will not draw when added
 
 		/**
 		 * Add a shape to the Element
@@ -340,7 +382,7 @@ function Canvas(container, width, height)
 		 */
 		this.draggable = function()
 		{
-			set.draggable(canvas.calcDataflows);
+			set.draggable(canvas.calcDataflows, me);
 		};
 
 		/**
@@ -482,12 +524,17 @@ function Canvas(container, width, height)
 	 * @param {Element} source - Source of the Dataflow
 	 * @param {Element} target - Target of the Dataflow
 	 */
-	var Dataflow = function(source,target)
+	var Dataflow = function(canvas,source,target)
 	{
+		var me = this;
 		var source = source;
 		var target = target;
+		var canvas = canvas;
 		var path;
 		var arrow;
+
+		// Make sure this dataflow will get drawn
+		target.hasMoved = true;
 
 		/**
 		 * Get the attach points for an Element
@@ -507,51 +554,76 @@ function Canvas(container, width, height)
 		};
 
 		/**
+		 * Called when the Element is selected
+		 */
+		this.setSelected = function()
+		{
+			path.animate({"stroke-width": 5}, 100);
+		};
+
+		/**
+		 * Called when the Element is unselected
+		 */
+		this.setUnselected = function()
+		{
+			path.animate({"stroke-width": 3}, 100);
+		};
+
+		/**
+		 * Called when any Shape in the set is clicked
+		 */
+		var onMouseClick = function()
+		{
+			// Using "this" would result in the wrong object being used
+			canvas.dataflowClicked(me);
+		};
+
+		/**
 		 * Calculate Dataflow's path as the minium between the two Elements
 		 */
 		this.calcPath = function() {
 			if (!source.hasMoved || !target.hasMoved)
 				return;
 
-			var sP = getAttachPoints(source);
-			var tP = getAttachPoints(target);
-			var sIndex = 0; // Shortest point index for source
-			var tIndex = 0; // Shortest point index for source
+			var sourcePoint = getAttachPoints(source);
+			var targetPoint = getAttachPoints(target);
+			var sourceIndex = 0; // Shortest point index for source
+			var targetIndex = 0; // Shortest point index for source
 			var min; // Minimum length
 
 			// Loop through all of the attach points for both Elements
-			for (var i = 0; i < sP.length; i++)
+			for (var i = 0; i < sourcePoint.length; i++)
 			{
-				for (var j = 0; j < tP.length; j++)
+				for (var j = 0; j < targetPoint.length; j++)
 				{
 					// Calculate vector's length (sqrt(a^2 + b^2))
-					var dx = Math.abs(sP[i].x - tP[j].x);
-					var dy = Math.abs(sP[i].y - tP[j].y);
+					var dx = Math.abs(sourcePoint[i].x - targetPoint[j].x);
+					var dy = Math.abs(sourcePoint[i].y - targetPoint[j].y);
 					var length = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 					if (min)
 					{
 						// Check if new vector is minimum
 						if (length < min)
 						{
-							sIndex = i;
-							tIndex = j;
+							sourceIndex = i;
+							targetIndex = j;
 							min = length;
 						}
 					} 
 					else // No previous minimum existed
 					{
-						sIndex = i;
-						tIndex = j;
+						sourceIndex = i;
+						targetIndex = j;
 						min = length;
 					}
 				}
 			}
-			var pathString = "M" + sP[sIndex].x + " " + sP[sIndex].y + " L" + tP[tIndex].x + " " + tP[tIndex].y + " Z";
+			var pathString = "M" + sourcePoint[sourceIndex].x + " " + sourcePoint[sourceIndex].y + " L" + targetPoint[targetIndex].x + " " + targetPoint[targetIndex].y + " Z";
 
-			var angle = Math.atan2(tP[tIndex].x - sP[sIndex].x, tP[tIndex].y - sP[sIndex].y);
+			var angle = Math.atan2(targetPoint[targetIndex].x - sourcePoint[sourceIndex].x, targetPoint[targetIndex].y - sourcePoint[sourceIndex].y);
 			angle = (angle / (2 * Math.PI)) * 360;
-			var arrowString = "M" + tP[tIndex].x + " " + tP[tIndex].y + " L" + (tP[tIndex].x - 5) + " " + (tP[tIndex].y - 5) + " L" + (tP[tIndex].x - 5) + " " + (tP[tIndex].y + 5) + " L" + tP[tIndex].x + " " + tP[tIndex].y;
-			var arrowRotationString = "r" + ((-90+angle)*-1) + "," + tP[tIndex].x + "," + tP[tIndex].y;
+			var arrowString = "M" + targetPoint[targetIndex].x + " " + targetPoint[targetIndex].y + " L" + (targetPoint[targetIndex].x - 5) + " " + (targetPoint[targetIndex].y - 5) + " L" + (targetPoint[targetIndex].x - 5) + " " + (targetPoint[targetIndex].y + 5) + " L" + targetPoint[targetIndex].x + " " + targetPoint[targetIndex].y;
+			var arrowRotationString = "r" + ((-90+angle)*-1) + "," + targetPoint[targetIndex].x + "," + targetPoint[targetIndex].y;
 
 			if (path && arrow)
 			{
@@ -568,7 +640,8 @@ function Canvas(container, width, height)
 					arrow.remove();
 
 				// Path did not exist, create
-				path = paper.path(pathString);
+				path = paper.path(pathString).attr("stroke-width", 3);
+				path.mouseup(onMouseClick);
 				arrow = paper.path(arrowString).attr("fill","black");
 				arrow.transform(arrowRotationString);
 			}
