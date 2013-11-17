@@ -58,21 +58,29 @@
 				return $(this).clone().appendTo('body').css('zIndex',5).show();
 			};
 
+			var ELETYPE = {
+				PROCESS : {value: 0, name: "Process", code: "P"},
+				MULTIPROCESS: {value:1, name: "Multiprocess", code: "MP"},
+				DATASTORE: {value:1, name: "Datastore", code: "D"},
+				EXTINTERACTOR: {value:1, name: "External-Interactor", code: "EI"}
+
+			};
+
 			$("#process").draggable({
 				helper: draggableHelper
-			}).data("type", "process");
+			}).data("type", ELETYPE.PROCESS);
 
 			$("#multiprocess").draggable({
 				helper: draggableHelper
-			}).data("type", "multiprocess");
+			}).data("type", ELETYPE.MULTIPROCESS);
 
 			$("#datastore").draggable({
 				helper: draggableHelper
-			}).data("type", "datastore");
+			}).data("type", ELETYPE.DATASTORE);
 
 			$("#extinteractor").draggable({
 				helper: draggableHelper
-			}).data("type", "extinteractor");
+			}).data("type", ELETYPE.EXTINTERACTOR);
 
 			// Setup drag/drop
 			$("#tab1").droppable({
@@ -81,13 +89,13 @@
 					var posx = event.pageX - $('#tab1').offset().left;
 					var posy = event.pageY - $('#tab1').offset().top;
 
-					if ($(ui.draggable).data("type") == "process")
+					if ($(ui.draggable).data("type") == ELETYPE.PROCESS)
 						canvas.addProcess(posx,posy);
-					else if ($(ui.draggable).data("type") == "multiprocess")
+					else if ($(ui.draggable).data("type") == ELETYPE.MULTIPROCESS)
 						canvas.addMultiProcess(posx,posy);
-					else if ($(ui.draggable).data("type") == "datastore")
+					else if ($(ui.draggable).data("type") == ELETYPE.DATASTORE)
 						canvas.addDatastore(posx,posy);
-					else if ($(ui.draggable).data("type") == "extinteractor")
+					else if ($(ui.draggable).data("type") == ELETYPE.EXTINTERACTOR)
 						canvas.addExtInteractor(posx,posy);
 					else
 						alert("Draggable Element was malformed.");
