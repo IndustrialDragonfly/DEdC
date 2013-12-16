@@ -7,9 +7,13 @@ module.exports = function(grunt) {
       options: {
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
       },
-      build: {
+      canvas: {
         src: 'src/canvas.js',
-        dest: '../canvas.min.js'
+		dest: '../../dist/js/canvas.js'
+      },
+      canvas_test: {
+        src: 'src/canvas-test.js',
+		dest: '../../dist/js/canvas-test.js'
       }
     }
   });

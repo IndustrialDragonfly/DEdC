@@ -1,5 +1,5 @@
 JS_FILES = \
-	js/canvas.js
+	canvas/src/canvas.js
 
 JSDOC = jsdoc/jsdoc
 
