@@ -6,6 +6,15 @@ Use git to clone the repository:
 
     git clone https://github.com/IndustrialDragonfly/ded_c.git
     
+Build Canvas
+------------
+    sudo apt-get install npm
+    sudo npm install -g grunt-cli
+    ln -sf /usr/bin/nodejs /usr/bin/node
+    cd ded_c/Frontend/js/canvas
+    npm install
+    grunt
+
 Build Doc
 ---------
 Use git to initialize and update the submodules:
