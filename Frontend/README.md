@@ -14,6 +14,6 @@ Build Canvas
     cd ded_c/Frontend/dev/canvas
     npm install
     grunt uglify
-    grunt jsdoc // Build documentation (Optional)
+    grunt jsdoc #Build documentation (Optional)
 
 Canvas will be built in dist/js/, and the documentation for Cavans will be built it dist/doc.
