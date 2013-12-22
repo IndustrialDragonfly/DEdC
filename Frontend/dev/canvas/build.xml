@@ -1,0 +1,32 @@
+<!-- Build Canvas JavaScript library -->
+<project name="Canvas">
+
+	<target name="init">
+
+		<!-- Install Nodejs dependencies with npm -->
+		<echo message="Canvas: Installing Node dependencies"/>
+		<exec executable="${npm}" dir="${canvasDir}" failonerror="true">
+			<arg value="install"/>
+		</exec>
+	</target>
+
+	<!-- Build Target -->
+	<target name="build" depends="init">
+
+		<!-- Build Canvas with grunt -->
+		<echo message="Canvas: Building"/>
+		<exec executable="${grunt}" dir="${canvasDir}" failonerror="true">
+			<arg value="uglify"/>
+		</exec>
+	</target>
+
+	<!-- Doc Target -->
+	<target name="doc" depends="init">
+
+		<!-- Build Canvas with grunt -->
+		<echo message="Canvas: Building Documentation"/>
+		<exec executable="${grunt}" dir="${canvasDir}" failonerror="true">
+			<arg value="jsdoc"/>
+		</exec>
+	</target>
+</project>
