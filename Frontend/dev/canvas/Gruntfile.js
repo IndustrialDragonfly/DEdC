@@ -9,20 +9,23 @@ module.exports = function(grunt) {
       },
       canvas: {
         src: 'src/canvas.js',
-		dest: '../../dist/js/canvas.js'
+        dest: '../../dist/js/canvas.js'
       },
       canvas_test: {
         src: 'src/canvas-test.js',
-		dest: '../../dist/js/canvas-test.js'
+        dest: '../../dist/js/canvas-test.js'
       }
     },
-    jsdoc : {
-        dist : {
-            src: ['src/canvas.js'], 
-            options: {
-                destination: '../../dist/doc'
-            }
+    jsdoc: {
+      dist : {
+        src: ['src/canvas.js'], 
+        options: {
+          destination: '../../dist/doc'
         }
+      }
+    },
+    jshint: {
+      all: ['Gruntfile.js', 'src/canvas.js', 'src/canvas-test.js']
     }
   });
 
@@ -31,6 +34,9 @@ module.exports = function(grunt) {
   
   // Load the plugin that provides the "jsdoc" task
   grunt.loadNpmTasks('grunt-jsdoc');
+
+  // Load the plugin that provides the "jshint" task
+  grunt.loadNpmTasks('grunt-contrib-jshint');
 
   // Default task(s).
   grunt.registerTask('default', ['uglify']);
