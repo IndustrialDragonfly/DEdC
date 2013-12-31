@@ -72,17 +72,22 @@ function Canvas(container, width, height)
 		UP: {value:1, name: "Up", code: "U"}
 	};
 
-	var ctrlState = KEYSTATE.UP;
+	// Keyboard keys
+	var KEYS = {
+		CTRL : {value: 17, name: "Ctrl", code: "C"},
+	};
 
+	// Register key events
+	var ctrlState = KEYSTATE.UP; // Default state for ctrl
 	$("body").keydown(function(e) {
-		if (e.which == 17) // CTRL
+		if (e.which == KEYS.CTRL)
 		{
 			ctrlState = KEYSTATE.DOWN;
 		}
 	});
 
 	$("body").keyup(function(e) {
-		if (e.which == 17) // CTRL
+		if (e.which == KEYS.CTRL) // CTRL
 		{
 			ctrlState = KEYSTATE.UP;
 		}
