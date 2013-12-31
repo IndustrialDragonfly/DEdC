@@ -3,11 +3,11 @@
  * @param {Function} callback - Function to call when an object has been moved
  * @param {Element} element - Element that this Set belongs to
  */
-Raphael.st.draggable = function(callback,element)
+Raphael.st.draggable = function(callback, element)
 {
 	// Cache Set so elements can use it
 	var parent = this;
-	var element = element;
+	var myElement = element;
 
 	// Transform location
 	var tx = 0,
@@ -23,7 +23,7 @@ Raphael.st.draggable = function(callback,element)
 		tx = dx + ox;
 		ty = dy + oy;
 		parent.transform('t' + tx + ',' + ty);
-		element.hasMoved = true;
+		myElement.hasMoved = true;
 
 		// Recalculate the Dataflows
 		callback();
@@ -59,12 +59,12 @@ function Canvas(container, width, height)
 	var paper = Raphael(container, width, height);
 
 	// Element and Dataflow arrays
-	var elements = new Array();
-	var dataflows = new Array();
+	var elements = [];
+	var dataflows = [];
 
 	// Curent selection
-	var selection = new Array();
-	var dataflowSelection = new Array();
+	var selection = [];
+	var dataflowSelection = [];
 
 	// Keyboard events
 	var KEYSTATE = {
@@ -209,7 +209,7 @@ function Canvas(container, width, height)
 	this.setSize = function(width,height)
 	{
 		paper.setSize(width,height);
-	}
+	};
 
 	/** 
 	 * Add a process element to the canvas at the given location
@@ -351,7 +351,7 @@ function Canvas(container, width, height)
 	{
 		var me = this;
 		var set = paper.set(); // Raphael.Set for shapes
-		var canvas = canvas; // Internal reference to canvas
+		var myCanvas = canvas; // Internal reference to canvas
 		this.hasMoved = true; // Must initially be true, or dataflows will not draw when added
 
 		/**
@@ -382,7 +382,7 @@ function Canvas(container, width, height)
 		 */
 		this.draggable = function()
 		{
-			set.draggable(canvas.calcDataflows, me);
+			set.draggable(myCanvas.calcDataflows, me);
 		};
 
 		/**
@@ -426,7 +426,7 @@ function Canvas(container, width, height)
 		var onMouseClick = function()
 		{
 			// Using "this" would result in the wrong object being used
-			canvas.elementClicked(me);
+			myCanvas.elementClicked(me);
 		};
 	};
 	
@@ -527,14 +527,14 @@ function Canvas(container, width, height)
 	var Dataflow = function(canvas,source,target)
 	{
 		var me = this;
-		var source = source;
-		var target = target;
-		var canvas = canvas;
+		var mySource = source;
+		var myTarget = target;
+		var myCanvas = canvas;
 		var path;
 		var arrow;
 
 		// Make sure this dataflow will get drawn
-		target.hasMoved = true;
+		myTarget.hasMoved = true;
 
 		/**
 		 * Get the attach points for an Element
@@ -544,7 +544,7 @@ function Canvas(container, width, height)
 		var getAttachPoints = function(element)
 		{
 			var bb = element.getBBox();
-			var points = new Array();
+			var points = [];
 			points.push({x: bb.x, y: bb.y + bb.height / 2}); // Left
 			points.push({x: bb.x + bb.width / 2, y: bb.y}); // Top
 			points.push({x: bb.x + bb.width, y: bb.y + bb.height / 2}); // Right
@@ -575,18 +575,18 @@ function Canvas(container, width, height)
 		var onMouseClick = function()
 		{
 			// Using "this" would result in the wrong object being used
-			canvas.dataflowClicked(me);
+			myCanvas.dataflowClicked(me);
 		};
 
 		/**
 		 * Calculate Dataflow's path as the minium between the two Elements
 		 */
 		this.calcPath = function() {
-			if (!source.hasMoved || !target.hasMoved)
+			if (!mySource.hasMoved || !myTarget.hasMoved)
 				return;
 
-			var sourcePoint = getAttachPoints(source);
-			var targetPoint = getAttachPoints(target);
+			var sourcePoint = getAttachPoints(mySource);
+			var targetPoint = getAttachPoints(myTarget);
 			var sourceIndex = 0; // Shortest point index for source
 			var targetIndex = 0; // Shortest point index for source
 			var min; // Minimum length
@@ -650,4 +650,4 @@ function Canvas(container, width, height)
 		// Initially calculate the path
 		this.calcPath();
 	};
-};
+}
