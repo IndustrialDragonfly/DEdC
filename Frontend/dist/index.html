@@ -44,6 +44,7 @@
 			// Create the canvas, and add some sample elements
 			var canvas = new Canvas("tab1", 640, 480);
 			var p = canvas.addProcess(100,100);
+			p.setText("Test process");
 			canvas.addMultiProcess(200,100);
 			var d = canvas.addDatastore(100,200);
 			canvas.addExtInteractor(200,200);

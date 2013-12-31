@@ -23,6 +23,7 @@ Raphael.st.draggable = function(callback, element)
 		tx = dx + ox;
 		ty = dy + oy;
 		parent.transform('t' + tx + ',' + ty);
+		myElement.updateText();
 		myElement.setHasMoved(true);
 
 		// Recalculate the Dataflows
@@ -356,6 +357,7 @@ function Canvas(container, width, height)
 	{
 		var me = this;
 		var set = paper.set(); // Raphael.Set for shapes
+		var textBox;
 		var myCanvas = canvas; // Internal reference to canvas
 		var hasMoved = false;
 
@@ -460,6 +462,19 @@ function Canvas(container, width, height)
 			return points;
 		};
 
+		this.setText = function(text)
+		{
+			if (!textBox)
+			{
+				var points = this.getAttachPoints();
+				textBox = paper.text(points[3].x, points[3].y + 10, text);
+			}
+			else
+			{
+				textBox.attr("text", text);
+			}
+		};
+
 		/**
 		 * Called when any Shape in the set is clicked
 		 */
@@ -467,6 +482,16 @@ function Canvas(container, width, height)
 		{
 			// Using "this" would result in the wrong object being used
 			myCanvas.elementClicked(me);
+		};
+
+		this.updateText = function()
+		{
+			if (textBox)
+			{
+				var points = this.getAttachPoints();
+				textBox.attr("x", points[3].x);
+				textBox.attr("y", points[3].y + 10);
+			}
 		};
 	};
 	
@@ -607,7 +632,9 @@ function Canvas(container, width, height)
 		 */
 		this.calcPath = function() {
 			if (!mySource.getHasMoved() || !myTarget.getHasMoved())
+			{
 				return;
+			}
 
 			var sourcePoint = mySource.getAttachPoints();
 			var targetPoint = myTarget.getAttachPoints();
