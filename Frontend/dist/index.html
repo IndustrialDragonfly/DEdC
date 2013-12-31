@@ -107,6 +107,10 @@
 				canvas.addDataflowFromSelection();
 			});
 
+			$("#delete").button().click(function(){
+				canvas.removeElementFromSelection();
+			});
+
 			// Initial resize to fit
 			resizeCanvas();
 		});
@@ -188,6 +192,7 @@
 	<div id="content" class="ui-layout-center">
 		<div id="toolbar" class="ui-widget-header ui-conrner-all">
 			<button id="connect">Create Dataflow</button>
+			<button id="delete">Delete Element</button>
 		</div>
 		<ul id="menu">
 			<li><a href="#tab1">DFD</a></li>

@@ -81,14 +81,14 @@ function Canvas(container, width, height)
 	// Register key events
 	var ctrlState = KEYSTATE.UP; // Default state for ctrl
 	$("body").keydown(function(e) {
-		if (e.which == KEYS.CTRL)
+		if (e.which == KEYS.CTRL.value)
 		{
 			ctrlState = KEYSTATE.DOWN;
 		}
 	});
 
 	$("body").keyup(function(e) {
-		if (e.which == KEYS.CTRL) // CTRL
+		if (e.which == KEYS.CTRL.value) // CTRL
 		{
 			ctrlState = KEYSTATE.UP;
 		}
@@ -301,7 +301,20 @@ function Canvas(container, width, height)
 				this.addDataflow(selection[i], selection[i+1]);
 		}
 
-		this.unselectAll();
+		this.unselectAllElements();
+	};
+
+	/**
+	 * Remove an element from the canvas
+	 */
+	this.removeElementFromSelection = function()
+	{
+		// TODO: Handle floating dataflows
+		for (var i = 0; i < selection.length; i++)
+		{
+			this.removeElement(selection[i]);
+		}
+		this.unselectAllElements();
 	};
 
 	/**
@@ -314,6 +327,7 @@ function Canvas(container, width, height)
 		var index = elements.indexOf(element);
 		if (index > -1)
 		{
+			element.remove();
 			elements.splice(index, 1);
 			return true;
 		}
@@ -462,6 +476,10 @@ function Canvas(container, width, height)
 			return points;
 		};
 
+		/**
+		 * Set the text label for the element
+		 * @param {String} text - Text to set label to
+		 */
 		this.setText = function(text)
 		{
 			if (!textBox)
@@ -484,6 +502,9 @@ function Canvas(container, width, height)
 			myCanvas.elementClicked(me);
 		};
 
+		/**
+		 * Update the position of the text label
+		 */
 		this.updateText = function()
 		{
 			if (textBox)
@@ -491,6 +512,22 @@ function Canvas(container, width, height)
 				var points = this.getAttachPoints();
 				textBox.attr("x", points[3].x);
 				textBox.attr("y", points[3].y + 10);
+			}
+		};
+
+		/**
+		 * Remove the element from the canvas
+		 */
+		this.remove = function()
+		{
+			if (textBox)
+			{
+				textBox.remove();
+			}
+
+			if (set)
+			{
+				set.remove();
 			}
 		};
 	};
