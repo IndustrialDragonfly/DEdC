@@ -23,7 +23,7 @@ Raphael.st.draggable = function(callback, element)
 		tx = dx + ox;
 		ty = dy + oy;
 		parent.transform('t' + tx + ',' + ty);
-		myElement.hasMoved = true;
+		myElement.setHasMoved(true);
 
 		// Recalculate the Dataflows
 		callback();
@@ -357,7 +357,7 @@ function Canvas(container, width, height)
 		var me = this;
 		var set = paper.set(); // Raphael.Set for shapes
 		var myCanvas = canvas; // Internal reference to canvas
-		this.hasMoved = true; // Must initially be true, or dataflows will not draw when added
+		var hasMoved = false;
 
 		/**
 		 * Add a shape to the Element
@@ -423,6 +423,41 @@ function Canvas(container, width, height)
 		this.setUnselected = function()
 		{
 			set.animate({"fill-opacity": 1.0}, 100);
+		};
+
+		/**
+		 * Get whether the element has moved
+		 * @returns {Boolean} True if element has moved, false otherwise
+		 */
+		this.getHasMoved = function()
+		{
+			return hasMoved;
+		};
+
+		/**
+		 * Get whether the element has moved
+		 * @param {Boolean} moved - Set to true when moved, false when updated
+		 */
+		this.setHasMoved = function(moved)
+		{
+			hasMoved = moved;
+		};
+
+		/**
+		 * Get the attach points for the Element
+		 * @returns {Array} Array of four points (x,y)
+		 */
+		this.getAttachPoints = function()
+		{
+			var bb = this.getBBox();
+			var points = [];
+
+			points.push({x: bb.x, y: bb.y + bb.height / 2}); // Left
+			points.push({x: bb.x + bb.width / 2, y: bb.y}); // Top
+			points.push({x: bb.x + bb.width, y: bb.y + bb.height / 2}); // Right
+			points.push({x: bb.x + bb.width / 2, y: bb.y + bb.height}); // Bottom
+
+			return points;
 		};
 
 		/**
@@ -539,24 +574,8 @@ function Canvas(container, width, height)
 		var arrow;
 
 		// Make sure this dataflow will get drawn
-		myTarget.hasMoved = true;
-
-		/**
-		 * Get the attach points for an Element
-		 * @param {Element} element - The element to get the attach points off
-		 * @returns {Array} Array of four points (x,y)
-		 */
-		var getAttachPoints = function(element)
-		{
-			var bb = element.getBBox();
-			var points = [];
-			points.push({x: bb.x, y: bb.y + bb.height / 2}); // Left
-			points.push({x: bb.x + bb.width / 2, y: bb.y}); // Top
-			points.push({x: bb.x + bb.width, y: bb.y + bb.height / 2}); // Right
-			points.push({x: bb.x + bb.width / 2, y: bb.y + bb.height}); // Bottom
-
-			return points;
-		};
+		myTarget.setHasMoved(true);
+		mySource.setHasMoved(true);
 
 		/**
 		 * Called when the Element is selected
@@ -587,11 +606,11 @@ function Canvas(container, width, height)
 		 * Calculate Dataflow's path as the minium between the two Elements
 		 */
 		this.calcPath = function() {
-			if (!mySource.hasMoved || !myTarget.hasMoved)
+			if (!mySource.getHasMoved() || !myTarget.getHasMoved())
 				return;
 
-			var sourcePoint = getAttachPoints(mySource);
-			var targetPoint = getAttachPoints(myTarget);
+			var sourcePoint = mySource.getAttachPoints();
+			var targetPoint = myTarget.getAttachPoints();
 			var sourceIndex = 0; // Shortest point index for source
 			var targetIndex = 0; // Shortest point index for source
 			var min; // Minimum length
