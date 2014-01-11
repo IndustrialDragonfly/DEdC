@@ -1,0 +1,42 @@
+{ "collection" :
+	{
+		"version" : "1.0",
+		"href" : "http://localhost/dfd/",
+
+		"items" : [
+			{
+				"href" : "http://localhost/dfd/1",
+				"data" : [
+					{"name" : "name", "value" : "Example Process"},
+					{"name" : "description", "value" : "This is an example process."},
+					{"name" : "type", "value" : "process"},
+					{"name" : "x", "value" : "50"},
+					{"name" : "y", "value" : "50"},
+					{"name" : "id", "value" : "1"}
+				]
+			},
+			{
+				"href" : "http://localhost/dfd/2",
+				"data" : [
+					{"name" : "name", "value" : "Example Datastore"},
+					{"name" : "description", "value" : "This is an example datastore."},
+					{"name" : "type", "value" : "datastore"},
+					{"name" : "x", "value" : "100"},
+					{"name" : "y", "value" : "50"},
+					{"name" : "id", "value" : "2"}
+				]
+			}
+		],
+
+		"template" : {
+			"data" : [
+				{"name" : "name", "value" : ""},
+				{"name" : "description", "value" : ""},
+				{"name" : "type", "value" : ""},
+				{"name" : "x", "value" : ""},
+				{"name" : "y", "value" : ""},
+				{"name" : "id", "value" : ""}
+			]
+		}
+	}
+}
