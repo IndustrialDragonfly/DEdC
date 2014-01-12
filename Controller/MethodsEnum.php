@@ -14,9 +14,9 @@
  * @author eugene
  */
 class MethodsEnum {
-    const GET = 0;
-    const POST = 1;
-    const PUT = 2;
-    const DELETE = 3;
-    const UPDATE = 4;
+    const GET = 1;
+    const POST = 2;
+    const PUT = 3;
+    const DELETE = 4;
+    const PATCH = 5;
 }

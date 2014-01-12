@@ -1,42 +1,67 @@
 <?php
-
 /**
- * Description of request
- * 
- * Abstract object which parses the incoming requests objects and provides
+  * Abstract object which parses the incoming requests objects and provides
  * getters for all the data contained within
  *
  * @author eugene
  */
+require_once 'MethodException.php';
+
 abstract class Request {
     //<editor-fold desc="Attributes" defaultstate="collapsed">
-    protected $method; // HTTP method in use
-    protected $identifier; // identifier that the URL requested
+    protected $method; // HTTP method in use, stored as a MethodsEnum type
+                       // but looks like an int here
+    /**
+     * The URI given for the location, example: "/someplace/in/server"
+     * @access protected
+     * @var String
+     */
+    protected $resource; 
     protected $query; // Query data from the URL (optional)
-    protected $header; // Header from the client (required)
     protected $body; // Contains the body of the message (optional)
     protected $type; // Media type the request in/has requested
         //<editor-fold desc="Header Attributes" defaultstate="expanded">
-        protected $accept; // Acceptable content types
+        /**
+         * Array of the acceptable content types according to the client.
+         * @var String Array
+         */
+        protected $accept; 
         
         //</editor-fold>
     //</editor-fold>
     
     //<editor-fold desc="Setter functions" defaultstate="collapsed">
-    protected function setMethod($method) {
-        $this->method = $method;
+    protected function setMethod($method) 
+    {
+        switch ($method)
+        {
+            case "GET":
+                $this->method = MethodsEnum::GET;
+                break;
+            case "POST":
+                $this->method = MethodsEnum::POST;
+                break;
+            case "PUT":
+                $this->method = MethodsEnum::PUT;
+                break;
+            case "DELETE":
+                $this->method = MethodsEnum::DELETE;
+                break;
+            case "PATCH":
+                $this->method = MethodsEnum::PATCH;
+                break;
+            default:
+                throw new MethodException($method." is not a valid HTTP method
+                    for use with DEdC.");
+                
+        }
     }
-    protected function setIdentifier($identifier) {
-        $this->identifier = $identifier;
+    protected function setResource($resource) {
+        $this->resource = $resource;
     }
     protected function setQuery($query)
     {
         $this->query = $query;
-    }
-    
-    protected function setHeader($header)
-    {
-        $this->header = $header;
     }
     
     protected function setBody($body)
@@ -53,17 +78,12 @@ abstract class Request {
     public function getMethod() {
         return $this->method;
     }
-    public function getIdentifier()
+    public function getResource()
     {
-        return $this->identifier;
+        return $this->resource;
     }
     public function getQuery() {
         return $this->query;
-    }
-    
-    public function getHeader()
-    {
-        return $this->header;
     }
     public function getBody()
     {
@@ -78,32 +98,22 @@ abstract class Request {
         return $this->accept;
     }
     //</editor-fold>
-    
-    public function __construct($header)
-    {
-        // Save header
-        $this->setHeader($header);
-        $this->processHeader();
-    }
-    
     /**
-     * processHeader reads the header and pulls out the individual pieces
-     * of infomation from it, storing them into their own attributes
+     * Creates a new request object from data from the HTTP reuest, and puts
+     * it into a convient form for use by the controller.
+     * 
+     * @param String $accept
+     * @param String $method
+     * @param String $resource
      */
-    private function processHeader()
+    public function __construct($accept, $method, $resource)
     {
-        $this->accept = array();
-        $acceptValues = $this->header['Accept'];
+        // Save method type used to access (from enum)
+        $this->setMethod($method);
+        // Save the acceptable types
         $delim = ", "; // Delimiter between acceptable content types
-        $curPos = 0; // Current start of content type
-        $delimPos = strpos($acceptValues, $delim, $curPos);
-        while (FALSE !== $delimPos)
-        {
-            array_push($this->accept, substr($acceptValues, $curPos, $delimPos - $curPos));
-            $curPos = $delimPos + 2;
-            $delimPos = strpos($acceptValues, $delim, $curPos);            
-        }
-        // Final read, gets last content type
-        array_push($this->accept, substr($acceptValues, $curPos));
+        $this->accept = explode($delim, $accept);
+        
+        $this->setResource($resource);
     }
 }
