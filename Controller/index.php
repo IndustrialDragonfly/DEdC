@@ -19,6 +19,7 @@
     }
     
     // Determine if a valid request and media type
+    // apache_request_headers();
     if (!checkFormat())
     {
         // Return error indicating problem with format to client
