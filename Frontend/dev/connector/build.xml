@@ -18,6 +18,9 @@
 		<exec executable="${grunt}" dir="${connectorDir}" failonerror="true">
 			<arg value="uglify"/>
 		</exec>
+		<exec executable="${grunt}" dir="${connectorDir}" failonerror="true">
+			<arg value="copy"/>
+		</exec>
 	</target>
 
 	<!-- Doc Target -->

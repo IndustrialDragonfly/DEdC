@@ -26,6 +26,12 @@ module.exports = function(grunt) {
     },
     jshint: {
       all: ['Gruntfile.js', 'src/connector.js', 'src/connector-test.js']
+    },
+    copy: {
+      main: {
+        files: [
+          {expand: true, src: ['example_data/*'], dest: '../../dist/'}]
+      }
     }
   });
 
@@ -38,7 +44,10 @@ module.exports = function(grunt) {
   // Load the plugin that provides the "jshint" task
   grunt.loadNpmTasks('grunt-contrib-jshint');
 
+  // Load the plugin that provides the "" task
+  grunt.loadNpmTasks('grunt-contrib-copy');
+
   // Default task(s).
-  grunt.registerTask('default', ['uglify']);
+  grunt.registerTask('default', ['uglify', 'copy']);
 
 };
