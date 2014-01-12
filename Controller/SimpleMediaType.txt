@@ -1,0 +1,83 @@
+For purposes of early development purposes, a simple media type has
+been defined for testing integration between client and controller code.
+This media type is JSON based, and is not to be used in any production code.
+This media type does not fully support all data that can be within a given DFD,
+only providing one level.
+
+Definition for a DFD (note there are no nested DFDs in this definition)
+{
+    "name": "DFD",
+    "properties": {
+        "elements": {
+            "type": "array",
+            "description": "all elements contained in the DFD",
+            "elements": {
+                "type": "object"
+                }
+             }
+};
+
+Definition for a single node
+{
+    "name": "Node",
+    "properties": {
+        "id": {
+            "type": "string",
+            "description": "Element identifier",
+            "required": true
+            },
+        "x": {
+            "type": "number",
+            "description": "x-coordinate of an element",
+            "required": true
+             },
+        "y": {
+            "type": "number",
+            "description": "y-coordinate of an element",
+            "required": true
+             },
+        "type": {
+            "type": "string",
+            "description": "type of element",
+            "required": "true"
+            },
+       "label": {
+            "type": "string",
+            "description": "name of element",
+            "required": "true"
+            },
+       "originator": {
+            "type": "string",
+            "description": "name of creating user"
+            "required": "true"
+            },
+       "dataflows": {
+            "type": "array",
+            "description: "list of dataflows connected to element"
+            "dataflows": {
+                "type": "string"
+             }
+            }
+};
+
+Definition for a single dataflow
+{
+    "name": "Dataflow",
+    "properties": {
+        "id": {
+            "type": "string",
+            "description": "Element identifier",
+            "required": true
+            },
+        "origin_id": {
+            "type": "string",
+            "description": "Element identifier to connect to",
+            "required": true
+            },
+       "dest_id": {
+            "type": "string",
+            "description": "Element identifier to connect to",
+            "required": true
+            }
+      }
+}

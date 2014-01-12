@@ -12,7 +12,6 @@ require_once "Request/SimpleRequest.php";
 require_once "MethodsEnum.php";
 require_once "Authentication.php";
 require_once "AuthorizeUser.php";
-require_once "Headers.php";
 
     // Decode URL if needed
     
@@ -52,7 +51,7 @@ require_once "Headers.php";
     switch ($request->getMethod())
     {
         case MethodsEnum::GET:
-            header(header_codes(200));
+            //header(header_codes(200));
             echo "Success\n";
             break;
         case MethodsEnum::POST:
