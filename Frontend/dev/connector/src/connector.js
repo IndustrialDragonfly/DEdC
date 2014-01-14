@@ -2,21 +2,23 @@
  * Create a Connector
  * @constructor
  */
-function Connector()
+function Connector(canvas)
 {
+	var myCanvas = canvas;
+
 	/**
 	 * Get a DFD, and return it as plain text
 	 * @param {String} url - Url of the DFD with no domain
 	 * @return {Response} Response from the request
 	 */
-	this.getDfd = function(url)
+	this.get = function(url)
 	{
 		var response = new Response();
 		
 		$.ajax({
 			url: url,
 			async: false,		// If async is true, response will be returned before query executes
-			dataType: "text"	// Do not let jQuery automatically parse the JSON response
+			dataType: "json"	// Do not let jQuery automatically parse the JSON response
 		}).done(function(data, textStatus) {
 				// Request was successful
 				response.setData(data);
@@ -28,6 +30,13 @@ function Connector()
 		});
 
 		return response;
+	};
+
+	this.load = function(url)
+	{
+		var response = this.get(url);
+
+		canvas.addProcess(response.getData().elements[0].x, response.getData().elements[0].y);
 	};
 
 	/**
