@@ -4,16 +4,30 @@
 		{
 			"id": "1234",
 			"type": "process",
-			"label": "Example Process 1",
+			"label": "Example Process",
 			"x": "50",
 			"y": "50"
 		},
 		{
 			"id": "1235",
-			"type": "process",
-			"label": "Example Process 2",
-			"x": "100",
+			"type": "multiprocess",
+			"label": "Example MultiProcess",
+			"x": "200",
 			"y": "50"
+		},
+		{
+			"id": "1236",
+			"type": "datastore",
+			"label": "Example Datastore",
+			"x": "200",
+			"y": "200"
+		},
+		{
+			"id": "1237",
+			"type": "extinteractor",
+			"label": "Example ExtInteractor",
+			"x": "50",
+			"y": "200"
 		}
 	]
 }

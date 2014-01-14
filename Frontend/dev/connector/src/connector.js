@@ -34,9 +34,24 @@ function Connector(canvas)
 
 	this.load = function(url)
 	{
+		//TODO: Handle errors
+		//TODO: Use enum for types
 		var response = this.get(url);
 
-		canvas.addProcess(response.getData().elements[0].x, response.getData().elements[0].y);
+		response.getData().elements.forEach(function(entry) {
+			if (entry.type === "process") {
+				canvas.addProcess(entry.x, entry.y);
+			}
+			else if (entry.type === "multiprocess") {
+				canvas.addMultiProcess(entry.x, entry.y);
+			}
+			else if (entry.type === "datastore") {
+				canvas.addDatastore(entry.x, entry.y);
+			}
+			else if (entry.type === "extinteractor") {
+				canvas.addExtInteractor(entry.x, entry.y);
+			}
+		});
 	};
 
 	/**
