@@ -8,10 +8,39 @@
  * Currently is no more than a very rough skeleton with the aim of sparking
  * discussion on its design. 
  */
-require_once "Request/SimpleRequest.php";
+
+/**
+ * Autoload function which loads a file based on class name from any of the 
+ * relevant folders - those of the data models and those of Request and Response
+ * folders.
+ * @param String $classname
+ */
+function __autoload($classname)
+{
+    if (file_exists($classname . ".php") )
+    {
+        require_once $classname . ".php";
+    }
+    elseif (file_exists("Request/" . $classname . ".php"))
+    {
+        require_once "Request/" . $classname . ".php";
+    }
+    elseif (file_exists("Response/" . $classname . ".php"))
+    {
+        require_once "Request/" . $classname . ".php";
+    }
+    else
+    {
+        // Make throw an exception later
+        echo "Problem loading file";
+        exit;
+    }
+}
+
 require_once "MethodsEnum.php";
 require_once "Authentication.php";
 require_once "AuthorizeUser.php";
+
 
     // Decode URL if needed
     
