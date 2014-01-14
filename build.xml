@@ -1,0 +1,29 @@
+<!-- Global Ant build file for DEdC -->
+<project name="DEdC" default="build" basedir=".">
+
+	<!-- Set global properties -->
+	<property name="grunt" location="/usr/local/bin/grunt"/>
+	<property name="npm" location="/usr/bin/npm"/>
+	<property name="canvasDir" location="Frontend/dev/canvas"/>
+
+	<!-- Global build target, build all submodules -->
+	<target name="build">
+		<echo message="Building DEdC Modules"/>
+
+		<!-- Build Canvas -->
+		<ant antfile="${canvasDir}/build.xml" target="build"/>
+	</target>
+
+	<!-- Global doc target, build all documentation -->
+	<target name="doc">
+		<echo message="Building DEdC Documentation"/>
+
+		<!-- Build Canvas Doc -->
+		<ant antfile="${canvasDir}/build.xml" target="doc"/>
+	</target>
+
+	<!-- Global all target, build everything -->
+	<target name="all" depends="build,doc">
+		<echo message="Building all of DEdC"/>
+	</target>
+</project>

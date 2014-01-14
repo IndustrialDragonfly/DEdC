@@ -26,8 +26,29 @@ html, body
   overflow: hidden;
 }
 
+#tabsContainer
+{
+  overflow: hidden;
+}
+
+#toolbar
+{
+  padding: 0.25em;
+  margin-bottom: 0.25em;
+}
 /* Overriding jQuery accordion padding */
 .ui-accordion .ui-accordion-content
 {
   padding: 0.25em 0.25em;
+}
+
+.ui-layout-content
+{
+  padding: 0;
+}
+
+.ui-tabs-panel.ui-widget-content
+{
+  padding: 0;
+  margin: 0;
 }
