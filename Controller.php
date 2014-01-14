@@ -27,7 +27,7 @@ function __autoload($classname)
     }
     elseif (file_exists("Response/" . $classname . ".php"))
     {
-        require_once "Request/" . $classname . ".php";
+        require_once "Response/" . $classname . ".php";
     }
     else
     {
