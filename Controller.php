@@ -93,8 +93,10 @@ require_once "AuthorizeUser.php";
     switch ($request->getMethod())
     {
         case MethodsEnum::GET:
-            //header(header_codes(200));
-            echo "Success\n";
+            $response = new SimpleResponse();
+            $response->setHeader(200);
+            header($response->getHeader());
+            echo $response->getBody();
             break;
         case MethodsEnum::POST:
             sendHeader(successful);
