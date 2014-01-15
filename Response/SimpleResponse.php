@@ -8,8 +8,9 @@ require_once "Response.php";
 
 class SimpleResponse extends Response
 {
-    public function __construct()
+    public function __construct($element)
     {
+        parent::__construct($element);
         // Set the very hard coded DFD up
         $body =<<<EOT
                 {

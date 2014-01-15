@@ -18,6 +18,17 @@ abstract class Response
      * @var String
      */
     protected $body;
+    /**
+     * The element object being returned, can be a node, DFD, or dataflow
+     * Optional
+     * @var Element
+     */
+    protected $element;    
+    
+    public function __construct($element) {
+        $this->setElement($element);
+    }
+    
     //</editor-fold>
     
     //<editor-fold desc="Setters" defaultstate="collapsed">
@@ -61,7 +72,14 @@ abstract class Response
         }
         $this->header = $header;
     }
-    
+    /**
+     * Sets the element that is being returned to the client
+     * @param Element Object $element
+     */
+    protected function setElement($element)
+    {
+        $this->element = $element;
+    }
     /**
      * Sets the body function in whatever data format it is passed.
      * @param String $body
@@ -74,7 +92,7 @@ abstract class Response
     
     //<editor-fold desc="Getters" defaultstate="collapsed">
     /**
-     * 
+     * Returns the header to be sent to the client
      * @return String
      */
     public function getHeader()
@@ -89,6 +107,15 @@ abstract class Response
     public function getBody()
     {
         return $this->body;
+    }
+    /**
+     * Returns the element that is to be converted into a different format and
+     * returned to the client
+     * @return Element
+     */
+    public function getElement()
+    {
+        return $this->element;
     }
     //</editor-fold>
 }

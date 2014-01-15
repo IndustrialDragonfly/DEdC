@@ -14,7 +14,7 @@ abstract class Request {
     /**
      * The URI given for the location, example: "/someplace/in/server"
      * @access protected
-     * @var String
+     * @var string
      */
     protected $resource; 
     protected $query; // Query data from the URL (optional)
