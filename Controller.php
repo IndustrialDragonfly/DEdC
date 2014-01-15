@@ -9,6 +9,19 @@
  * discussion on its design. 
  */
 
+/*
+ * Checks to see if the incoming request has the proper user agent product,
+ * if it does not loads the web client page.
+ */
+$web_client_location = "Frontend/dist/";
+$browser_accept = '*/*';
+if (FALSE !== stripos($_SERVER['HTTP_ACCEPT'], $browser_accept))
+{
+    require_once $web_client_location."/index.php";
+    webClient($web_client_location);
+    exit;
+}
+
 /**
  * Autoload function which loads a file based on class name from any of the 
  * relevant folders - those of the data models and those of Request and Response
@@ -27,7 +40,7 @@ function __autoload($classname)
     }
     elseif (file_exists("Response/" . $classname . ".php"))
     {
-        require_once "Request/" . $classname . ".php";
+        require_once "Response/" . $classname . ".php";
     }
     else
     {
@@ -80,8 +93,10 @@ require_once "AuthorizeUser.php";
     switch ($request->getMethod())
     {
         case MethodsEnum::GET:
-            //header(header_codes(200));
-            echo "Success\n";
+            $response = new SimpleResponse();
+            $response->setHeader(200);
+            header($response->getHeader());
+            echo $response->getBody();
             break;
         case MethodsEnum::POST:
             sendHeader(successful);
