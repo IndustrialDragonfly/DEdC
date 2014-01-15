@@ -6,7 +6,7 @@ only providing one level.
 
 Definition for a DFD (note there are no nested DFDs in this definition)
 {
-    "name": "DFD",
+    "name": "string",
     "elements": []
 }
 
