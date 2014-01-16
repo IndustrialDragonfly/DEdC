@@ -1,0 +1,30 @@
+For purposes of early development purposes, a simple media type has
+been defined for testing integration between client and controller code.
+This media type is JSON based, and is not to be used in any production code.
+This media type does not fully support all data that can be within a given DFD,
+only providing one level.
+
+Definition for a DFD (note there are no nested DFDs in this definition)
+{
+    "name": "string",
+    "elements": []
+}
+
+Definition for a single node
+{
+    "id": "string",
+    "type": "string",
+    "label": "string",
+    "x": "value",
+    "y": "value",
+    "originator": "string",
+    "dataflows": []
+}
+
+
+Definition for a single dataflow
+{
+    "id": "string",
+    "origin_id": "string",
+    "dest_id": "string"
+}
