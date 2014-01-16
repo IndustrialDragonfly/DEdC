@@ -16,6 +16,7 @@ echo <<<EOF
             <script type="text/javascript" src="${web_client_location}js/lib/jquery-layout-resizeAccordionCallback-1.2.js"></script>
             <script type="text/javascript" src="${web_client_location}js/lib/raphael-2.1.2.js"></script>
             <script type="text/javascript" src="${web_client_location}js/canvas.js"></script>
+            <script type="text/javascript" src="${web_client_location}js/connector.js"></script>
             <script>
                     $(document).ready(function () {
                             // Function to resize the canvas to fit in the tab
@@ -47,13 +48,13 @@ echo <<<EOF
 
                             // Create the canvas, and add some sample elements
                             var canvas = new Canvas("tab1", 640, 480);
-                            var p = canvas.addProcess(100,100);
-                            p.setText("Test process");
-                            canvas.addMultiProcess(200,100);
-                            var d = canvas.addDatastore(100,200);
-                            canvas.addExtInteractor(200,200);
+                            //var p = canvas.addProcess(100,100);
+                            //p.setText("Test process");
+                            //canvas.addMultiProcess(200,100);
+                            //var d = canvas.addDatastore(100,200);
+                            //canvas.addExtInteractor(200,200);
 
-                            canvas.addDataflow(p,d);
+                            //canvas.addDataflow(p,d);
 
                             canvas.setBackground('#A8A8A8');
 
@@ -114,6 +115,12 @@ echo <<<EOF
                             $("#delete").button().click(function(){
                                     canvas.removeElementFromSelection();
                             });
+                            var connector = new Connector(canvas);
+
+                            $("#load").button().click(function(){
+                                connector.load("Controller.php/test_dfd");
+                            });
+
 
                             // Initial resize to fit
                             resizeCanvas();
@@ -197,6 +204,7 @@ echo <<<EOF
                     <div id="toolbar" class="ui-widget-header ui-conrner-all">
                             <button id="connect">Create Dataflow</button>
                             <button id="delete">Delete Element</button>
+                            <button id="load">Load DFD</button>
                     </div>
                     <ul id="menu">
                             <li><a href="#tab1">DFD</a></li>
