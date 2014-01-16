@@ -6,78 +6,25 @@ only providing one level.
 
 Definition for a DFD (note there are no nested DFDs in this definition)
 {
-    "name": "DFD",
-    "properties": {
-        "elements": {
-            "type": "array",
-            "description": "all elements contained in the DFD",
-            "elements": {
-                "type": "object"
-                }
-             }
-};
+    "name": "string",
+    "elements": []
+}
 
 Definition for a single node
 {
-    "name": "Node",
-    "properties": {
-        "id": {
-            "type": "string",
-            "description": "Element identifier",
-            "required": true
-            },
-        "x": {
-            "type": "number",
-            "description": "x-coordinate of an element",
-            "required": true
-             },
-        "y": {
-            "type": "number",
-            "description": "y-coordinate of an element",
-            "required": true
-             },
-        "type": {
-            "type": "string",
-            "description": "type of element",
-            "required": "true"
-            },
-       "label": {
-            "type": "string",
-            "description": "name of element",
-            "required": "true"
-            },
-       "originator": {
-            "type": "string",
-            "description": "name of creating user"
-            "required": "true"
-            },
-       "dataflows": {
-            "type": "array",
-            "description: "list of dataflows connected to element"
-            "dataflows": {
-                "type": "string"
-             }
-            }
-};
+    "id": "string",
+    "type": "string",
+    "label": "string",
+    "x": "value",
+    "y": "value",
+    "originator": "string",
+    "dataflows": []
+}
+
 
 Definition for a single dataflow
 {
-    "name": "Dataflow",
-    "properties": {
-        "id": {
-            "type": "string",
-            "description": "Element identifier",
-            "required": true
-            },
-        "origin_id": {
-            "type": "string",
-            "description": "Element identifier to connect to",
-            "required": true
-            },
-       "dest_id": {
-            "type": "string",
-            "description": "Element identifier to connect to",
-            "required": true
-            }
-      }
+    "id": "string",
+    "origin_id": "string",
+    "dest_id": "string"
 }
