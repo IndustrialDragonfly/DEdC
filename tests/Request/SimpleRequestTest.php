@@ -48,7 +48,11 @@ class SimpleRequestTest extends PHPUnit_Framework_TestCase
         $result = $singleMedia->getAccept();
         $this->assertEquals($testType, $result[0]);
     }
-    
+    /**
+     * Checks that Request object correctly handles multiple types in the 
+     * accept portion of the header
+     * @covers Request::processHeader
+     */
     public function testMultipleMediaType()
     {
         $testTypes = array("text/html", "text/xml", "text/json");
@@ -78,5 +82,49 @@ class SimpleRequestTest extends PHPUnit_Framework_TestCase
         $resource = "/test.html";
         $accept = "text/html";
         $this->object = new SimpleRequest($accept, $badMethod, $resource);
+    }
+    
+    /**
+     * Test all the different potential methods to ensure that when a string
+     * with their name is passed in, they will return a string with the proper
+     * integer equivalent (as per MethodsEnum)
+     * @covers Request::__construct, Request::setMethod, Request::getMethod
+     */
+    public function testGoodMethods()
+    {
+        $resource = "dfd/uuid100";
+        $accept = "text/json";
+        
+        // Test with GET
+        $this->object = new SimpleRequest($accept, "GET", $resource);
+        $this->assertEquals(MethodsEnum::GET, $this->object->getMethod());
+        
+        // Test with POST
+        $this->object = new SimpleRequest($accept, "POST", $resource);
+        $this->assertEquals(MethodsEnum::POST, $this->object->getMethod());
+        
+        // Test with PUT
+        $this->object = new SimpleRequest($accept, "PUT", $resource);
+        $this->assertEquals(MethodsEnum::PUT, $this->object->getMethod());
+        
+        // Test with DELETE
+        $this->object = new SimpleRequest($accept, "DELETE", $resource);
+        $this->assertEquals(MethodsEnum::DELETE, $this->object->getMethod());
+        
+        // Test with PATCH
+        $this->object = new SimpleRequest($accept, "PATCH", $resource);
+        $this->assertEquals(MethodsEnum::PATCH, $this->object->getMethod());
+    }
+    /**
+     * @covers Request::__construct, Request::setResource, Request::getResource
+     */
+    public function testResource()
+    {
+        $resource = "dfd/uuid100";
+        $accept = "text/json";
+        $method = "GET";
+        
+        $this->object = new SimpleRequest($accept, $method, $resource);        
+        $this->assertEquals($resource, $this->object->getResource());
     }
 }

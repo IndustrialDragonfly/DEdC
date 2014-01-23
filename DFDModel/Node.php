@@ -32,6 +32,15 @@ require_once 'Element.php';
    }
    
    /**
+    * Function that return the links that connect to a node
+    * @return string[]
+    */
+   public function getLinks()
+   {
+       return $links;
+   }
+   
+   /**
     * function that adds a new link to the list of links
     * @param DataFlow $newLink
     * @throws BadFunctionCallException
