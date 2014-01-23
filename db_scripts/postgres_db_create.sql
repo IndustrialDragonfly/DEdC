@@ -4,17 +4,35 @@ CREATE DATABASE dedc;
 --Create and grant proper privileges
 CREATE ROLE dedc_user WITH LOGIN PASSWORD 'dedc';
 GRANT ALL PRIVILEGES ON DATABASE dedc TO dedc_user;
+-- Tester role is ONLY to be created on test systems never in production DBs
 CREATE ROLE tester WITH LOGIN PASSWORD 'test';
 GRANT ALL PRIVILEGES ON DATABASE dedc TO tester;
 
 -- Execute in dedc DB
+CREATE TABLE types
+(
+type_id SMALLINT NOT NULL,
+type_name VARCHAR(20) NOT NULL,
+PRIMARY KEY (type_id)
+);
+
+-- Insert valid types into types table
+INSERT INTO types(type_name, type_id) VALUES('Process', 0);
+INSERT INTO types(type_name, type_id) VALUES('DataStore', 1);
+INSERT INTO types(type_name, type_id) VALUES('Multiprocess', 2);
+INSERT INTO types(type_name, type_id) VALUES('ExternalInteractor', 3);
+INSERT INTO types(type_name, type_id) VALUES('DataFlow', 4);
+INSERT INTO types(type_name, type_id) VALUES('DataFlowDiagram', 5);
+
 CREATE TABLE entity
 (
 id CHAR(44) NOT NULL,
 label VARCHAR(100) NOT NULL,
-type SMALLINT NOT NULL,  -- Could be an enum, maps to types
+type SMALLINT NOT NULL,
 originator VARCHAR(100), -- Username
-PRIMARY KEY (id)
+PRIMARY KEY (id),
+FOREIGN KEY (type)
+REFERENCES types(type_id)
 );
 
 CREATE TABLE element
@@ -102,10 +120,10 @@ GRANT SELECT, INSERT, UPDATE ON entity TO dedc_user;
 GRANT DELETE ON entity TO dedc_user;
 GRANT SELECT, INSERT, UPDATE ON dataflow TO dedc_user;
 GRANT SELECT, INSERT, UPDATE ON element TO dedc_user;
-GRANT SELECT, INSERT, UPDATE ON element_list TO dedc_user;
-GRANT SELECT, INSERT, UPDATE ON external_links TO dedc_user;
 GRANT SELECT, INSERT, UPDATE ON multiprocess TO dedc_user;
-GRANT SELECT, INSERT, UPDATE ON node TO dedc_user;
+GRANT SELECT, INSERT, DELETE ON element_list TO dedc_user;
+GRANT SELECT, INSERT, DELETE ON external_links TO dedc_user;
+GRANT SELECT, INSERT, DELETE ON node TO dedc_user;
 
 --Grant privileges for tester don't use these on anything but testing DB
 GRANT ALL ON entity TO tester;
