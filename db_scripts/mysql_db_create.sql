@@ -116,6 +116,7 @@ GRANT SELECT, INSERT, UPDATE ON dedc.multiprocess TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.element_list TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.external_links TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.node TO 'dedc_user'@'localhost';
+GRANT SELECT ON dedc.types TO 'dedc_user'@'localhost';
 GRANT DELETE ON dedc.entity TO 'dedc_user'@'localhost';
 
 #Grant proper privileges - don't use these on anything but testing DB
