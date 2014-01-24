@@ -2,21 +2,34 @@
 require_once 'Entity.php';
 
 /**
- * Description of Element
- *
- * @author Josh Clark
- */
+* Description of Element
+*
+* @author Josh Clark
+*/
  abstract class Element extends Entity
 {
    //<editor-fold desc="Attributes" defaultstate="collapsed">
+   /**
+* the x coordinate of this element
+* @var int
+*/
    protected $x;
+   /**
+* the y coordinate of this element
+* @var int
+*/
    protected $y;
+   /**
+* the parent DFD that contains this element
+* @var type DataFlowDiagram
+*/
+   protected $parent;
    //</editor-fold>
    
    //<editor-fold desc="Constructor" defaultstate="collapsed">
    /**
-    * create a new Element object with a 128 bit random number as an id
-    */
+* create a new Element object with a 128 bit random number as an id
+*/
    public function __construct()
    {
       parent::__construct();
@@ -44,24 +57,42 @@ require_once 'Entity.php';
       return $this->y;
    }
    /**
-    * function that sets both the X and Y values at the same time
-    * @param type $newX the X value to be set
-    * @param type $newY the Y value to be set
-    */
+* function that sets both the X and Y values at the same time
+* @param type $newX the X value to be set
+* @param type $newY the Y value to be set
+*/
    public function setLocation($newX, $newY)
    {
       $this->x = $newX;
       $this->y = $newY;
    }
    /**
-    * function that returns both the X and Y values
-    * @return type returns an array that contains the X and Y values
-    *          index 0: X
-    *          index 1: Y
-    */
+* function that returns both the X and Y values
+* @return type returns an array that contains the X and Y values
+* index 0: X
+* index 1: Y
+*/
    public function getLocation()
    {
       return array($this->x,$this->y);
+   }
+   
+   /**
+* function that changest the parent DFD of this element
+* @param DataFlowDiagram $newParent
+*/
+   public function setParent($newParent)
+   {
+      $this->parent = $newParent;
+   }
+   
+   /**
+* function that retrieves the current parent of this element
+* @return DataFlowDiagram
+*/
+   public function getParent()
+   {
+      return $this->parent;
    }
    //</editor-fold>
 }
