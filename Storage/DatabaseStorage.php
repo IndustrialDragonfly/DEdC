@@ -33,6 +33,49 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          }
          return $type['type_name'];
     }
+    
+    public function saveNode($id, $label, $type, $originator, $x, $y, $links, $numLinks)
+    {
+        $dbh = getDb();
+        //<editor-fold desc="save to Entity table" defaultstate="collapsed">
+        // Prepare the statement
+        $insert_stmt = $dbh->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
+
+        // Bind the parameters of the prepared statement
+        $type = Types::Process;
+        $insert_stmt->bindParam(1, $id);
+        $insert_stmt->bindParam(2, $label);
+        $insert_stmt->bindParam(3, $type);
+        $insert_stmt->bindParam(4, $originator);
+
+        // Execute, catch any errors resulting
+        $insert_stmt->execute();
+        //</editor-fold>
+        //<editor-fold desc="save to Element table" defaultstate="collapsed">
+        // Prepare the statement
+        $insert_stmt = $dbh->prepare("INSERT INTO element (id, x, y) VALUES(?,?,?)");
+
+        // Bind the parameters of the prepared statement
+        $insert_stmt->bindParam(1, $id);
+        $insert_stmt->bindParam(2, $x);
+        $insert_stmt->bindParam(3, $y);
+
+        // Execute, catch any errors resulting
+        $insert_stmt->execute();
+        //</editor-fold>
+        //<editor-fold desc="save to Node table" defaultstate="collapsed">
+        // Prepare the statement
+        $insert_stmt = $dbh->prepare("INSERT INTO node (id, df_id) VALUES(?,?)");
+        for ($i = 0; $i < $numLinks; $i++)
+        {
+            // Bind the parameters of the prepared statement
+            $insert_stmt->bindParam(1, $id);
+            $insert_stmt->bindParam(2, $links[$i]->getId());
+            // Execute, catch any errors resulting
+            $insert_stmt->execute();
+        }
+        //</editor-fold>
+    }
 }
 
 ?>

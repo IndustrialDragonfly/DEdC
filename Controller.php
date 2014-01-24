@@ -94,12 +94,12 @@ require_once 'Storage/DatabaseStorageConfig.php';
     // Demonstrate ability to retrieve the type of an existing element
     // from the DB. Not really controller code, just a convient place to
     // demo, absolutely should be deleted soon
-    $dbh = getDb();
-    $test_element = new DataStore();
-    $test_element->save($dbh);
-    $id = $test_element->getId();
     $storage_access = new DatabaseStorage();
-    $test_id = $storage_access->getTypeFromUUID($id);
+    $test_element = new Process();
+    $test_element->save($storage_access);
+    $id = $test_element->getId();
+    $test_type = $storage_access->getTypeFromUUID($id);
+    echo $test_type;
     
     
     

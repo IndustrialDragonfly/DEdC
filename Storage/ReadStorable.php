@@ -12,12 +12,25 @@
 interface ReadStorable
 {
     /**
-     * Returns the type of element from the database based on the given resource
+     * Returns the type of element from the data store based on the given resource
      * UUID
      * 
      * @param string $resource
      */
     public function getTypeFromUUID($resource);
+    
+    /**
+     * Saves a given node object into the data store
+     * 
+     * @param String $resource
+     * @param String $label
+     * @param String $type
+     * @param String $originator
+     * @param int $x
+     * @param int $y
+     * @param String array $links
+     */
+    public function saveNode($resource, $label, $type, $originator, $x, $y, $links, $numLinks);
 }
 
 ?>
