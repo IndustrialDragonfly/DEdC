@@ -49,15 +49,34 @@ Raphael.st.draggable = function(callback, element)
 
 (function() {
 	var DEdC = (function() {
-		var tabs,
-			tabCount = 0,
-			canvases = [];
+		var tabs, // jQuery tab widget
+			tabCount = 0, // Count of number of tabs
+			canvases = []; // Array of all open canvases
 
+
+		/**
+		 * The the canvas object from the currently selected tab
+		 */
 		var getCurrentCanvas = function() {
 			var id = tabs.tabs('option', 'active');
 			return canvases[id];
 		}
 
+		/**
+		 * Setup the UI for the browser
+		 * @param {string} content - Center DOM element - tabs
+		 * @param {string} sidebar - Sidebar DOM element - accordion
+		 * @param {string} users - Users DOM element - accordion
+		 * @param {string} tabContainer - DOM element for the individual tabs
+		 * @param {string} process - Process DOM element to be made draggable
+		 * @param {string} multiprocess - Multiprocess DOM element to be made draggable
+		 * @param {string} datastore - Datastore DOM element to be made draggable
+		 * @param {string} extinteractor - ExtInteractor DOM element to be made draggable
+		 * @param {string} connect - Dataflow creation DOM button
+		 * @param {string} deleteButton - Delete element DOM button
+		 * @param {string} load - Load DOM button
+		 * @param {string} newTab - New Tab DOM button
+		 */
 		var publicSetupUi = function (
 			content, 
 			sidebar, 
@@ -73,7 +92,9 @@ Raphael.st.draggable = function(callback, element)
 			newTab
 			) {
 
-			// Function to resize the canvas to fit in the tab
+			/**
+			 * Resize the currently selected canvas
+			 */
 			var resizeCanvas = function()
 			{
 					var width = $(tabContainer).width();
@@ -84,8 +105,10 @@ Raphael.st.draggable = function(callback, element)
 					canvases[id].setSize(width, height);
 			};
 
+			// Create jQuery tabs widget
 			tabs = $(content).tabs();
 
+			// Create the UILayout layout
 			// Needs to be created after tabs, but before accordions
 			myLayout = $('body').layout({
 					west__size: 200,
@@ -93,11 +116,13 @@ Raphael.st.draggable = function(callback, element)
 					center__onresize: resizeCanvas
 			});
 
+			// Create the sidebar accordion
 			$(sidebar).accordion({
 					heightStyle:"fill",
 					collapsible: true
 			});
 
+			// Create the users accordion
 			$(users).accordion({
 					heightStyle:"content",
 					collapsible: true
@@ -114,9 +139,9 @@ Raphael.st.draggable = function(callback, element)
 					MULTIPROCESS: {value:1, name: "Multiprocess", code: "MP"},
 					DATASTORE: {value:1, name: "Datastore", code: "D"},
 					EXTINTERACTOR: {value:1, name: "External-Interactor", code: "EI"}
-
 			};
 
+			// Make the elements in the toolbox draggable
 			$(process).draggable({
 					helper: draggableHelper
 			}).data("type", ELETYPE.PROCESS);
@@ -134,48 +159,59 @@ Raphael.st.draggable = function(callback, element)
 			}).data("type", ELETYPE.EXTINTERACTOR);
 
 			// Setup toolbar
+			// Connect Dataflow button
 			$(connect).button().click(function(){
 					getCurrentCanvas().addDataflowFromSelection();
 			});
 
+			// Delete Element button
 			$(deleteButton).button().click(function(){
 					getCurrentCanvas().removeElementFromSelection();
 			});
 			//var connector = new Connector(canvas);
 
+			// Load DFD button
 			$(load).button().click(function(){
 				//connector.load("Controller.php/test_dfd");
 			});
 
+			// New tab button
 			$(newTab).button().click(function() {
-				var tabTemplate = "<li><a href='#{href}'>#{label}</a></li>",
-					label = "Tab" + ++tabCount,
-					id = "tab" + tabCount,
-					li = $( tabTemplate.replace( /#\{href\}/g, "#" + id ).replace( /#\{label\}/g, label ) );
+				var tabTemplate = "<li><a href='#{href}'>#{label}</a></li>", // Template for the tabs
+					label = "Tab" + ++tabCount, // Name of the tab
+					id = "tab" + tabCount, // Id of the tabs
+					li = $(tabTemplate.replace( /#\{href\}/g, "#" + id ).replace( /#\{label\}/g, label )); // List item HTML
 
+				// Add the new tab to the tab list
 				tabs.find( ".ui-tabs-nav" ).append( li );
+
+				// Add the body of the tab to the container
 				$(tabContainer).prepend("<div id='" + id + "'></div>");
+
+				// Create the canvas
 				var c = new Canvas(id, 640, 480);
 				canvases.push(c);
 				c.setBackground('#A8A8A8');
+
+				// Update the tab view
 				$(content).tabs("refresh");
 
+				// Set the initial size of the canvas
+				// Cannot call resizeCanvas because it hasn't been selected yet
 				 var width = $(tabContainer).width();
 				 var height = $(tabContainer).height();
-
-				 // Get the current active tab
 				 c.setSize(width, height);
 
-
-				// Setup drag/drop
+				// Setup drop for the new tab
 				$("#" + id).droppable({
 					drop: function(event,ui) {
-						// Add to canvas
+						// Executed when something is dropped onto the tab
 						var posx = event.pageX - $(tabContainer).offset().left,
 							posy = event.pageY - $(tabContainer).offset().top;
 
 						var c = getCurrentCanvas();
 
+						// Check the type of the dropped element and an element to the canvas
 						if ($(ui.draggable).data("type") == ELETYPE.PROCESS)
 								c.addProcess(posx,posy);
 						else if ($(ui.draggable).data("type") == ELETYPE.MULTIPROCESS)
@@ -191,6 +227,7 @@ Raphael.st.draggable = function(callback, element)
 			});
 		};
 
+		// Expose methods to be public
 		return {
 			setupUi: publicSetupUi
 		}
