@@ -19,111 +19,20 @@ echo <<<EOF
             <script type="text/javascript" src="${web_client_location}js/connector.js"></script>
             <script>
                     $(document).ready(function () {
-                            // Function to resize the canvas to fit in the tab
-                            var resizeCanvas = function()
-                            {
-                                    var width = $('#tabsContainer').width();
-                                    var height = $('#tabsContainer').height();
-                                    canvas.setSize(width,height);
-                            };
-
-                            $("#content").tabs();
-
-                            // Needs to be created after tabs, but before accordions
-                            myLayout = $('body').layout({
-                                    west__size: 200,
-                                    west__onresize: $.layout.callbacks.resizePaneAccordions,
-                                    center__onresize: resizeCanvas
-                            });
-
-                            $("#sidebar1").accordion({
-                                    heightStyle:"fill",
-                                    collapsible: true
-                            });
-
-                            $("#users").accordion({
-                                    heightStyle:"content",
-                                    collapsible: true
-                            });
-
-                            // Create the canvas, and add some sample elements
-                            var canvas = new Canvas("tab1", 640, 480);
-                            //var p = canvas.addProcess(100,100);
-                            //p.setText("Test process");
-                            //canvas.addMultiProcess(200,100);
-                            //var d = canvas.addDatastore(100,200);
-                            //canvas.addExtInteractor(200,200);
-
-                            //canvas.addDataflow(p,d);
-
-                            canvas.setBackground('#A8A8A8');
-
-                            // Setup drag and drop
-                            var draggableHelper = function(event,ui)
-                            {
-                                    return $(this).clone().appendTo('body').css('zIndex',5).show();
-                            };
-
-                            var ELETYPE = {
-                                    PROCESS : {value: 0, name: "Process", code: "P"},
-                                    MULTIPROCESS: {value:1, name: "Multiprocess", code: "MP"},
-                                    DATASTORE: {value:1, name: "Datastore", code: "D"},
-                                    EXTINTERACTOR: {value:1, name: "External-Interactor", code: "EI"}
-
-                            };
-
-                            $("#process").draggable({
-                                    helper: draggableHelper
-                            }).data("type", ELETYPE.PROCESS);
-
-                            $("#multiprocess").draggable({
-                                    helper: draggableHelper
-                            }).data("type", ELETYPE.MULTIPROCESS);
-
-                            $("#datastore").draggable({
-                                    helper: draggableHelper
-                            }).data("type", ELETYPE.DATASTORE);
-
-                            $("#extinteractor").draggable({
-                                    helper: draggableHelper
-                            }).data("type", ELETYPE.EXTINTERACTOR);
-
-                            // Setup drag/drop
-                            $("#tab1").droppable({
-                                    drop: function(event,ui) {
-                                            // Add to canvas
-                                            var posx = event.pageX - $('#tab1').offset().left;
-                                            var posy = event.pageY - $('#tab1').offset().top;
-
-                                            if ($(ui.draggable).data("type") == ELETYPE.PROCESS)
-                                                    canvas.addProcess(posx,posy);
-                                            else if ($(ui.draggable).data("type") == ELETYPE.MULTIPROCESS)
-                                                    canvas.addMultiProcess(posx,posy);
-                                            else if ($(ui.draggable).data("type") == ELETYPE.DATASTORE)
-                                                    canvas.addDatastore(posx,posy);
-                                            else if ($(ui.draggable).data("type") == ELETYPE.EXTINTERACTOR)
-                                                    canvas.addExtInteractor(posx,posy);
-                                            else
-                                                    alert("Draggable Element was malformed.");
-                                    }
-                            });
-
-                            $("#connect").button().click(function(){
-                                    canvas.addDataflowFromSelection();
-                            });
-
-                            $("#delete").button().click(function(){
-                                    canvas.removeElementFromSelection();
-                            });
-                            var connector = new Connector(canvas);
-
-                            $("#load").button().click(function(){
-                                connector.load("Controller.php/test_dfd");
-                            });
-
-
-                            // Initial resize to fit
-                            resizeCanvas();
+                        DEdC.setupUi(
+                            "#content", 
+                            "#sidebar1", 
+                            "#users",
+                            "#tab1", 
+                            "#tabsContainer", 
+                            "#process", 
+                            "#multiprocess", 
+                            "#datastore", 
+                            "#extinteractor", 
+                            "#connect", 
+                            "#delete", 
+                            "#load"
+                        ); 
                     });
             </script>
 
