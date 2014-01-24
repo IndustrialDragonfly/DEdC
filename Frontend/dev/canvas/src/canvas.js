@@ -49,16 +49,19 @@ Raphael.st.draggable = function(callback, element)
 
 (function() {
 	var DEdC = (function() {
+		var tabs,
+			tabCount = 0,
+			canvases = [];
 
-		var publicCanvas = function (container, width, height) {
-			return new Canvas(container, width, height);
-		};
+		var getCurrentCanvas = function() {
+			var id = tabs.tabs('option', 'active');
+			return canvases[id];
+		}
 
 		var publicSetupUi = function (
 			content, 
 			sidebar, 
 			users, 
-			tab, 
 			tabContainer, 
 			process, 
 			multiprocess, 
@@ -66,111 +69,129 @@ Raphael.st.draggable = function(callback, element)
 			extinteractor,
 			connect,
 			deleteButton,
-			load
+			load,
+			newTab
 			) {
 
-	        // Function to resize the canvas to fit in the tab
-            var resizeCanvas = function()
-            {
-                    var width = $(tabContainer).width();
-                    var height = $(tabContainer).height();
-                    canvas.setSize(width,height);
-            };
+			// Function to resize the canvas to fit in the tab
+			var resizeCanvas = function()
+			{
+					var width = $(tabContainer).width();
+					var height = $(tabContainer).height();
 
-            $(content).tabs();
+					// Get the current active tab
+					var id = tabs.tabs('option', 'active');
+					canvases[id].setSize(width, height);
+			};
 
-            // Needs to be created after tabs, but before accordions
-            myLayout = $('body').layout({
-                    west__size: 200,
-                    west__onresize: $.layout.callbacks.resizePaneAccordions,
-                    center__onresize: resizeCanvas
-            });
+			tabs = $(content).tabs();
 
-            $(sidebar).accordion({
-                    heightStyle:"fill",
-                    collapsible: true
-            });
+			// Needs to be created after tabs, but before accordions
+			myLayout = $('body').layout({
+					west__size: 200,
+					west__onresize: $.layout.callbacks.resizePaneAccordions,
+					center__onresize: resizeCanvas
+			});
 
-            $(users).accordion({
-                    heightStyle:"content",
-                    collapsible: true
-            });
+			$(sidebar).accordion({
+					heightStyle:"fill",
+					collapsible: true
+			});
 
-            // Create the canvas, and add some sample elements
-            var canvas = new Canvas("tab1", 640, 480);
-            canvas.setBackground('#A8A8A8');
+			$(users).accordion({
+					heightStyle:"content",
+					collapsible: true
+			});
 
-            // Setup drag and drop
-            var draggableHelper = function(event,ui)
-            {
-                    return $(this).clone().appendTo('body').css('zIndex',5).show();
-            };
+			// Setup drag and drop
+			var draggableHelper = function(event,ui)
+			{
+				return $(this).clone().appendTo('body').css('zIndex',5).show();
+			};
 
-            var ELETYPE = {
-                    PROCESS : {value: 0, name: "Process", code: "P"},
-                    MULTIPROCESS: {value:1, name: "Multiprocess", code: "MP"},
-                    DATASTORE: {value:1, name: "Datastore", code: "D"},
-                    EXTINTERACTOR: {value:1, name: "External-Interactor", code: "EI"}
+			var ELETYPE = {
+					PROCESS : {value: 0, name: "Process", code: "P"},
+					MULTIPROCESS: {value:1, name: "Multiprocess", code: "MP"},
+					DATASTORE: {value:1, name: "Datastore", code: "D"},
+					EXTINTERACTOR: {value:1, name: "External-Interactor", code: "EI"}
 
-            };
+			};
 
-            $(process).draggable({
-                    helper: draggableHelper
-            }).data("type", ELETYPE.PROCESS);
+			$(process).draggable({
+					helper: draggableHelper
+			}).data("type", ELETYPE.PROCESS);
 
-            $(multiprocess).draggable({
-                    helper: draggableHelper
-            }).data("type", ELETYPE.MULTIPROCESS);
+			$(multiprocess).draggable({
+					helper: draggableHelper
+			}).data("type", ELETYPE.MULTIPROCESS);
 
-            $(datastore).draggable({
-                    helper: draggableHelper
-            }).data("type", ELETYPE.DATASTORE);
+			$(datastore).draggable({
+					helper: draggableHelper
+			}).data("type", ELETYPE.DATASTORE);
 
-            $(extinteractor).draggable({
-                    helper: draggableHelper
-            }).data("type", ELETYPE.EXTINTERACTOR);
-
-            // Setup drag/drop
-            $(tab).droppable({
-                    drop: function(event,ui) {
-                            // Add to canvas
-                            var posx = event.pageX - $('#tab1').offset().left;
-                            var posy = event.pageY - $('#tab1').offset().top;
-
-                            if ($(ui.draggable).data("type") == ELETYPE.PROCESS)
-                                    canvas.addProcess(posx,posy);
-                            else if ($(ui.draggable).data("type") == ELETYPE.MULTIPROCESS)
-                                    canvas.addMultiProcess(posx,posy);
-                            else if ($(ui.draggable).data("type") == ELETYPE.DATASTORE)
-                                    canvas.addDatastore(posx,posy);
-                            else if ($(ui.draggable).data("type") == ELETYPE.EXTINTERACTOR)
-                                    canvas.addExtInteractor(posx,posy);
-                            else
-                                    alert("Draggable Element was malformed.");
-                    }
-            });
+			$(extinteractor).draggable({
+					helper: draggableHelper
+			}).data("type", ELETYPE.EXTINTERACTOR);
 
 			// Setup toolbar
-            $(connect).button().click(function(){
-                    canvas.addDataflowFromSelection();
-            });
+			$(connect).button().click(function(){
+					getCurrentCanvas().addDataflowFromSelection();
+			});
 
-            $(deleteButton).button().click(function(){
-                    canvas.removeElementFromSelection();
-            });
-            var connector = new Connector(canvas);
+			$(deleteButton).button().click(function(){
+					getCurrentCanvas().removeElementFromSelection();
+			});
+			//var connector = new Connector(canvas);
 
-            $(load).button().click(function(){
-                connector.load("Controller.php/test_dfd");
-            });
+			$(load).button().click(function(){
+				//connector.load("Controller.php/test_dfd");
+			});
+
+			$(newTab).button().click(function() {
+				var tabTemplate = "<li><a href='#{href}'>#{label}</a></li>",
+					label = "Tab" + ++tabCount,
+					id = "tab" + tabCount,
+					li = $( tabTemplate.replace( /#\{href\}/g, "#" + id ).replace( /#\{label\}/g, label ) );
+
+				tabs.find( ".ui-tabs-nav" ).append( li );
+				$(tabContainer).prepend("<div id='" + id + "'></div>");
+				var c = new Canvas(id, 640, 480);
+				canvases.push(c);
+				c.setBackground('#A8A8A8');
+				$(content).tabs("refresh");
+
+				 var width = $(tabContainer).width();
+				 var height = $(tabContainer).height();
+
+				 // Get the current active tab
+				 c.setSize(width, height);
 
 
-            // Initial resize to fit
-            resizeCanvas();
+				// Setup drag/drop
+				$("#" + id).droppable({
+					drop: function(event,ui) {
+						// Add to canvas
+						var posx = event.pageX - $(tabContainer).offset().left,
+							posy = event.pageY - $(tabContainer).offset().top;
+
+						var c = getCurrentCanvas();
+
+						if ($(ui.draggable).data("type") == ELETYPE.PROCESS)
+								c.addProcess(posx,posy);
+						else if ($(ui.draggable).data("type") == ELETYPE.MULTIPROCESS)
+								c.addMultiProcess(posx,posy);
+						else if ($(ui.draggable).data("type") == ELETYPE.DATASTORE)
+								c.addDatastore(posx,posy);
+						else if ($(ui.draggable).data("type") == ELETYPE.EXTINTERACTOR)
+								c.addExtInteractor(posx,posy);
+						else
+								alert("Draggable Element was malformed.");
+					}
+				});
+			});
 		};
 
 		return {
-			canvas: publicCanvas,
 			setupUi: publicSetupUi
 		}
 	})();

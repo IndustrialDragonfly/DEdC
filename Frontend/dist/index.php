@@ -14,6 +14,7 @@ echo <<<EOF
             <script type="text/javascript" src="${web_client_location}js/lib/jquery-ui-1.10.3.js"></script>
             <script type="text/javascript" src="${web_client_location}js/lib/jquery-layout-1.3.0-rc30.79.js"></script>
             <script type="text/javascript" src="${web_client_location}js/lib/jquery-layout-resizeAccordionCallback-1.2.js"></script>
+            <script type="text/javascript" src="${web_client_location}js/lib/jquery-layout-resizeTabLayout-1.3.js"></script>
             <script type="text/javascript" src="${web_client_location}js/lib/raphael-2.1.2.js"></script>
             <script type="text/javascript" src="${web_client_location}js/canvas.js"></script>
             <script type="text/javascript" src="${web_client_location}js/connector.js"></script>
@@ -23,7 +24,6 @@ echo <<<EOF
                             "#content", 
                             "#sidebar1", 
                             "#users",
-                            "#tab1", 
                             "#tabsContainer", 
                             "#process", 
                             "#multiprocess", 
@@ -31,7 +31,8 @@ echo <<<EOF
                             "#extinteractor", 
                             "#connect", 
                             "#delete", 
-                            "#load"
+                            "#load",
+                            "#newTab"
                         ); 
                     });
             </script>
@@ -83,28 +84,9 @@ echo <<<EOF
                     </ul>
                     <h3>Layers</h3>
                     <ul id="layers">
-                            <li>Root</li>
-                            <ul>
-                                    <li>Firing Control</li>
-                            </ul>
                     </ul>
                     <h3>Users</h3>
                     <div id="users">
-                            <h3>Malcolm</h3>
-                            <div>
-                                    Edits Made
-                                    <ul>
-                                            <li><a href="#">Created DFD</a></li>
-                                    </ul>
-                            </div>
-                            <h3>Josh</h3>
-                            <div>
-                                    Edits Made
-                                    <ul>
-                                            <li><a href="#">Reposition Firing Control</a></li>
-                                            <li><a href="#">Added Firing Control</a></li>
-                                    </ul>
-                            </div>
                     </div>
             </div>
             </div>
@@ -114,18 +96,12 @@ echo <<<EOF
                             <button id="connect">Create Dataflow</button>
                             <button id="delete">Delete Element</button>
                             <button id="load">Load DFD</button>
+                            <button id="newTab">New Tab</button>
                     </div>
                     <ul id="menu">
-                            <li><a href="#tab1">DFD</a></li>
-                            <li><a href="#tab2">Firing Control</a></li>
                     </ul>
 
                     <div id="tabsContainer" class="ui-layout-content ui-widget-content">
-                            <div id="tab1"></div>
-
-                            <div id="tab2">
-                                    <p>Firing Control View<p>
-                            </div>
                     </div>
             </div>
 
