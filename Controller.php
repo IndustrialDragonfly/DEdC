@@ -58,8 +58,6 @@ require_once "MethodsEnum.php";
 require_once "Authentication.php";
 require_once "AuthorizeUser.php";
 require_once 'Storage/DatabaseStorage.php';
-require_once 'Storage/DatabaseStorageConfig.php';
-
 
 
     // Decode URL if needed
