@@ -10,7 +10,18 @@
  */
 interface WriteStorable
 {
-    
+    /**
+     * Saves a given node object into the data store
+     * 
+     * @param String $resource
+     * @param String $label
+     * @param String $type
+     * @param String $originator
+     * @param int $x
+     * @param int $y
+     * @param String array $links
+     */
+    public function saveNode($resource, $label, $type, $originator, $x, $y, $links, $numLinks);
 }
 
 ?>

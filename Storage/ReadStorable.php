@@ -19,18 +19,13 @@ interface ReadStorable
      */
     public function getTypeFromUUID($resource);
     
-    /**
-     * Saves a given node object into the data store
-     * 
-     * @param String $resource
-     * @param String $label
-     * @param String $type
-     * @param String $originator
-     * @param int $x
-     * @param int $y
-     * @param String array $links
+     /**
+     * loadNode takes as input a UUID and returns an associative array
+     * of all information related to that ID from the database.
+     * @param String $id
+     * @returns associative array
      */
-    public function saveNode($resource, $label, $type, $originator, $x, $y, $links, $numLinks);
+    public function loadNode($id);
 }
 
 ?>
