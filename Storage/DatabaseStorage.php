@@ -19,7 +19,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         // file later, here for convience for now
         // Setup for the database for the PDO object to use.
         $db_type = 'mysql';
-        // $db_type = postgres;
+        //$db_type = 'postgres';
         $db_hostname = 'localhost';
         $db_database = 'dedc';
         $db_username = 'dedc_user';
@@ -73,7 +73,6 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $insert_stmt = $this->dbh->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
 
         // Bind the parameters of the prepared statement
-        $type = Types::Process;
         $insert_stmt->bindParam(1, $id);
         $insert_stmt->bindParam(2, $label);
         $insert_stmt->bindParam(3, $type);

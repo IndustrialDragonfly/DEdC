@@ -1,30 +1,30 @@
 CREATE DATABASE dedc;
 USE dedc;
 
+# Create listing of all types
 CREATE TABLE types
 (
-type_id SMALLINT NOT NULL,
-type_name VARCHAR(20) NOT NULL,
-PRIMARY KEY (type_id)
+type VARCHAR(20) NOT NULL,
+PRIMARY KEY (type)
 )Engine InnoDB;
 
 # Insert valid types into types table
-INSERT INTO types(type_name, type_id) VALUES('Process', 0);
-INSERT INTO types(type_name, type_id) VALUES('DataStore', 1);
-INSERT INTO types(type_name, type_id) VALUES('Multiprocess', 2);
-INSERT INTO types(type_name, type_id) VALUES('ExternalInteractor', 3);
-INSERT INTO types(type_name, type_id) VALUES('DataFlow', 4);
-INSERT INTO types(type_name, type_id) VALUES('DataFlowDiagram', 5);
+INSERT INTO types(type) VALUES('Process');
+INSERT INTO types(type) VALUES('DataStore');
+INSERT INTO types(type) VALUES('Multiprocess');
+INSERT INTO types(type) VALUES('ExternalInteractor');
+INSERT INTO types(type) VALUES('DataFlow');
+INSERT INTO types(type) VALUES('DataFlowDiagram');
 
 CREATE TABLE entity
 (
 id CHAR(44) NOT NULL,
 label VARCHAR(100) NOT NULL,
-type SMALLINT NOT NULL,
+type VARCHAR(20) NOT NULL,
 originator VARCHAR(100), # Username
 PRIMARY KEY (id),
 FOREIGN KEY (type)
-REFERENCES types(type_id)
+REFERENCES types(type)
 )Engine InnoDB;
 
 CREATE TABLE element
@@ -116,7 +116,6 @@ GRANT SELECT, INSERT, UPDATE ON dedc.multiprocess TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.element_list TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.external_links TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.node TO 'dedc_user'@'localhost';
-GRANT SELECT ON dedc.types TO 'dedc_user'@'localhost';
 GRANT DELETE ON dedc.entity TO 'dedc_user'@'localhost';
 
 #Grant proper privileges - don't use these on anything but testing DB

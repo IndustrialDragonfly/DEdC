@@ -8,12 +8,12 @@
 class Types
 {
 
-    const Process = 0;
-    const DataStore = 1;
-    const Multiprocess = 2;
-    const ExternalInteractor = 3;
-    const DataFlow = 4;
-    const DataFlowDiagram = 5;
+    const Process = "Process";
+    const DataStore = "DataStore";
+    const Multiprocess = "Multiprocess";
+    const ExternalInteractor = "ExternalInteractor";
+    const DataFlow = "DataFlow";
+    const DataFlowDiagram = "DataFlowDiagram";
 
 }
 

@@ -214,7 +214,7 @@ require_once 'Element.php';
     */
     public function save($dataStore)
     {
-        $dataStore->saveNode($this->id, $this->label, get_class(), $this->originator, $this->x, $this->y, $this->links, $this->getNumberOfLinks());
+        $dataStore->saveNode($this->id, $this->label, get_class($this), $this->originator, $this->x, $this->y, $this->links, $this->getNumberOfLinks());
     }
 
     //</editor-fold>

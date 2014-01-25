@@ -79,44 +79,8 @@ class DataFlowDiagram extends Entity
             $mySQLstatement->bindParam(1, $id_list[$i]);
             $mySQLstatement->execute();
             $type = $mySQLstatement->fetch();
-            $newElement = null;
-            if($type['type'] != Types::DataFlow)
-            {
-               switch ($type['type'])
-               {
-                  case Types::Process:
-                     $newElement = new Process($pdo, $id_list[$i], $this);
-                     break;
-                  case Types::DataStore:
-                     $newElement = new DataStore($pdo, $id_list[$i], $this);
-                     break;
-                  case Types::ExternalInteractor:
-                     $newElement = new ExternalInteractor($pdo, $id_list[$i], $this);
-                     break;
-                  case Types::Multiprocess:
-                     $newElement = new Multiprocess($pdo, $id_list[$i], $this);
-                     break;
-               }
-               $this->addElement($newElement);
-            }
-         }
-         
-         // go though the list of ids and load all of the dataflows
-         for ($i = 0; $i < count($id_list); $i++)
-         {
-            //check to see if the element is a DataFlow
-            //if it is
-            //load the element from the DB and add it to the element list
-            
-            $mySQLstatement = $pdo->prepare("SELECT type FROM entity WHERE id=?");
-            $mySQLstatement->bindParam(1, $id_list[$i]);
-            $mySQLstatement->execute();
-            $type = $mySQLstatement->fetch();
-            if($type['type'] == Types::DataFlow)
-            {
-               $newElement = new DataFlow($pdo, $id_list[$i], $this);
-               $this->addElement($newElement);
-            }
+            $newElement = new $type['type']($pdo, $id_list[$i], $this);
+            $this->addElement($newElement);
          }
          
          //handle external links
