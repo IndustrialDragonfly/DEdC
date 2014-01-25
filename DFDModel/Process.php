@@ -20,7 +20,7 @@ class Process extends Node
 * constructor. if no arguments are specified a new object is created with
 * a random id. if three arguments are specified, the oject is loaded from the
 * DB if an entry with a matching id exists
-* @param PDO $pdo
+* @param ReadStorable $datastore
 * @param string $id
 * @param DataFlowDiagram $parent
 */
@@ -34,41 +34,28 @@ class Process extends Node
       else if (func_num_args() == 3)
       {
          parent::__construct();
-         $pdo = func_get_arg(0);
+         $datastore = func_get_arg(0);
          $this->id = func_get_arg(1);
          $parent = func_get_arg(2);
          
          $this->setParent($parent);
          
-         //$Entity_var = $pdo->query("SELECT * FROM entity WHERE id = '" . $this->getId() . "'")->fetch();
-         $mySQLstatement = $pdo->prepare("SELECT * FROM entity WHERE id=?");
-         $mySQLstatement->bindParam(1, $this->getId());
-         $mySQLstatement->execute();
-         $Entity_var = $mySQLstatement->fetch();
-         if($Entity_var == FALSE )
-         {
-            throw new BadFunctionCallException("no matching id found in entity DB");
-         }
-         $this->id = $Entity_var['id'];
-         $this->label = $Entity_var['label'];
-         $this->originator = $Entity_var['originator'];
+         $vars = $datastore->loadNode($this->id);
          
-         $Element_var = $pdo->query("SELECT * FROM element WHERE id = '" . $this->getId() . "'")->fetch();
-         if($Element_var == FALSE)
-         {
-            throw new BadFunctionCallException("no matching id found in element DB");
-         }
-         $this->x = $Element_var['x'];
-         $this->y = $Element_var['y'];
-         
-         
+         // Potentially this section could be rewritten using a foreach loop
+         // on the array and reflection on the current node to determine
+         // what it should store locally
+         $this->label = $vars['label'];
+         $this->originator = $vars['originator'];
+         $this->x = $vars['x'];
+         $this->y = $vars['y'];
       }
     }
 
     //</editor-fold>
     //<editor-fold desc="Accessor functions" defaultstate="collapsed">
     //</editor-fold>
-    //<editor-fold desc="DB functions" defaultstate="collapsed">
+    //<editor-fold desc="save" defaultstate="collapsed">
     /**
     * function that will save this object to the data store
     */

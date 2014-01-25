@@ -118,8 +118,8 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      */
     public function loadNode($id)
     {
-         $mySQLstatement = $pdo->prepare("SELECT * FROM entity NATURAL JOIN element WHERE id=?");
-         $mySQLstatement->bindParam(1, $this->getId());
+         $mySQLstatement = $this->dbh->prepare("SELECT * FROM entity NATURAL JOIN element WHERE id=?");
+         $mySQLstatement->bindParam(1, $id);
          $mySQLstatement->execute();
          $node_vars = $mySQLstatement->fetch();
          if($node_vars == FALSE )
