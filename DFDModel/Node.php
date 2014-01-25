@@ -1,7 +1,11 @@
 <?php
 require_once 'Element.php';
 /**
- * Description of Node
+ * Node is the abstract class that governs all node objects, like process, datastore
+ * etc. For all storage access methods, they could currently go in the Element
+ * class, but this would reduce flexibility should the approach to loading
+ * a DFD be changed (for instance so that Node objects could be loaded
+ * independently of the DFD)
  *
  * @author Josh Clark
  */
@@ -12,10 +16,38 @@ require_once 'Element.php';
    //</editor-fold>
    
    //<editor-fold desc="Constructor" defaultstate="collapsed">
+   /**
+    * constructor. if no arguments are specified a new object is created with
+    * a random id. if three arguments are specified, the oject is loaded from the
+    * DB if an entry with a matching id exists
+    * @param ReadStorable $datastore
+    * @param string $id
+    * @param DataFlowDiagram $parent
+    */
    public function __construct()
    {
       parent::__construct();
       $this->links = array();
+ 
+      //if 3 parameters are passed load the object with values from the DB
+      if (func_num_args() == 3)
+      {
+         $datastore = func_get_arg(0);
+         $this->id = func_get_arg(1);
+         $parent = func_get_arg(2);
+         
+         $this->setParent($parent);
+         
+         $vars = $datastore->loadNode($this->id);
+         
+         // Potentially this section could be rewritten using a foreach loop
+         // on the array and reflection on the current node to determine
+         // what it should store locally
+         $this->label = $vars['label'];
+         $this->originator = $vars['originator'];
+         $this->x = $vars['x'];
+         $this->y = $vars['y'];
+      }
    }
 
    //</editor-fold>
@@ -176,5 +208,15 @@ require_once 'Element.php';
       }
    }
    //</editor-fold>
+   //<editor-fold desc="save" defaultstate="collapsed">
+    /**
+    * function that will save this object to the data store
+    */
+    public function save($dataStore)
+    {
+        $dataStore->saveNode($this->id, $this->label, get_class(), $this->originator, $this->x, $this->y, $this->links, $this->getNumberOfLinks());
+    }
+
+    //</editor-fold>
 }
 ?>

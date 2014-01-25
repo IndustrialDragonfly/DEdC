@@ -91,6 +91,9 @@ class ProcessTest extends PHPUnit_Framework_TestCase
             $this->assertEquals($this->object->getLinkbyPosition($i)->getId(), $row['df_id']);
         }
     }
+    /**
+     * @covers __contruct (loading)
+     */
     public function testLoad_smoke()
     {
         // Items to store in DB and then compare too
