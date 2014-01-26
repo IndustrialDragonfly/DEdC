@@ -23,15 +23,69 @@ abstract class Link extends Element
    protected $destinationNode;
    //</editor-fold>
    
-   //<editor-fold desc="Constructor" defaultstate="collapsed">
+//<editor-fold desc="Constructor" defaultstate="collapsed">
+/**
+* constructor. if no arguments are specified a new object is created with
+* a random id. if three arguments are specified, the oject is loaded from the
+* DB if an entry with a matching id exists
+* @param ReadStorable $storage
+* @param string $id
+* @param DataFlowDiagram $parent
+*/
    public function __construct()
    {
-      parent::__construct();
-      $this->originNode = NULL;
-      $this->destinationNode = NULL;
+      //if no parameters are passed just create a new instance
+      if(func_num_args() == 0)
+      {
+         parent::__construct();
+         $this->originNode = NULL;
+         $this->destinationNode = NULL;
+      }
+      //if 3 parameters are passed load the object with values from the DB
+      else if (func_num_args() == 3)
+      {
+         parent::__construct();
+         $storage = func_get_arg(0);
+         $this->id = func_get_arg(1);
+         $parent = func_get_arg(2);
+         
+         $this->setParent($parent);
+         
+         $vars = $storage->loadLink($this->id);
+         
+         // As in other classes, this could probably be turned into a for
+         // each loop in the future for greater flexibility
+         
+         // Perform mapping
+         $this->label = $vars['label'];
+         $this->originator = $vars['originator'];
+         $this->x = $vars['x'];
+         $this->y = $vars['y'];
+         $originNode_id = $vars['origin_id'];
+         $destinationNode_id = $vars['dest_id'];
+         
+         if( $originNode_id != NULL)
+         {
+            $origin = $parent->getElementById($originNode_id);
+            $this->setOriginNode($origin);
+         }
+         else
+         {
+            $this->originNode = NULL;
+         }
+         
+         if( $destinationNode_id != NULL)
+         {
+            $destination = $parent->getElementById($destinationNode_id);
+            $this->setDestinationNode($destination);
+         }
+         else
+         {
+            $this->destinationNode = NULL;
+         }
+      }
    }
-
-   //</editor-fold>
+//</editor-fold>
    
    //<editor-fold desc="Accessor functions" defaultstate="collapsed">
    //<editor-fold desc="originNode functions" defaultstate="collapsed">
@@ -158,6 +212,35 @@ abstract class Link extends Element
       $this->clearOriginNode();
       $this->clearDestinationNode();
    }
+   //</editor-fold>
+   
+      //<editor-fold desc="Save" defaultstate="collapsed">
+   /**
+* function that will save this object to the database
+* @param WriteStorable $datastore this is the data store to write to
+*/
+   public function save($datastore)
+   {
+       // Check if origin node is connected
+       $origin_id = NULL;
+       if ($this->originNode != NULL)
+       {
+           $origin_id = $this->originNode->getId();
+       }
+       
+       // Check if destination node is connected
+       $dest_id = NULL;
+       if ($this->destinationNode != NULL)
+       {
+           $dest_id = $this->destinationNode->getId();
+       }
+       
+       // Send info required to save dataflow to the data store
+       $datastore->saveLink($this->id, $this->label, get_class($this), 
+               $this->originator, $this->x, $this->y, $origin_id, 
+               $dest_id);
+   }
+   
    //</editor-fold>
 }
 ?>

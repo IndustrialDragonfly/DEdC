@@ -127,6 +127,134 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          }
          return $node_vars;
     }
+   
+    /**
+     * Stores the mapping between a subDFDNode and its DFD into the database
+     * 
+     * @param String $dfd_resource
+     * @param String $mp_resource
+     */
+    public function saveSubDFDNode($dfd_resource, $subDFD_resource)
+    {
+        //<editor-fold desc="save to multiprocess table" defaultstate="collapsed">
+      // Prepare the statement
+      $insert_stmt = $this->dbh->prepare("INSERT INTO multiprocess (dfd_id, mp_id) VALUES(?,?)");
+
+      // Bind the parameters of the prepared statement
+      $insert_stmt->bindParam(1, $dfd_resource);
+      $insert_stmt->bindParam(2, $subDFD_resource);
+
+      // Execute, catch any errors resulting
+      $insert_stmt->execute();
+      //</editor-fold>
+    }
+    
+    /**
+     * Stores a dataflow object into the database
+     * 
+     * @param string $resource
+     * @param string $label
+     * @param string $type
+     * @param origin $originator
+     * @param int $x
+     * @param int $y
+     * @param string $origin_resource
+     * @param string $dest_resource
+     */
+    public function saveLink($resource, $label, $type, $originator, $x, $y, $origin_resource, $dest_resource)
+    {
+      //<editor-fold desc="save to Entity table" defaultstate="collapsed">
+      // Prepare the statement
+      $insert_stmt = $this->dbh->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
+
+      // Bind the parameters of the prepared statement
+      $insert_stmt->bindParam(1, $resource);
+      $insert_stmt->bindParam(2, $label);
+      $insert_stmt->bindParam(3, $type);
+      $insert_stmt->bindParam(4, $originator);
+
+      // Execute, catch any errors resulting
+      $insert_stmt->execute();
+      //</editor-fold>
+      
+      //<editor-fold desc="save to Element table" defaultstate="collapsed">
+      // Prepare the statement
+      $insert_stmt = $this->dbh->prepare("INSERT INTO element (id, x, y) VALUES(?,?,?)");
+
+      // Bind the parameters of the prepared statement
+      $insert_stmt->bindParam(1, $resource);
+      $insert_stmt->bindParam(2, $x);
+      $insert_stmt->bindParam(3, $y);
+
+      // Execute, catch any errors resulting
+      $insert_stmt->execute();
+      //</editor-fold>
+      
+      //<editor-fold desc="save to DataFlow table" defaultstate="collapsed">
+      // Prepare the statement
+      if($origin_resource != NULL && $dest_resource != NULL)
+      {
+         $insert_stmt = $this->dbh->prepare("INSERT INTO dataflow (id, origin_id, dest_id) VALUES(?,?,?)");
+         // Bind the parameters of the prepared statement
+         $insert_stmt->bindParam(1, $resource);
+         $insert_stmt->bindParam(2, $origin_resource);
+         $insert_stmt->bindParam(3, $dest_resource);
+         // Execute, catch any errors resulting
+         $insert_stmt->execute();
+      }
+      else if($origin_resource == NULL && $dest_resource != NULL)
+      {
+         $insert_stmt = $this->dbh->prepare("INSERT INTO dataflow (id, dest_id) VALUES(?,?)");
+         // Bind the parameters of the prepared statement
+         $insert_stmt->bindParam(1, $resource);
+         $insert_stmt->bindParam(2, $dest_resource);
+         // Execute, catch any errors resulting
+         $insert_stmt->execute();
+      }
+      else if($origin_resource != NULL && $dest_resource == NULL)
+      {
+         $insert_stmt = $this->dbh->prepare("INSERT INTO dataflow (id, origin_id) VALUES(?,?)");
+         // Bind the parameters of the prepared statement
+         $insert_stmt->bindParam(1, $resource);
+         $insert_stmt->bindParam(2, $origin_resource);
+         // Execute, catch any errors resulting
+         $insert_stmt->execute();
+      }
+      if($origin_resource == NULL && $dest_resource == NULL)
+      {
+         $insert_stmt = $this->dbh->prepare("INSERT INTO dataflow (id) VALUES(?)");
+         // Bind the parameters of the prepared statement
+         $insert_stmt->bindParam(1, $resource);
+         // Execute, catch any errors resulting
+         $insert_stmt->execute();
+      }
+      //</editor-fold>
+    }
+    
+     /**
+     * loadLink takes an input of a UUID and returns an associative array of
+     * all the informaiton related to that ID from the database.dragonfly
+     * 
+     * @param string $id
+     */
+    public function loadLink($id)
+    {
+        // Setup select statement
+        $select_stmt = $this->dbh->prepare('SELECT * FROM entity NATURAL JOIN element NATURAL JOIN dataflow
+                WHERE id = ?');
+        $select_stmt->bindParam(1, $id);
+        $select_stmt->execute();
+        $results =  $select_stmt->fetch();
+        
+        // If there was no matching ID, thrown an exception
+        if($results == FALSE )
+         {
+            throw new BadFunctionCallException("no matching id found in entity DB");
+         }
+         
+         // Return the assocative array
+         return $results;
+    }
 }
 
 ?>

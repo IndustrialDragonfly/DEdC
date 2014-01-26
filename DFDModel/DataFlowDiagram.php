@@ -40,6 +40,7 @@ class DataFlowDiagram extends Entity
          $this->elementList = array();
          $pdo = func_get_arg(0);
          $this->id = func_get_arg(1);
+         // The owning multiprocess
          $parent = func_get_arg(2);
          
          //get the id, label and the originator of the dfd from the database

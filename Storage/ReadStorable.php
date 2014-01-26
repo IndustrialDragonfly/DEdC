@@ -26,6 +26,14 @@ interface ReadStorable
      * @returns associative array
      */
     public function loadNode($id);
+    
+    /**
+     * loadLink takes an input of a UUID and returns an associative array of
+     * all the informaiton related to that ID from the database.dragonfly
+     * 
+     * @param string $id
+     */
+    public function loadLink($id);
 }
 
 ?>

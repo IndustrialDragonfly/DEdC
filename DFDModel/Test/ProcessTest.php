@@ -66,11 +66,11 @@ class ProcessTest extends PHPUnit_Framework_TestCase
 
         $df1 = new DataFlow;
         $df1->setDestinationNode($this->object);
-        $df1->save($this->pdo);
+        $df1->save($storage);
 
         $df2 = new DataFlow;
         $df2->setOriginNode($this->object);
-        $df2->save($this->pdo);
+        $df2->save($storage);
 
         $this->object->save($storage);
 

@@ -3,6 +3,8 @@
 require_once '../Node.php';
 require_once '../Process.php';
 require_once '../DataFlow.php';
+require_once '../DataStore.php';
+require_once '../DataFlowDiagram.php';
 require_once 'testDB_functions.php';
 
 /**
@@ -33,6 +35,8 @@ class DataFlowTest extends PHPUnit_Framework_TestCase
         {
             $this->pdo = testDB_functions::getConnection();
         }
+        
+        $this->storage = new DatabaseStorage();
     }
 
     /**
@@ -211,15 +215,15 @@ class DataFlowTest extends PHPUnit_Framework_TestCase
         $this->object->setOriginNode($node);
         $this->object->setDestinationNode($node);
 
-        $this->object->save($this->pdo);
-        $node->save($this->pdo);
+        $this->object->save($this->storage);
+        $node->save($this->storage);
 
         //check that the DF stored correctly
         $row = $this->pdo->query("SELECT * FROM entity WHERE id = '" . $this->object->getId() . "'")->fetch();
         $this->assertEquals($this->object->getId(), $row['id']);
         $this->assertEquals($this->object->getLabel(), $row['label']);
         $this->assertEquals($this->object->getOriginator(), $row['originator']);
-        $this->assertEquals(Types::DataFlow, $row['type']);
+        $this->assertEquals(get_class($this->object), $row['type']);
 
         $row = $this->pdo->query("SELECT * FROM element WHERE id = '" . $this->object->getId() . "'")->fetch();
         $this->assertEquals($this->object->getX(), $row['x']);
@@ -230,4 +234,77 @@ class DataFlowTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->object->getDestinationNode()->getId(), $row['dest_id']);
     }
 
+    public function testLoad_smoke()
+    {
+        // Setup a node to use for the test and store it
+        $node = new Process;
+        $node->setLabel('someNode');
+        $node->setLocation(20, 20);
+        $node->setOriginator('Josh');
+        $node->save($this->storage);
+        
+        // Setup a second node to test with
+        $node2 = new DataStore();
+        $node2->setLabel('some Other Node');
+        $node2->setLabel(1, 12);
+        $node2->setOriginator('The Eugene');
+        $node2->save($this->storage);
+        
+        // Variables to insert and compare to
+        $resource = 'theawesomenode';
+        $label ='something';
+        $type = 'DataFlow';
+        $originator = 'The Eugene';
+        $x = 3;
+        $y = 4;
+                
+        //<editor-fold desc="save to Entity table" defaultstate="collapsed">
+        // Prepare the statement
+        $insert_stmt = $this->pdo->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
+
+        // Bind the parameters of the prepared statement
+        $insert_stmt->bindParam(1, $resource);
+        $insert_stmt->bindParam(2, $label);
+        $insert_stmt->bindParam(3, $type);
+        $insert_stmt->bindParam(4, $originator);
+
+        // Execute, catch any errors resulting
+        $insert_stmt->execute();
+        //</editor-fold>
+        //<editor-fold desc="save to Element table" defaultstate="collapsed">
+        // Prepare the statement
+        $insert_stmt = $this->pdo->prepare("INSERT INTO element (id, x, y) VALUES(?,?,?)");
+
+        // Bind the parameters of the prepared statement
+        $insert_stmt->bindParam(1, $resource);
+        $insert_stmt->bindParam(2, $x);
+        $insert_stmt->bindParam(3, $y);
+
+        // Execute, catch any errors resulting
+        $insert_stmt->execute();
+        //</editor-fold>
+        //<editor-fold desc="save to Links table" defaultstate="collapsed">
+        $insert_stmt = $this->pdo->prepare('INSERT INTO dataflow (id, origin_id, dest_id) VALUES(?,?,?)');
+        // Bind the parameters of the prepared statement
+        $insert_stmt->bindParam(1, $resource);
+        $insert_stmt->bindParam(2, $node->getId());
+        $insert_stmt->bindParam(3, $node2->getId());
+        // Execute, catch any errors resulting
+        $insert_stmt->execute();
+        //</editor-fold>
+         
+        $dfd = new DataFlowDiagram();
+        $dfd->addElement($node);
+        $dfd->addElement($node2);
+        $dataflow = new DataFlow($this->storage, $resource, $dfd);
+        
+        $this->assertEquals($resource, $dataflow->getId());
+        $this->assertEquals($label, $dataflow->getLabel());
+        $this->assertEquals($type, get_class($dataflow));
+        $this->assertEquals($originator, $dataflow->getOriginator());
+        $this->assertEquals($x, $dataflow->getX());
+        $this->assertEquals($y, $dataflow->getY());
+        $this->assertEquals($node->getId(), $dataflow->getOriginNode()->getId());
+        $this->assertEquals($node2->getId(), $dataflow->getDestinationNode()->getId());
+    }
 }

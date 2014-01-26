@@ -22,6 +22,28 @@ interface WriteStorable
      * @param String array $links
      */
     public function saveNode($resource, $label, $type, $originator, $x, $y, $links, $numLinks);
+    
+    /**
+     * Stores the mapping between a subDFDNode and its DFD into the data store
+     * 
+     * @param String $dfd_resource
+     * @param String $mp_resource
+     */
+    public function saveSubDFDNode($dfd_resource, $subDFD_resource);
+    
+    /**
+     * Stores a dataflow object into the data store
+     * 
+     * @param string $resource
+     * @param string $label
+     * @param string $type
+     * @param origin $originator
+     * @param int $x
+     * @param int $y
+     * @param string $origin_resource
+     * @param string $dest_resource
+     */
+    public function saveLink($resource, $label, $type, $originator, $x, $y, $origin_resource, $dest_resource);
 }
 
 ?>
