@@ -229,7 +229,7 @@ class DataFlowTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->object->getX(), $row['x']);
         $this->assertEquals($this->object->getY(), $row['y']);
 
-        $row = $this->pdo->query("SELECT * FROM dataflow WHERE id = '" . $this->object->getId() . "'")->fetch();
+        $row = $this->pdo->query("SELECT * FROM link WHERE id = '" . $this->object->getId() . "'")->fetch();
         $this->assertEquals($this->object->getOriginNode()->getId(), $row['origin_id']);
         $this->assertEquals($this->object->getDestinationNode()->getId(), $row['dest_id']);
     }
@@ -284,7 +284,7 @@ class DataFlowTest extends PHPUnit_Framework_TestCase
         $insert_stmt->execute();
         //</editor-fold>
         //<editor-fold desc="save to Links table" defaultstate="collapsed">
-        $insert_stmt = $this->pdo->prepare('INSERT INTO dataflow (id, origin_id, dest_id) VALUES(?,?,?)');
+        $insert_stmt = $this->pdo->prepare('INSERT INTO link (id, origin_id, dest_id) VALUES(?,?,?)');
         // Bind the parameters of the prepared statement
         $insert_stmt->bindParam(1, $resource);
         $insert_stmt->bindParam(2, $node->getId());

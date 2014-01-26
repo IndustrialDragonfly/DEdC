@@ -49,7 +49,7 @@ class testDB_functions
         {
             $pdo->query('BEGIN');
             $pdo->query('TRUNCATE TABLE element;');
-            $pdo->query('TRUNCATE TABLE dataflow;');
+            $pdo->query('TRUNCATE TABLE link;');
             $pdo->query('TRUNCATE TABLE node;');
             $pdo->query('TRUNCATE TABLE external_links;');
             $pdo->query('TRUNCATE TABLE element_list;');

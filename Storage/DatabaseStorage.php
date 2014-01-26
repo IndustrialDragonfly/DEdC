@@ -190,11 +190,11 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       $insert_stmt->execute();
       //</editor-fold>
       
-      //<editor-fold desc="save to DataFlow table" defaultstate="collapsed">
+      //<editor-fold desc="save to link table" defaultstate="collapsed">
       // Prepare the statement
       if($origin_resource != NULL && $dest_resource != NULL)
       {
-         $insert_stmt = $this->dbh->prepare("INSERT INTO dataflow (id, origin_id, dest_id) VALUES(?,?,?)");
+         $insert_stmt = $this->dbh->prepare("INSERT INTO link (id, origin_id, dest_id) VALUES(?,?,?)");
          // Bind the parameters of the prepared statement
          $insert_stmt->bindParam(1, $resource);
          $insert_stmt->bindParam(2, $origin_resource);
@@ -204,7 +204,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       }
       else if($origin_resource == NULL && $dest_resource != NULL)
       {
-         $insert_stmt = $this->dbh->prepare("INSERT INTO dataflow (id, dest_id) VALUES(?,?)");
+         $insert_stmt = $this->dbh->prepare("INSERT INTO link (id, dest_id) VALUES(?,?)");
          // Bind the parameters of the prepared statement
          $insert_stmt->bindParam(1, $resource);
          $insert_stmt->bindParam(2, $dest_resource);
@@ -213,7 +213,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       }
       else if($origin_resource != NULL && $dest_resource == NULL)
       {
-         $insert_stmt = $this->dbh->prepare("INSERT INTO dataflow (id, origin_id) VALUES(?,?)");
+         $insert_stmt = $this->dbh->prepare("INSERT INTO link (id, origin_id) VALUES(?,?)");
          // Bind the parameters of the prepared statement
          $insert_stmt->bindParam(1, $resource);
          $insert_stmt->bindParam(2, $origin_resource);
@@ -222,7 +222,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       }
       if($origin_resource == NULL && $dest_resource == NULL)
       {
-         $insert_stmt = $this->dbh->prepare("INSERT INTO dataflow (id) VALUES(?)");
+         $insert_stmt = $this->dbh->prepare("INSERT INTO link (id) VALUES(?)");
          // Bind the parameters of the prepared statement
          $insert_stmt->bindParam(1, $resource);
          // Execute, catch any errors resulting
@@ -240,14 +240,13 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     public function loadLink($id)
     {
         // Setup select statement
-        $select_stmt = $this->dbh->prepare('SELECT * FROM entity NATURAL JOIN element NATURAL JOIN dataflow
-                WHERE id = ?');
+        $select_stmt = $this->dbh->prepare('SELECT * FROM entity NATURAL JOIN element NATURAL JOIN link WHERE id = ?');
         $select_stmt->bindParam(1, $id);
         $select_stmt->execute();
         $results =  $select_stmt->fetch();
         
         // If there was no matching ID, thrown an exception
-        if($results == FALSE )
+        if($results === FALSE )
          {
             throw new BadFunctionCallException("no matching id found in entity DB");
          }

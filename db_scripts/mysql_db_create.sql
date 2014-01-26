@@ -39,7 +39,7 @@ ON DELETE CASCADE
 ON UPDATE CASCADE
 ) Engine InnoDB;
 
-CREATE TABLE dataflow 
+CREATE TABLE link 
 ( 
 id CHAR(44) NOT NULL, 
 origin_id CHAR(44), 
@@ -111,7 +111,7 @@ ON UPDATE CASCADE
 CREATE USER 'dedc_user'@'localhost' IDENTIFIED BY 'dedc';
 GRANT SELECT, INSERT, UPDATE ON dedc.entity TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, UPDATE ON dedc.element TO 'dedc_user'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON dedc.dataflow TO 'dedc_user'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON dedc.link TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, UPDATE ON dedc.multiprocess TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.element_list TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.external_links TO 'dedc_user'@'localhost';

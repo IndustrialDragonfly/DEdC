@@ -48,7 +48,7 @@ ON DELETE CASCADE
 ON UPDATE CASCADE
 );
 
-CREATE TABLE dataflow 
+CREATE TABLE link 
 ( 
 id CHAR(44) NOT NULL, 
 origin_id CHAR(44), 
@@ -119,7 +119,7 @@ ON UPDATE CASCADE
 -- Grant privileges for normal user
 GRANT SELECT, INSERT, UPDATE ON entity TO dedc_user;
 GRANT DELETE ON entity TO dedc_user;
-GRANT SELECT, INSERT, UPDATE ON dataflow TO dedc_user;
+GRANT SELECT, INSERT, UPDATE ON link TO dedc_user;
 GRANT SELECT, INSERT, UPDATE ON element TO dedc_user;
 GRANT SELECT, INSERT, UPDATE ON multiprocess TO dedc_user;
 GRANT SELECT, INSERT, DELETE ON element_list TO dedc_user;
@@ -128,7 +128,7 @@ GRANT SELECT, INSERT, DELETE ON node TO dedc_user;
 
 --Grant privileges for tester don't use these on anything but testing DB
 GRANT ALL ON entity TO tester;
-GRANT ALL ON dataflow TO tester;
+GRANT ALL ON link TO tester;
 GRANT ALL ON element TO tester;
 GRANT ALL ON element_list TO tester;
 GRANT ALL ON external_links TO tester;
