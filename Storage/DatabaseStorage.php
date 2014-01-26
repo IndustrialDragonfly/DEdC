@@ -54,7 +54,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      */
     public function getTypeFromUUID($resource)
     {
-         $type_find = $this->dbh->prepare("SELECT type_name FROM entity NATURAL JOIN types WHERE id=?");
+         $type_find = $this->dbh->prepare("SELECT type FROM entity WHERE id=?");
          $type_find->bindParam(1, $resource);
          $type_find->execute();
          $type = $type_find->fetch();
@@ -63,9 +63,10 @@ class DatabaseStorage implements ReadStorable, WriteStorable
              // Should probably make this a custom exception type
              throw new BadFunctionCallException("no matching id found in entity DB");
          }
-         return $type['type_name'];
+         return $type['type'];
     }
     
+//<editor-fold desc="Node Related Functions" defaultstate="collapsed">
     public function saveNode($id, $label, $type, $originator, $x, $y, $links, $numLinks)
     {
         //<editor-fold desc="save to Entity table" defaultstate="collapsed">
@@ -100,7 +101,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         {
             // Bind the parameters of the prepared statement
             $insert_stmt->bindParam(1, $id);
-            $insert_stmt->bindParam(2, $links[$i]->getId());
+            $insert_stmt->bindParam(2, $links[$i]);
             // Execute, catch any errors resulting
             $insert_stmt->execute();
         }
@@ -117,16 +118,75 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      */
     public function loadNode($id)
     {
-         $mySQLstatement = $this->dbh->prepare("SELECT * FROM entity NATURAL JOIN element WHERE id=?");
-         $mySQLstatement->bindParam(1, $id);
-         $mySQLstatement->execute();
-         $node_vars = $mySQLstatement->fetch();
+        // Get main Node information
+         $load = $this->dbh->prepare("SELECT * FROM entity NATURAL JOIN element WHERE id=?");
+         $load->bindParam(1, $id);
+         $load->execute();
+         $node_vars = $load->fetch();
          if($node_vars == FALSE )
          {
             throw new BadFunctionCallException("no matching id found in entity DB");
          }
+         
+         // Get links list
+         $load = $this->dbh->prepare("SELECT * FROM node WHERE id=?");
+         $load->bindParam(1, $id);
+         $load->execute();
+         
+         //extract all the ids of the elements
+         $df_list = array();
+         $newDF = $load->fetch();
+         while ($newDF != FALSE)
+         {
+            array_push($df_list,$newDF['df_id']);
+            $newDF = $load->fetch();
+         }
+                  
+         // Put array of all dataflow ids into array to return as links
+         $node_vars['links'] = $df_list;
+         
+         // Setup select statement to grab parent DFD id
+        $select_stmt = $this->dbh->prepare('SELECT * FROM element_list WHERE el_id = ?');
+        $select_stmt->bindParam(1, $id);
+        $select_stmt->execute();
+        $parent =  $select_stmt->fetch();
+        
+        if ($parent === FALSE)
+        {
+            $node_vars['dfd_id'] = NULL;
+        }
+        else
+        {
+            $node_vars['dfd_id'] = $parent['dfd_id'];
+        }
+        
          return $node_vars;
     }
+    
+    /**
+     * Deletes the node object passed from all relevant tables
+     * 
+     * @param String $id
+     */
+    public function deleteNode($id)
+    {
+        // Delete from node table
+        $delete = $this->dbh->prepare("DELETE FROM node WHERE id=?");
+        $delete->bindParam(1, $id);
+        $delete->execute();
+        
+        // Delete from element table
+        $delete = $this->dbh->prepare("DELETE FROM element WHERE id=?");
+        $delete->bindParam(1, $id);
+        $delete->execute();
+        
+        // Delete from entity table
+        $delete = $this->dbh->prepare("DELETE FROM entity WHERE id=?");
+        $delete->bindParam(1, $id);
+        $delete->execute();
+        
+    }
+    //</editor-fold>
    
     /**
      * Stores the mapping between a subDFDNode and its DFD into the database
@@ -251,8 +311,46 @@ class DatabaseStorage implements ReadStorable, WriteStorable
             throw new BadFunctionCallException("no matching id found in entity DB");
          }
          
+        // Setup select statement to grab parent DFD id
+        $select_stmt = $this->dbh->prepare('SELECT * FROM element_list WHERE el_id = ?');
+        $select_stmt->bindParam(1, $id);
+        $select_stmt->execute();
+        $parent =  $select_stmt->fetch();
+        
+        if ($parent === FALSE)
+        {
+            $results['dfd_id'] = NULL;
+        }
+        else
+        {
+            $results['dfd_id'] = $parent['dfd_id'];
+        }
+         
          // Return the assocative array
          return $results;
+    }
+    
+    /**
+     * Deletes the link from the database.
+     * 
+     * @param String $id
+     */
+    public function deleteLink($id)
+    {
+        // Delete from node table
+        $delete = $this->dbh->prepare("DELETE FROM link WHERE id=?");
+        $load->bindParam(1, $this->getId());
+        $load->execute();
+        
+        // Delete from element table
+        $delete = $this->dbh->prepare("DELETE FROM element WHERE id=?");
+        $load->bindParam(1, $this->getId());
+        $load->execute();
+        
+        // Delete from entity table
+        $delete = $this->dbh->prepare("DELETE FROM entity WHERE id=?");
+        $load->bindParam(1, $this->getId());
+        $load->execute();
     }
 }
 

@@ -58,10 +58,6 @@ df_id CHAR(44) NOT NULL,
 FOREIGN KEY (id)
 REFERENCES entity(id)
 ON DELETE CASCADE
-ON UPDATE CASCADE,
-FOREIGN KEY (df_id)
-REFERENCES entity(id)
-ON DELETE CASCADE
 ON UPDATE CASCADE
 ) Engine InnoDB;
 
@@ -83,10 +79,6 @@ CREATE TABLE element_list
 (
 dfd_id CHAR(44) NOT NULL,
 el_id CHAR(44) NOT NULL,
-FOREIGN KEY (dfd_id)
-REFERENCES entity(id)
-ON DELETE CASCADE
-ON UPDATE CASCADE,
 FOREIGN KEY (el_id)
 REFERENCES entity(id)
 ON DELETE CASCADE
@@ -109,10 +101,10 @@ ON UPDATE CASCADE
 
 #Grant proper privileges
 CREATE USER 'dedc_user'@'localhost' IDENTIFIED BY 'dedc';
-GRANT SELECT, INSERT, UPDATE ON dedc.entity TO 'dedc_user'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON dedc.element TO 'dedc_user'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON dedc.link TO 'dedc_user'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON dedc.multiprocess TO 'dedc_user'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.entity TO 'dedc_user'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.element TO 'dedc_user'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.link TO 'dedc_user'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.multiprocess TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.element_list TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.external_links TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.node TO 'dedc_user'@'localhost';

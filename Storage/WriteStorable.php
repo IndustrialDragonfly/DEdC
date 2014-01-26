@@ -24,6 +24,13 @@ interface WriteStorable
     public function saveNode($resource, $label, $type, $originator, $x, $y, $links, $numLinks);
     
     /**
+     * Deletes the node ID passed in from the data store
+     * 
+     * @param String $id
+     */
+    public function deleteNode($id);
+    
+    /**
      * Stores the mapping between a subDFDNode and its DFD into the data store
      * 
      * @param String $dfd_resource
@@ -44,6 +51,13 @@ interface WriteStorable
      * @param string $dest_resource
      */
     public function saveLink($resource, $label, $type, $originator, $x, $y, $origin_resource, $dest_resource);
+    
+    /**
+     * Deletes the link from the data store.
+     * 
+     * @param String $id
+     */
+    public function deleteLink($id);
 }
 
 ?>

@@ -8,11 +8,14 @@ require_once 'Element.php';
  * independently of the DFD)
  *
  * @author Josh Clark
+ * @author Eugene Davis
  */
  abstract class Node extends Element
 {
    //<editor-fold desc="Attributes" defaultstate="collapsed">
    protected $links;
+   
+   protected $storage;
    //</editor-fold>
    
    //<editor-fold desc="Constructor" defaultstate="collapsed">
@@ -28,17 +31,23 @@ require_once 'Element.php';
    {
       parent::__construct();
       $this->links = array();
- 
-      //if 3 parameters are passed load the object with values from the DB
-      if (func_num_args() == 3)
+      $this->storage = func_get_arg(0);
+      // If only one argument, parent is NULL
+      if (func_num_args() == 1)
       {
-         $datastore = func_get_arg(0);
+          $this->parent = NULL;
+      }
+      // Find if the type of the second argument is DFD, if so, its a new DFD
+      elseif (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DataFlowDiagram"))
+      {
+        $this->parent = func_get_arg(1);
+      }
+      //if the type of the second argument is not a DFD, then load from DB
+      else
+      {
          $this->id = func_get_arg(1);
-         $parent = func_get_arg(2);
          
-         $this->setParent($parent);
-         
-         $vars = $datastore->loadNode($this->id);
+         $vars = $this->storage->loadNode($this->id);
          
          // Potentially this section could be rewritten using a foreach loop
          // on the array and reflection on the current node to determine
@@ -47,6 +56,8 @@ require_once 'Element.php';
          $this->originator = $vars['originator'];
          $this->x = $vars['x'];
          $this->y = $vars['y'];
+         $this->links = $vars['links'];
+         $this->parent = $vars['dfd_id'];
       }
    }
 
@@ -69,99 +80,35 @@ require_once 'Element.php';
     */
    public function getLinks()
    {
-       return $links;
+       return $this->links;
    }
    
    /**
-    * function that adds a new link to the list of links
+    * Function that adds a new link to the list of links
+    * Should ONLY be called by a object descended from Link, otherwise may
+    * break DFD
+    * 
     * @param DataFlow $newLink
     * @throws BadFunctionCallException
     */
    public function addLink($newLink)
    {
-      if($newLink instanceof DataFlow)
+       // Check that it is a link, and that it isn't already in the array
+       // This allows either link or node to add link, without going into
+       // infinite look
+      if($newLink instanceof Link)
       {
-         array_push($this->links, $newLink);
+          if (!array_search($newLink->getId(), $this->links))
+          {
+            array_push($this->links, $newLink->getId());
+          }
       }
       else
       {
-         throw new BadFunctionCallException("input parameter was not a DataFlow");
+         throw new BadFunctionCallException("input parameter was not a Link");
       }
    }
-   
-   /**
-    * removes a specified DataFlow from the list of links
-    * @param type $link the link to be removed
-    * @return boolean if the link was in the array
-    * @throws BadFunctionCallException if the input was not a DataFlow
-    */   
-   public function removeLink($link)
-   {
-      if($link instanceof DataFlow)
-      {
-         //find if the link is in the list and get its location if it is
-         $loc = array_search($link, $this->links, true);
-         if ($loc !== false)
-         {
-            
-            //remove the link from the list
-            unset($this->links[$loc]);
-            //normalize the indexes of the list
-            $this->links = array_values($this->links);
-            
-            //code to find if this Node is the DataFlows orgin or destination
-            if($this->isOrigin($link) == true)
-            {
-               //clear the origin of the link
-               $link->clearOriginNode();
-            }
-            else
-            {
-               // clear the destination of the link
-               $link->clearDestinationNode();
-            }
-            return true;
-         }
-         else
-         {
-            return false;
-         }
-      }
-      else
-      {
-         throw new BadFunctionCallException("input parameter was not a DataFlow");
-      }
-   }
-   
-   /**
-    * Function that check to see if this Node is the origin or the destination 
-    * of the specified dataflow, it will throw an exception if this node was 
-    * not associated with that dataflow
-    * @throws BadFunctionCallException
-    */
-   protected function isOrigin($link)
-   {
-      if($link instanceof DataFlow)
-      {
-         if ($this == $link->getOriginNode())
-         {
-            return TRUE;
-         }
-         elseif ($this == $link->getDestinationNode())
-         {
-            return FALSE;
-         }
-         else
-         {
-            throw new BadFunctionCallException("This DataFlow is not connected to this Node");
-         }
-      }
-      else 
-      {
-         throw new BadFunctionCallException("input parameter was not a DataFlow");
-      }
-   }
-   
+      
    /**
     * Returns a specified link based upon where it is in the list
     * @param type $index integer
@@ -189,35 +136,101 @@ require_once 'Element.php';
    {
       for ($i = 0; $i < count($this->links); $i++)
       {
-         if($this->links[$i]->getId() == $linkId)
+         if($this->links[$i] == $linkId)
          {
             return $this->links[$i];
          }
       }
       return null;
    }
+   //</editor-fold>
+    
+    /**
+    * removes a specified DataFlow from the list of links
+    * Should only be called by Link object
+    * @param type $link the link to be removed
+    * @return boolean if the link was in the array
+    * @throws BadFunctionCallException if the input was not a DataFlow
+    */   
+   public function removeLink($link)
+   {
+      if(is_subclass_of($link, "Link"))
+      {
+         //find if the link is in the list and get its location if it is
+         $loc = array_search($link->getId(), $this->links);
+         if ($loc !== FALSE)
+         {
+            
+            //remove the link from the list
+            unset($this->links[$loc]);
+            //normalize the indexes of the list
+            $this->links = array_values($this->links);
+         }
+         else
+         {
+            throw new BadFunctionCallException("Input parameter not contained in Node");
+         }
+      }
+      else
+      {
+         throw new BadFunctionCallException("Input parameter was not descended from Link");
+      }
+   }
    
-   /**
+      /**
     * function that removes every link to this node
     */
    public function removeAllLinks()
    {
-      while(count($this->links) != 0)
-      {
-         $this->removeLink($this->links[0]);
-      }
+       for ($i = 0; $i < count($this->links); $i++)
+       {
+           $type = $this->storage->getTypeFromUUID($this->links[$i]);
+           $link = new $type($links[$i]);
+           $link->removeNode($this);
+           // The call to link will actually call removeLink in this node
+           // cleaning itself out - because Link descendats objects are the ONLY 
+           // objects that can call removeLink
+       }
    }
-   //</editor-fold>
    
    //<editor-fold desc="save" defaultstate="collapsed">
     /**
     * function that will save this object to the data store
+     * 
+     * @param WriteStorable $dataStore
     */
-    public function save($dataStore)
+    public function save()
     {
-        $dataStore->saveNode($this->id, $this->label, get_class($this), $this->originator, $this->x, $this->y, $this->links, $this->getNumberOfLinks());
+        $this->storage->saveNode($this->id, $this->label, get_class($this), 
+                $this->originator, $this->x, $this->y, $this->links, 
+                $this->getNumberOfLinks());
     }
 
+    /**
+     * Deletes the node, including cleaning up the links that are connected
+     * to it
+     * @param WriteStorable $dataStore
+     */
+    public function delete()
+    {
+        // Remove all links
+        $this->removeAllLinks();
+        
+        // Delete node itself
+        $this->storage->deleteNode($this->id);
+    }
+    
+    /**
+     * Updates the node with new information. For now, it cheats by just deleting
+     * then recreating the node
+     * 
+     * @param WriteStorable and ReadStorable $dataStore
+     */
+    public function update()
+    {
+        $this->storage->deleteNode($this->id);
+        $this->save();
+    }
     //</editor-fold>
 }
 ?>
