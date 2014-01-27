@@ -29,7 +29,8 @@ class ExternalInteractorTest extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new ExternalInteractor;
+        $this->storage = new DatabaseStorage();
+        $this->object = new ExternalInteractor($this->storage);
 
         if ($this->pdo == null)
         {
@@ -59,20 +60,18 @@ class ExternalInteractorTest extends PHPUnit_Framework_TestCase
      */
     public function testSave_smoke()
     {
-        $storage = new DatabaseStorage();
         $this->object->setLabel('name');
         $this->object->setOriginator('Josh');
         $this->object->setLocation(50, 60);
+        $this->object->save();
 
-        $df1 = new DataFlow;
+        $df1 = new DataFlow($this->storage);
         $df1->setDestinationNode($this->object);
-        $df1->save($storage);
+        $df1->save();
 
-        $df2 = new DataFlow;
+        $df2 = new DataFlow($this->storage);
         $df2->setOriginNode($this->object);
-        $df2->save($storage);
-
-        $this->object->save($storage);
+        $df2->save();
 
         $row = $this->pdo->query("SELECT * FROM entity WHERE id = '" . $this->object->getId() . "'")->fetch();
         $this->assertEquals($this->object->getId(), $row['id']);
@@ -88,7 +87,7 @@ class ExternalInteractorTest extends PHPUnit_Framework_TestCase
         for ($i = 0; $i < $this->object->getNumberOfLinks(); $i++)
         {
             $row = $rows->fetch();
-            $this->assertEquals($this->object->getLinkbyPosition($i)->getId(), $row['df_id']);
+            $this->assertEquals($this->object->getLinkbyPosition($i), $row['df_id']);
         }
     }
     /**
@@ -133,12 +132,11 @@ class ExternalInteractorTest extends PHPUnit_Framework_TestCase
         //</editor-fold>
         
         // Setup storage object for process object to use
-        $storage = new DatabaseStorage();
         
         $dfd = new DataFlowDiagram();
         
         // Make comparisons
-        $proc = new ExternalInteractor($storage, $id, $dfd);
+        $proc = new ExternalInteractor($this->storage, $id, $dfd);
         $this->assertEquals($id, $proc->getId());
         $this->assertEquals($label, $proc->getLabel());
         $this->assertEquals($originator, $proc->getOriginator());

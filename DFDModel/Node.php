@@ -165,6 +165,7 @@ require_once 'Element.php';
             unset($this->links[$loc]);
             //normalize the indexes of the list
             $this->links = array_values($this->links);
+            return true;
          }
          else
          {
@@ -177,23 +178,32 @@ require_once 'Element.php';
       }
    }
    
-      /**
-    * function that removes every link to this node
+    /**
+    * function that removes every link to this node, used when deleting a node
     */
    public function removeAllLinks()
    {
-       for ($i = 0; $i < count($this->links); $i++)
+       // Counts down to avoid any ambigutity with unsetting of things in
+       // links
+       for ($i = count($this->links); $i > 0; $i--)
        {
-           $type = $this->storage->getTypeFromUUID($this->links[$i]);
-           $link = new $type($links[$i]);
+           $type = $this->storage->getTypeFromUUID($this->links[0]);
+           $link = new $type($this->storage, $this->links[0]);
            $link->removeNode($this);
+           $link->update();
            // The call to link will actually call removeLink in this node
-           // cleaning itself out - because Link descendats objects are the ONLY 
+           // cleaning itself out - because Link descendents objects are the ONLY 
            // objects that can call removeLink
        }
+       // Previous code probably needs to get a result from link
+       // before calling this part of code - since this is meant
+       // for in memory usauge only, as the database should already
+       // have been updated to reflected
+       unset($this->links);
+       $this->links = array();
    }
    
-   //<editor-fold desc="save" defaultstate="collapsed">
+   //<editor-fold desc="Save/Delete/Update" defaultstate="collapsed">
     /**
     * function that will save this object to the data store
      * 

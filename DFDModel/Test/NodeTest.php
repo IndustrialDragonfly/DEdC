@@ -17,8 +17,9 @@ class NodeTest extends PHPUnit_Framework_TestCase
     * This method is called before a test is executed.
     */
    protected function setUp()
-   {
-      $this->object = new Process;
+   {      
+        $this->storage = new DatabaseStorage();
+        $this->object = new Process($this->storage);
    }
 
    /**
@@ -43,7 +44,7 @@ class NodeTest extends PHPUnit_Framework_TestCase
     */
    public function testGetNumberOfLinks_smoke()
    {
-      $aDF = new DataFlow;
+      $aDF = new DataFlow($this->storage);
       $this->object->addLink($aDF);
       $this->assertEquals(1, $this->object->getNumberOfLinks());
    }
@@ -53,11 +54,11 @@ class NodeTest extends PHPUnit_Framework_TestCase
     */
    public function testAddLink_smoke()
    {
-      $aDF = new DataFlow;
+      $aDF = new DataFlow($this->storage);
       $this->object->addLink($aDF);
       $this->assertEquals(1, $this->object->getNumberOfLinks());
       $annotherDF =  $this->object->getLinkbyPosition(0);
-      $this->assertEquals($aDF, $annotherDF);
+      $this->assertEquals($aDF->getId(), $annotherDF);
    }
    
    /**
@@ -66,7 +67,7 @@ class NodeTest extends PHPUnit_Framework_TestCase
     */
    public function testAddLink_invalidInput()
    {
-      $aNode =new Process;
+      $aNode =new Process($this->storage);
       $this->object->addLink($aNode);
    }
 
@@ -75,21 +76,24 @@ class NodeTest extends PHPUnit_Framework_TestCase
     */
    public function testRemoveLink_smoke()
    {
-      $aDF = new DataFlow;
+      $aDF = new DataFlow($this->storage);
       $aDF->setOriginNode($this->object);
+      $aDF->save();
       $this->assertEquals(1, $this->object->getNumberOfLinks());
-      $this->assertTrue($this->object->removeLink($aDF));
+      // Only Links can break a linkage
+      $aDF->removeNode($this->object);
       $this->assertEquals(0, $this->object->getNumberOfLinks());
       $this->assertNull($aDF->getOriginNode());
    }
    
    /**
     * @covers Node::removeLink
+    * @expectedException BadFunctionCallException
     */
    public function testRemoveLink_empty()
    {
-      $aDF = new DataFlow;
-      $this->assertFalse($this->object->removeLink($aDF));
+      $aDF = new DataFlow($this->storage);
+      $this->object->removeLink($aDF);
    }
 
    /**
@@ -97,9 +101,9 @@ class NodeTest extends PHPUnit_Framework_TestCase
     */
    public function testGetLinkbyPosition_smoke()
    {
-      $aDF = new DataFlow;
+      $aDF = new DataFlow($this->storage);
       $aDF->setOriginNode($this->object);
-      $this->assertEquals($this->object->getLinkbyPosition(0), $aDF);
+      $this->assertEquals($this->object->getLinkbyPosition(0), $aDF->getId());
    }
    
    /**
@@ -125,9 +129,9 @@ class NodeTest extends PHPUnit_Framework_TestCase
     */
    public function testGetLinkbyId_smoke()
    {
-      $aDF = new DataFlow;
+      $aDF = new DataFlow($this->storage);
       $aDF->setOriginNode($this->object);
-      $this->assertEquals($aDF, $this->object->getLinkbyId($aDF->getId()));
+      $this->assertEquals($aDF->getId(), $this->object->getLinkbyId($aDF->getId()));
    }
    
    /**
@@ -136,7 +140,7 @@ class NodeTest extends PHPUnit_Framework_TestCase
     */
    public function testGetLinkbyId_null()
    {
-      $aDF = new DataFlow;
+      $aDF = new DataFlow($this->storage);
       $this->assertNull($this->object->getLinkbyId($aDF->getId()));
    }
    
@@ -145,29 +149,42 @@ class NodeTest extends PHPUnit_Framework_TestCase
     */
    public function testGetLinkbyId_BiggerSmoke()
    {
-      $aDF = new DataFlow;
+      $aDF = new DataFlow($this->storage);
       $aDF->setOriginNode($this->object);
       for($i = 0; $i<10; $i++)
       {
-         $annotherDF = new DataFlow;
+         $annotherDF = new DataFlow($this->storage);
          $annotherDF->setOriginNode($this->object);
       }
-      $this->assertEquals($aDF, $this->object->getLinkbyId($aDF->getId()));
+      // Ok, this might be reduntant now...
+      $this->assertEquals($aDF->getId(), $this->object->getLinkbyId($aDF->getId()));
    }
 
    /**
+    * This test is somewhat broken under the refactor, especially since
+    * removeAllLinks is probably due for removal.
     * @covers Node::removeAllLinks
     */
    public function testRemoveAllLinks()
    {
       for($i = 0; $i<10; $i++)
       {
-         $annotherDF = new DataFlow;
+         $annotherDF = new DataFlow($this->storage);
          $annotherDF->setOriginNode($this->object);
+         $annotherDF->save();
       }
       $this->assertEquals(10, $this->object->getNumberOfLinks());
       $this->object->removeAllLinks();
+      $this->object->update();
+//      $this->assertEquals(0, $this->object->getNumberOfLinks()); 
+      // Check refreshed node for correct number of links
+      $node_id = $this->object->getId();
+      $this->object = new Process($this->storage, $node_id);
       $this->assertEquals(0, $this->object->getNumberOfLinks());
+      
+      // Refresh annotherDF
+      $annotherDF_id = $annotherDF->getId();
+      $annotherDF = new DataFlow($this->storage, $annotherDF_id);
       $this->assertNull($annotherDF->getOriginNode());
    }
 

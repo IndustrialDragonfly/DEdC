@@ -339,18 +339,18 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     {
         // Delete from node table
         $delete = $this->dbh->prepare("DELETE FROM link WHERE id=?");
-        $load->bindParam(1, $this->getId());
-        $load->execute();
+        $delete->bindParam(1, $id);
+        $delete->execute();
         
         // Delete from element table
         $delete = $this->dbh->prepare("DELETE FROM element WHERE id=?");
-        $load->bindParam(1, $this->getId());
-        $load->execute();
+        $delete->bindParam(1, $id);
+        $delete->execute();
         
         // Delete from entity table
         $delete = $this->dbh->prepare("DELETE FROM entity WHERE id=?");
-        $load->bindParam(1, $this->getId());
-        $load->execute();
+        $delete->bindParam(1, $id);
+        $delete->execute();
     }
 }
 

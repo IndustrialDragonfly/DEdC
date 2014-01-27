@@ -233,6 +233,7 @@ abstract class Link extends Element
        elseif ($node->getId() == $this->getDestinationNode())
        {
            $this->clearDestinationNode();
+           $node->removeLink($this);
            $node->update();
        }
        else
