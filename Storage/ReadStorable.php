@@ -29,11 +29,18 @@ interface ReadStorable
     
     /**
      * loadLink takes an input of a UUID and returns an associative array of
-     * all the informaiton related to that ID from the database.dragonfly
+     * all the information related to that ID from the database.
      * 
      * @param string $id
      */
     public function loadLink($id);
+    
+    /**
+     * loadDFD takes an input of a UUID and returns an associative array of all
+     * the information related to that ID from the database.
+     * @param String $id
+     */
+    public function loadDFD($id);
 }
 
 ?>

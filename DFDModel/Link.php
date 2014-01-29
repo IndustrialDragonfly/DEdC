@@ -27,6 +27,12 @@ abstract class Link extends Element
     * @var Writeable AND/OR Readable 
     */
    protected $storage;
+   
+   /**
+    * Containing DFD diagram for the link object
+    * @var DataFlowDiagram
+    */
+   protected $parent;
    //</editor-fold>
    
 //<editor-fold desc="Constructor" defaultstate="collapsed">
@@ -211,6 +217,15 @@ abstract class Link extends Element
       }
    }
    //</editor-fold>
+   
+   /**
+    * Gets the parent DFD UUID and returns it to the caller.
+    * @returns String
+    */
+   public function getParent()
+   {
+       $this->parent;
+   }
    
    /**
     * Removes the specified node

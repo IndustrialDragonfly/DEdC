@@ -16,6 +16,12 @@ require_once 'Element.php';
    protected $links;
    
    protected $storage;
+   
+   /**
+    * Containing DFD diagram for the link object
+    * @var DataFlowDiagram
+    */
+   protected $parent;
    //</editor-fold>
    
    //<editor-fold desc="Constructor" defaultstate="collapsed">

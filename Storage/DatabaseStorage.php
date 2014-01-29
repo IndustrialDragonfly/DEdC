@@ -352,6 +352,165 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $delete->bindParam(1, $id);
         $delete->execute();
     }
+    
+    /**
+     * Returns a stack of all the ancestors of the DFD whose
+     * UUID it has been passed.
+     * @param String $id
+     * @return String[]
+     */
+    private function getAncestry($id)
+    {
+        // This should produce a stack of the ancestry, with the root at top
+        // and the immediate parent the last entry
+        $loadAncestry = $this->dbh->prepare("SELECT ancestor_id
+            FROM dfd_ancestry 
+            WHERE descendant_id=?
+            ORDER BY ancestor_id DESC");
+        $loadAncestry->bindParam(1, $id);
+        
+        // Iterate through the results until all have been pulled out
+        $ancestryStack = array();
+        $newId = $loadAncestry->fetch();
+        while ($newId != FALSE)
+         {
+            array_push($ancestryStack,$newId['ancestor_id']);
+            $newId = $loadAncestry->fetch();
+         }
+         
+         // Return the whole stack
+         return $ancestryStack;
+    }
+    /**
+     * Needs updating to handle the fact its a jagged array and elementList
+     * has been split up
+     * Returns an associative array of the format:
+     * ['id'] string
+     * ['label'] string
+     * ['originator'] string
+     * ['elementList'] string[]
+     * ['ancestry'] string[]
+     * @param String $id
+     * @return Mixed[]
+     * @throws BadFunctionCallException
+     */
+    public function loadDFD($id)
+    {
+        // Get the id, label, originator, and curtesy of subdfdnode, the 
+        // subDFDNode the DFD is linked to
+         $loadDFD = $this->dbh->prepare("SELECT * 
+             FROM entity id
+                JOIN subdfdnode subdfdnode_id ON id=subdfdnode
+             WHERE id=?");
+         $loadDFD->bindParam(1, $id);
+         $loadDFD->execute();
+         $vars = $loadDFD->fetch();
+         if($vars == FALSE )
+         {
+            throw new BadFunctionCallException("no matching id found in entity DB");
+         }
+         
+         // Get the nodes list from the database
+         // This is performed by joining the relevant tables, then filtering
+         // out all subdfdnodes from the list with a subquery
+         $loadDFD = $this->dbh->prepare("
+             SELECT * 
+                FROM entity id
+                        JOIN element_list el_id ON el_id=id
+                        NATURAL JOIN element
+                        NATURAL JOIN node 
+                WHERE id NOT IN(SELECT subdfdnode_id FROM subdfdnode WHERE dfd_id=?) AND dfd_id=?;
+                ");
+         $loadDFD->bindParam(1, $id);
+         $loadDFD->execute();
+         
+         // Extract all the data of the nodes
+         $nodeList = array();
+         $newNode = $loadDFD->fetch();
+         while ($newNode != FALSE)
+         {
+            array_push($nodeList,$newNode);
+            $newNode = $loadDFD->fetch();
+         }
+         
+         // Add the data of the nodes to the $vars array that is
+         // to be returned
+         $vars['nodeList'] = $nodeList;
+         
+         
+         // Get the links list from the database
+         // This is performed by joining the relevant tables
+         $loadDFD = $this->dbh->prepare("
+             SELECT * 
+                FROM link id 
+                        JOIN element_list el_id ON id=el_id
+                        NATURAL JOIN entity
+                        NATURAL JOIN element
+                        NATURAL JOIN link
+                WHERE dfd_id=?;
+                ");
+         $loadDFD->bindParam(1, $id);
+         $loadDFD->execute();
+         
+         // Extract all the data of the nodes
+         $linkList = array();
+         $newLink = $loadDFD->fetch();
+         while ($newNode != FALSE)
+         {
+            array_push($linkList,$newLink);
+            $newLink = $loadDFD->fetch();
+         }
+         
+         // Add the data of the links to the $vars array that is
+         // to be returned
+         $vars['linkList'] = $linkList;
+         
+         
+         // Get the subdfdnode list from the database
+         // This is performed by joining the relevant tables
+         // This first approach should work, but MySQL seems to have a bug
+         // relating to this approach (something about a JOIN and having
+         // to specify the column name as table.column makes MySQL assume that
+         // the WHERE clause is impossible - supposedly fixed in new versions.)
+         /*$loadDFD = $this->dbh->prepare("
+             SELECT *
+                FROM node id
+                        JOIN element_list el_id ON el_id=id
+                        NATURAL JOIN element
+                        NATURAL JOIN entity
+                        JOIN subdfdnode subdfdnode_id ON subdfdnode_id=id
+                WHERE \"element_list.dfd_id\"=?;
+                ");*/
+         // Scarier looking work around version
+         $loadDFD = $this->dbh->prepare("
+             SELECT *
+                FROM node id
+                        NATURAL JOIN element
+                        NATURAL JOIN entity
+                        JOIN subdfdnode subdfdnode_id ON subdfdnode_id=id
+                WHERE id IN (SELECT el_id FROM element_list WHERE dfd_id=?);
+                ");
+         $loadDFD->bindParam(1, $id);
+         $loadDFD->execute();
+         
+         // Extract all the data of the nodes
+         $subDFDNodeList = array();
+         $newsubDFDNode = $loadDFD->fetch();
+         while ($newNode != FALSE)
+         {
+            array_push($subDFDNodeList,$newsubDFDNode);
+            $newsubDFDNode = $loadDFD->fetch();
+         }
+         
+         // Add the data from subdfdnodes to the $vars array that is
+         // to be returned
+         $vars['subDFDNodeList'] = $subDFDNodeList;         
+         
+         // Get the stack of the DFDs ancestry from the database
+         $vars['ancestry'] = getAncestry($id);
+         
+         return $vars;
+    }
 }
 
 ?>

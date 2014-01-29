@@ -6,194 +6,119 @@ require_once '../Multiprocess.php';
 * Description of DataFlowDiagram
 *
 * @author Josh Clark
+* @author Eugene Davis
 */
 class DataFlowDiagram extends Entity
 {
    //<editor-fold desc="Attributes" defaultstate="collapsed">
-   protected $externalLinks; // array of DataFlows
-   protected $elementList; //array of Elements that make up the DFD
+    /**
+     * Stack of the ancestors of this DFD, starting at the root DFD
+     * and going back to the immediate parent.
+     * Used to figure out how to route links that connect outside of this DFD.
+     * Can be null if root
+     * @var String[]
+     */
+   protected $ancestry;
+   /**
+    * List of all nodes contained within this DFD and basic data to use them.
+    * Stored in an associative array.
+    * @var String[]
+    */
+   protected $nodeList;
+    /**
+    * List of all links contained within this DFD and basic data to used them.
+    * Stored in an associative array.
+    * @var String[]
+    */
+   protected $linkList;
+   /**
+    * List of all the the subDFDNodes contained with this DFD and basic data
+    * for the frontend to use them. Stored in an associative array.
+    * @var Mixed[]
+    */
+   protected $subDFDNodeList;
+   /**
+    * Storage object, should be readable and/or writable (depending on whether
+    * this is a normal data store, import data source, or export data format)
+    * @var Readable/Writable
+    */
+   protected $storage;
+   /**
+    * The SubDFDNode UUID that this DFD is linked to 
+    * Can be null if root
+    * @var String 
+    */
+   protected $subDFDNode;
 
    //</editor-fold>
    //<editor-fold desc="Constructor" defaultstate="collapsed">
    /**
-* constructor. if no arguments are specified a new object is created with
-* a random id and having empty lists for elements and external links. if
-* three arguments are specified, the oject is loaded from the DB if an entry
-* with a matching id exists. if parent is null it is assumed that there are
-* no external links
-* @param PDO $pdo
-* @param string $id
-* @param Multiprocess $parent
-*/
+    * Constructor. If no arguments are specified a new object is created with
+    * a random id and having empty lists for elements and external links. If
+    * three arguments are specified, the oject is loaded from the DB if an entry
+    * with a matching id exists. If parent is null it is assumed that there are
+    * no external links
+    * @param Readable/Writable $storage
+    * @param string $id
+    */
    public function __construct()
    {
-      if (func_num_args() == 0)
+      parent::__construct();
+      // If there is only one argument (the storage object) then this is a
+      // root DFD
+      // DataFlowDiagram($storage)
+      if (func_num_args() == 1)
       {
-         parent::__construct();
-         $this->externalLinks = array();
          $this->elementList = array();
+         $this->parentStack = null;
+         $this->subDFDNode = null;
+         $this->storage = func_get_arg(0);
       }
-      else if (func_num_args() == 3)
+      // If creating a new DFD connected to a SubDFDNode
+      // DataFlowDiagram($storage, $SubDFDNode)
+      else if (func_num_args() == 2 && 
+              is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "SubDFDNode"))
       {
-         parent::__construct();
-         $this->externalLinks = array();
+           $this->storage = func_get_arg(0);
+           $this->elementList = array();
+           $this->subDFDNode = func_get_arg(1);
+           
+           // Initialize the linked SubDFDNode so we can get its parent and link
+           // ourselves into it
+           $type = getTypeFromUUID($this->subDFDNode);
+           $subDFDNode = new $type($this->storage);
+           
+           $parentDFD_id = $subDFDNode->getParent();
+           
+           // Initialize the parent DFD and get its ancenstry
+           $type = getTypeFromUUID($parentDFD_id);
+           $parentDFD = new $type($parentDFD_id);
+           $this->ancestry = $parentDFD->getAncestry();
+           // Add immediate parent to stack
+           array_push($this->ancestry, $parentDFD->getId());          
+      }
+      // If this is an existing DFD to load, get the ID of the DFD
+      // DataFlowDiagram($storage, $DFD)
+      else if (func_num_args() == 2 && 
+              is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DataFlowDiagram"))
+      {
          $this->elementList = array();
-         $pdo = func_get_arg(0);
+         $this->storage = func_get_arg(0);
          $this->id = func_get_arg(1);
-         // The owning multiprocess
-         $parent = func_get_arg(2);
+         $vars = $this->storage->loadDFD($this->id);
          
-         //get the id, label and the originator of the dfd from the database
-         $mySQLstatement = $pdo->prepare("SELECT * FROM entity WHERE id=?");
-         $mySQLstatement->bindParam(1, $this->getId());
-         $mySQLstatement->execute();
-         $Entity_var = $mySQLstatement->fetch();
-         if($Entity_var == FALSE )
-         {
-            throw new BadFunctionCallException("no matching id found in entity DB");
-         }
-         $this->id = $Entity_var['id'];
-         $this->label = $Entity_var['label'];
-         $this->originator = $Entity_var['originator'];
-         
-         //handle the element list
-         $mySQLstatement = $pdo->prepare("SELECT * FROM element_list WHERE dfd_id=?");
-         $mySQLstatement->bindParam(1, $this->getId());
-         $mySQLstatement->execute();
-         
-         //extract all the ids of the elements
-         $id_list = array();
-         $newId = $mySQLstatement->fetch();
-         while ($newId != FALSE)
-         {
-            array_push($id_list,$newId['el_id']);
-            $newId = $mySQLstatement->fetch();
-         }
-         //go though the list of ids and load all of the one that are not dataflows
-         for ($i = 0; $i < count($id_list); $i++)
-         {
-            //check to see if the element is not a DataFlow
-            //if it is
-            //load the element from the DB and add it to the element list
-            
-            $mySQLstatement = $pdo->prepare("SELECT type FROM entity WHERE id=?");
-            $mySQLstatement->bindParam(1, $id_list[$i]);
-            $mySQLstatement->execute();
-            $type = $mySQLstatement->fetch();
-            $newElement = new $type['type']($pdo, $id_list[$i], $this);
-            $this->addElement($newElement);
-         }
-         
-         //handle external links
-         if ($parent != null)
-         {
-            for ($i = 0; $i < $parent->getNumberOfLinks(); $i++)
-            {
-               $this->addExternalLink($parent->getLinkbyPosition($i));
-            }
-         }
-         
-         
+         // Load up values from the associative array
+         $this->label = $vars['label'];
+         $this->originator = $vars['originator'];
+         $this->nodeList = $vars['nodeList'];
+         $this->linkList = $vars['linkList'];
+         $this->subDFDNodeList = $vars['subDFDNodeList'];
+         $this->ancestry = $vars['ancestry'];
       }
    }
 
    //</editor-fold>
    //<editor-fold desc="Accessor functions" defaultstate="collapsed">
-   //<editor-fold desc="externalLinks functions" defaultstate="collapsed">
-   /**
-* function that returns how many external links this DFD has
-* @return integer
-*/
-   public function getNumberOfExternalLinks()
-   {
-      return count($this->externalLinks);
-   }
-
-   /**
-* function that adds a new extenal Link to the list
-* @param DataFlow $newlink
-* @throws BadFunctionCallException
-*/
-   public function addExternalLink($newLink)
-   {
-      if ($newLink instanceof DataFlow)
-      {
-         array_push($this->externalLinks, $newLink);
-      }
-      else
-      {
-         throw new BadFunctionCallException("input parameter was not a DataFlow");
-      }
-   }
-
-   /**
-* function that removes an external Link from the list
-* @param DataFlow $link
-* @return boolean true if the link was present and if it was removed
-* false otherwise
-* @throws BadFunctionCallException if input was of the wrong type
-*/
-   public function removeExternalLink($link)
-   {
-      if ($link instanceof DataFlow)
-      {
-         //find if the link is in the list and get its location if it is
-         $loc = array_search($link, $this->externalLinks);
-         if ($loc !== false)
-         {
-            //remove the link from the list
-            unset($this->externalLinks[$loc]);
-            //normalize the indexes of the list
-            $this->externalLinks = array_values($this->externalLinks);
-            return true;
-         }
-         else
-         {
-            return false;
-         }
-      }
-      else
-      {
-         throw new BadFunctionCallException("input parameter was not a DataFlow");
-      }
-   }
-
-   /**
-* function that returns an external link based uppon its position in the list
-* @param integer $index
-* @return DataFlow
-* @throws BadFunctionCallException if the input parameter was out of bounds
-*/
-   public function getExternalLinkByPosition($index)
-   {
-      if ($index <= count($this->externalLinks) - 1 && $index >= 0)
-      {
-         return $this->externalLinks[$index];
-      }
-      else
-      {
-         throw new BadFunctionCallException("input parameter was out of bounds");
-      }
-   }
-
-   /**
-* function that returns an external link based uppon it id
-* @param string $linkId
-* @return DataFlow will return the specified link
-*/
-   public function getExternalLinkbyId($linkId)
-   {
-      for ($i = 0; $i < count($this->externalLinks); $i++)
-      {
-         if ($this->externalLinks[$i]->getId() == $linkId)
-         {
-            return $this->externalLinks[$i];
-         }
-      }
-      return null;
-   }
-
-   //</editor-fold>
    //<editor-fold desc="elementList functions" defaultstate="collapsed">
    /**
 * function that returns the number of elements in this DFD
