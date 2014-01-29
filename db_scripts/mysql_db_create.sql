@@ -61,15 +61,16 @@ ON DELETE CASCADE
 ON UPDATE CASCADE
 ) Engine InnoDB;
 
-CREATE TABLE external_links
+CREATE TABLE dfd_ancestry
 (
-dfd_id CHAR(44) NOT NULL,
-df_id CHAR(44) NOT NULL,
-FOREIGN KEY (dfd_id)
+ancestor_id CHAR(44) NOT NULL,
+descendant_id CHAR(44) NOT NULL,
+depth INT NOT NULL,
+FOREIGN KEY (ancestor_id)
 REFERENCES entity(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE,
-FOREIGN KEY (df_id)
+FOREIGN KEY (descendant_id)
 REFERENCES entity(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE
@@ -85,15 +86,15 @@ ON DELETE CASCADE
 ON UPDATE CASCADE
 ) Engine InnoDB;
 
-CREATE TABLE multiprocess
+CREATE TABLE subdfdnode
 (
 dfd_id CHAR(44) NOT NULL,
-mp_id CHAR(44) NOT NULL,
+subdfdnode_id CHAR(44) NOT NULL,
 FOREIGN KEY (dfd_id)
 REFERENCES entity(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE,
-FOREIGN KEY (mp_id)
+FOREIGN KEY (subdfdnode_id)
 REFERENCES entity(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE
@@ -104,9 +105,9 @@ CREATE USER 'dedc_user'@'localhost' IDENTIFIED BY 'dedc';
 GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.entity TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.element TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.link TO 'dedc_user'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.multiprocess TO 'dedc_user'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.subdfdnode TO 'dedc_user'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.dfd_ancestry TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.element_list TO 'dedc_user'@'localhost';
-GRANT SELECT, INSERT, DELETE ON dedc.external_links TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.node TO 'dedc_user'@'localhost';
 GRANT DELETE ON dedc.entity TO 'dedc_user'@'localhost';
 
