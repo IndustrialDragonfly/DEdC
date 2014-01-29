@@ -1,0 +1,19 @@
+{
+  "name": "connectorjs",
+  "version": "0.0.0",
+  "description": "JavaScript library for interfacing with DEd C",
+  "main": "connector.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IndustrialDragonfly/ded_c"
+  },
+  "author": "IndustrialDragonfly",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-jshint": "~0.8.0",
+    "grunt-contrib-nodeunit": "~0.2.0",
+    "grunt-contrib-uglify": "~0.2.2",
+    "grunt-jsdoc": "~0.4.2",
+    "grunt-contrib-copy": "~0.5.0"
+  }
+}

@@ -14,109 +14,26 @@ echo <<<EOF
             <script type="text/javascript" src="${web_client_location}js/lib/jquery-ui-1.10.3.js"></script>
             <script type="text/javascript" src="${web_client_location}js/lib/jquery-layout-1.3.0-rc30.79.js"></script>
             <script type="text/javascript" src="${web_client_location}js/lib/jquery-layout-resizeAccordionCallback-1.2.js"></script>
+            <script type="text/javascript" src="${web_client_location}js/lib/jquery-layout-resizeTabLayout-1.3.js"></script>
             <script type="text/javascript" src="${web_client_location}js/lib/raphael-2.1.2.js"></script>
             <script type="text/javascript" src="${web_client_location}js/canvas.js"></script>
+            <script type="text/javascript" src="${web_client_location}js/connector.js"></script>
             <script>
                     $(document).ready(function () {
-                            // Function to resize the canvas to fit in the tab
-                            var resizeCanvas = function()
-                            {
-                                    var width = $('#tabsContainer').width();
-                                    var height = $('#tabsContainer').height();
-                                    canvas.setSize(width,height);
-                            };
-
-                            $("#content").tabs();
-
-                            // Needs to be created after tabs, but before accordions
-                            myLayout = $('body').layout({
-                                    west__size: 200,
-                                    west__onresize: $.layout.callbacks.resizePaneAccordions,
-                                    center__onresize: resizeCanvas
-                            });
-
-                            $("#sidebar1").accordion({
-                                    heightStyle:"fill",
-                                    collapsible: true
-                            });
-
-                            $("#users").accordion({
-                                    heightStyle:"content",
-                                    collapsible: true
-                            });
-
-                            // Create the canvas, and add some sample elements
-                            var canvas = new Canvas("tab1", 640, 480);
-                            var p = canvas.addProcess(100,100);
-                            p.setText("Test process");
-                            canvas.addMultiProcess(200,100);
-                            var d = canvas.addDatastore(100,200);
-                            canvas.addExtInteractor(200,200);
-
-                            canvas.addDataflow(p,d);
-
-                            canvas.setBackground('#A8A8A8');
-
-                            // Setup drag and drop
-                            var draggableHelper = function(event,ui)
-                            {
-                                    return $(this).clone().appendTo('body').css('zIndex',5).show();
-                            };
-
-                            var ELETYPE = {
-                                    PROCESS : {value: 0, name: "Process", code: "P"},
-                                    MULTIPROCESS: {value:1, name: "Multiprocess", code: "MP"},
-                                    DATASTORE: {value:1, name: "Datastore", code: "D"},
-                                    EXTINTERACTOR: {value:1, name: "External-Interactor", code: "EI"}
-
-                            };
-
-                            $("#process").draggable({
-                                    helper: draggableHelper
-                            }).data("type", ELETYPE.PROCESS);
-
-                            $("#multiprocess").draggable({
-                                    helper: draggableHelper
-                            }).data("type", ELETYPE.MULTIPROCESS);
-
-                            $("#datastore").draggable({
-                                    helper: draggableHelper
-                            }).data("type", ELETYPE.DATASTORE);
-
-                            $("#extinteractor").draggable({
-                                    helper: draggableHelper
-                            }).data("type", ELETYPE.EXTINTERACTOR);
-
-                            // Setup drag/drop
-                            $("#tab1").droppable({
-                                    drop: function(event,ui) {
-                                            // Add to canvas
-                                            var posx = event.pageX - $('#tab1').offset().left;
-                                            var posy = event.pageY - $('#tab1').offset().top;
-
-                                            if ($(ui.draggable).data("type") == ELETYPE.PROCESS)
-                                                    canvas.addProcess(posx,posy);
-                                            else if ($(ui.draggable).data("type") == ELETYPE.MULTIPROCESS)
-                                                    canvas.addMultiProcess(posx,posy);
-                                            else if ($(ui.draggable).data("type") == ELETYPE.DATASTORE)
-                                                    canvas.addDatastore(posx,posy);
-                                            else if ($(ui.draggable).data("type") == ELETYPE.EXTINTERACTOR)
-                                                    canvas.addExtInteractor(posx,posy);
-                                            else
-                                                    alert("Draggable Element was malformed.");
-                                    }
-                            });
-
-                            $("#connect").button().click(function(){
-                                    canvas.addDataflowFromSelection();
-                            });
-
-                            $("#delete").button().click(function(){
-                                    canvas.removeElementFromSelection();
-                            });
-
-                            // Initial resize to fit
-                            resizeCanvas();
+                        DEdC.setupUi(
+                            "#content", 
+                            "#sidebar1", 
+                            "#users",
+                            "#tabsContainer", 
+                            "#process", 
+                            "#multiprocess", 
+                            "#datastore", 
+                            "#extinteractor", 
+                            "#connect", 
+                            "#delete", 
+                            "#load",
+                            "#newTab"
+                        ); 
                     });
             </script>
 
@@ -167,28 +84,9 @@ echo <<<EOF
                     </ul>
                     <h3>Layers</h3>
                     <ul id="layers">
-                            <li>Root</li>
-                            <ul>
-                                    <li>Firing Control</li>
-                            </ul>
                     </ul>
                     <h3>Users</h3>
                     <div id="users">
-                            <h3>Malcolm</h3>
-                            <div>
-                                    Edits Made
-                                    <ul>
-                                            <li><a href="#">Created DFD</a></li>
-                                    </ul>
-                            </div>
-                            <h3>Josh</h3>
-                            <div>
-                                    Edits Made
-                                    <ul>
-                                            <li><a href="#">Reposition Firing Control</a></li>
-                                            <li><a href="#">Added Firing Control</a></li>
-                                    </ul>
-                            </div>
                     </div>
             </div>
             </div>
@@ -197,18 +95,13 @@ echo <<<EOF
                     <div id="toolbar" class="ui-widget-header ui-conrner-all">
                             <button id="connect">Create Dataflow</button>
                             <button id="delete">Delete Element</button>
+                            <button id="load">Load DFD</button>
+                            <button id="newTab">New Tab</button>
                     </div>
                     <ul id="menu">
-                            <li><a href="#tab1">DFD</a></li>
-                            <li><a href="#tab2">Firing Control</a></li>
                     </ul>
 
                     <div id="tabsContainer" class="ui-layout-content ui-widget-content">
-                            <div id="tab1"></div>
-
-                            <div id="tab2">
-                                    <p>Firing Control View<p>
-                            </div>
                     </div>
             </div>
 
