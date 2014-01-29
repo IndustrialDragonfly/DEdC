@@ -946,9 +946,13 @@ Raphael.st.draggable = function (callback, element) {
 
     var Connector = (function () {
 
+        /**
+         * Ajax GET method
+         * @param {String} url Url of resource
+         * @param {Function} successCallback Function called if a request executes successfully
+         * @param {Function} failCallback Function called if a request does not execute successfully
+         */
         var publicGet = function (url, successCallback, failCallback) {
-            var response = new Response();
-
             $.ajax({
                 accepts: "application/json",
                 url: url,
@@ -957,13 +961,28 @@ Raphael.st.draggable = function (callback, element) {
                 dataType: "json" // Do not let jQuery automatically parse the JSON response
             }).done(function (data, textStatus) {
                 // Request was successful
-                response.setData(data);
-                response.setStatus(textStatus);
+                successCallback(parseJson(data), textStatus);
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 // Request failed for some reason
+                var response = new Response();
+                
                 response.setStatus(textStatus);
                 response.setError("GET " + url + " " + jqXHR.status + " (" + jqXHR.statusText + ")");
+                
+                failCallback(response);
             });
+        };
+        
+        /**
+         * Parse a JSON object
+         * @param {jsonObject} jsonObject JSON document that has been translated by jQuery to an Object
+         * @param {String} textStatus Status text from jQuery.ajax
+         */
+        var parseJson = function (jsonObject, textStatus) {
+            var response = new Response();
+            
+            response.setData(jsonObject);
+            response.setStatus(textStatus);
         };
 
         return {
