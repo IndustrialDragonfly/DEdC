@@ -13,7 +13,7 @@
  * Checks to see if the incoming request has the proper user agent product,
  * if it does not loads the web client page.
  */
-$web_client_location = "Frontend/dist/";
+$web_client_location = "Frontend/";
 $browser_accept = '*/*';
 if (FALSE !== stripos($_SERVER['HTTP_ACCEPT'], $browser_accept))
 {
