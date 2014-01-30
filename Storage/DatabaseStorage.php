@@ -411,15 +411,15 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          }
          
          // Get the nodes list from the database
-         // This is performed by joining the relevant tables, then filtering
-         // out all subdfdnodes from the list with a subquery
+         // This is performed by joining element list, entity and element, then 
+         // filtering out all subdfdnodes and links from the list with a
+         // a subquery
          $loadDFD = $this->dbh->prepare("
              SELECT * 
-                FROM entity id
-                        JOIN element_list el_id ON el_id=id
-                        NATURAL JOIN element
-                        NATURAL JOIN node 
-                WHERE id NOT IN(SELECT subdfdnode_id FROM subdfdnode WHERE dfd_id=?) AND dfd_id=?;
+            FROM entity id
+                    JOIN element_list el_id ON el_id=id
+                    NATURAL JOIN element
+            WHERE id NOT IN (SELECT subdfdnode_id FROM subdfdnode UNION SELECT id FROM link) AND dfd_id=?;
                 ");
          $loadDFD->bindParam(1, $id);
          $loadDFD->execute();
