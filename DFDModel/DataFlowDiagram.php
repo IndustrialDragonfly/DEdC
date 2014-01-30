@@ -49,6 +49,18 @@ class DataFlowDiagram extends Entity
     * @var String 
     */
    protected $subDFDNode;
+   
+   /**
+    * UUID of the originator of this DFD
+    * @var String 
+    */
+   protected $originator;
+   
+   /**
+    * Label for this DFD
+    * @var string
+    */
+   protected $label;
 
    //</editor-fold>
    //<editor-fold desc="Constructor" defaultstate="collapsed">
@@ -64,6 +76,7 @@ class DataFlowDiagram extends Entity
    public function __construct()
    {
       parent::__construct();
+      $this->storage = func_get_arg(0);
       // If there is only one argument (the storage object) then this is a
       // root DFD
       // DataFlowDiagram($storage)
@@ -72,14 +85,12 @@ class DataFlowDiagram extends Entity
          $this->elementList = array();
          $this->parentStack = null;
          $this->subDFDNode = null;
-         $this->storage = func_get_arg(0);
       }
       // If creating a new DFD connected to a SubDFDNode
       // DataFlowDiagram($storage, $SubDFDNode)
       else if (func_num_args() == 2 && 
               is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "SubDFDNode"))
       {
-           $this->storage = func_get_arg(0);
            $this->elementList = array();
            $this->subDFDNode = func_get_arg(1);
            
@@ -103,7 +114,6 @@ class DataFlowDiagram extends Entity
               is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DataFlowDiagram"))
       {
          $this->elementList = array();
-         $this->storage = func_get_arg(0);
          $this->id = func_get_arg(1);
          $vars = $this->storage->loadDFD($this->id);
          
@@ -225,52 +235,16 @@ class DataFlowDiagram extends Entity
 
    //</editor-fold>
    //</editor-fold>
-   //<editor-fold desc="DB functions" defaultstate="collapsed">
+   //<editor-fold desc="Storage functions" defaultstate="collapsed">
    /**
 * function that will save this object to the database
 * this will also save every element in the element list
 * @param PDO $pdo this is the connection to the Database
 */
-   public function save($pdo)
+   public function save()
    {
-      //<editor-fold desc="save to Entity table" defaultstate="collapsed">
-      // Prepare the statement
-      $insert_stmt = $pdo->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
-
-      // Bind the parameters of the prepared statement
-      $type = Types::DataFlowDiagram;
-      $insert_stmt->bindParam(1, $this->id);
-      $insert_stmt->bindParam(2, $this->label);
-      $insert_stmt->bindParam(3, $type);
-      $insert_stmt->bindParam(4, $this->originator);
-
-      // Execute, catch any errors resulting
-      $insert_stmt->execute();
-      //</editor-fold>
-      //<editor-fold desc="save to Element List table" defaultstate="collapsed">
-      // Prepare the statement
-      $insert_stmt = $pdo->prepare("INSERT INTO element_list (dfd_id, el_id) VALUES(?,?)");
-      for ($i = 0; $i < $this->getNumberOfElements(); $i++)
-      {
-         // Bind the parameters of the prepared statement
-         $insert_stmt->bindParam(1, $this->id);
-         $insert_stmt->bindParam(2, $this->elementList[$i]->getId());
-         // Execute, catch any errors resulting
-         $insert_stmt->execute();
-      }
-      //</editor-fold>
-      //<editor-fold desc="save to External link List table" defaultstate="collapsed">
-      // Prepare the statement
-      $insert_stmt = $pdo->prepare("INSERT INTO external_links (dfd_id, df_id) VALUES(?,?)");
-      for ($i = 0; $i < $this->getNumberOfExternalLinks(); $i++)
-      {
-         // Bind the parameters of the prepared statement
-         $insert_stmt->bindParam(1, $this->id);
-         $insert_stmt->bindParam(2, $this->externalLinks[$i]->getId());
-         // Execute, catch any errors resulting
-         $insert_stmt->execute();
-      }
-      //</editor-fold>
+      saveDFD($this->id, get_class($this), $this->label, $this->originator, $this->ancestry, 
+            $this->nodeList, $this->linkList, $this->subDFDNodeList, $this->subDFDNode)
    }
 
    //</editor-fold>

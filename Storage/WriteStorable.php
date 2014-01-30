@@ -58,6 +58,12 @@ interface WriteStorable
      * @param String $id
      */
     public function deleteLink($id);
+    
+    /**
+     * Saves the DFD to the database
+     */
+    public function saveDFD($id, $ancestry, $nodeList, $linkList, $subDFDNodeList, $subDFDNode);
+
 }
 
 ?>

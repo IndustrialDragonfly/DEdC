@@ -366,7 +366,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $loadAncestry = $this->dbh->prepare("SELECT ancestor_id
             FROM dfd_ancestry 
             WHERE descendant_id=?
-            ORDER BY ancestor_id DESC");
+            ORDER BY depth DESC");
         $loadAncestry->bindParam(1, $id);
         
         // Iterate through the results until all have been pulled out
@@ -510,6 +510,96 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $vars['ancestry'] = getAncestry($id);
          
          return $vars;
+    }
+    
+    /**
+     * Adds the ancestry stack of the current DFD into the DFD tree
+     * 
+     * @param string $id
+     * @param string[] $ancestry
+     */
+    private function saveAncestry($id, $ancestry)
+    {
+      $insert_stmt = $this->dbh->prepare("INSERT INTO dfd_ancestry (ancestor_id, descendant_id, depth) VALUES(?,?,?)");
+      
+      for ($i = 0; $i < count($ancestry); $i++)
+      {
+          $insert_stmt->bindParam(1, $ancestry[$i]);
+          $insert_stmt->bindParam(2, $id);
+          $insert_stmt>-bindParam(3, $i);
+          
+          $insert_stmt->execute();
+      }
+    }
+    
+    /**
+     * Saves the DFD with the given input parameters
+     * 
+     * @param string $id
+     * @param string $type
+     * @param string $label
+     * @param string $originator
+     * @param string[] $ancestry
+     * @param string[] $nodeList
+     * @param string[] $linkList
+     * @param string[] $subDFDNodeList
+     * @param string $subDFDNode
+     */
+    public function saveDFD($id, $type, $label, $originator, $ancestry, 
+            $nodeList, $linkList, $subDFDNodeList, $subDFDNode)
+    {
+      // Prepare the statement
+      $insert_stmt = $this->dbh->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
+
+      // Bind the parameters of the prepared statement
+      $insert_stmt->bindParam(1, $id);
+      $insert_stmt->bindParam(2, $label);
+      $insert_stmt->bindParam(3, $type);
+      $insert_stmt->bindParam(4, $originator);
+
+      // Execute, catch any errors resulting
+      $insert_stmt->execute();
+      
+      // Prepare the statement to store the elements into the elmenet_list table
+      $insert_stmt = $this->dbh->prepare("INSERT INTO element_list (dfd_id, el_id) VALUES(?,?)");
+      
+      // Save each element in the nodeList to the table
+      foreach ($nodeList as $node)
+      {
+         // Bind the parameters of the prepared statement
+         $insert_stmt->bindParam(1, $id);
+         $insert_stmt->bindParam(2, $node);
+         // Execute, catch any errors resulting
+         $insert_stmt->execute();
+      }
+      
+      // Save each element in the linkList to the table
+      foreach ($linkList as $link)
+      {
+         // Bind the parameters of the prepared statement
+         $insert_stmt->bindParam(1, $id);
+         $insert_stmt->bindParam(2, $link);
+         // Execute, catch any errors resulting
+         $insert_stmt->execute();
+      }
+      
+      // Save each element in the suDFDNodeList to the table
+      foreach ($subDFDNodeList as $subDFDNode_id)
+      {
+         // Bind the parameters of the prepared statement
+         $insert_stmt->bindParam(1, $id);
+         $insert_stmt->bindParam(2, $subDFDNode_id);
+         // Execute, catch any errors resulting
+         $insert_stmt->execute();
+      }
+          // Prepare the statement
+      $insert_stmt = $this->dbh->prepare("INSERT INTO subDFDNode (subdfdnode_id, dfd_id) VALUES(?,?)");
+
+      // Bind the parameters of the prepared statement
+      $insert_stmt->bindParam(1, $subDFDNode);
+      $insert_stmt->bindParam(2, $id);
+      
+      $this->saveAncestry($id, $ancestry);
     }
 }
 
