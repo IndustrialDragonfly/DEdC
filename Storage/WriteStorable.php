@@ -63,7 +63,11 @@ interface WriteStorable
      * Saves the DFD to the database
      */
     public function saveDFD($id, $ancestry, $nodeList, $linkList, $subDFDNodeList, $subDFDNode);
-
+    
+    /**
+     * Deletes the DFD from the database
+     */
+    public function deleteDFD($id);
 }
 
 ?>

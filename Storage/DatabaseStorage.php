@@ -601,6 +601,27 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       
       $this->saveAncestry($id, $ancestry);
     }
+    
+    /**
+     * Deletes the DFD information itself from the dfd_ancestry table and the
+     * entity table. Expects that the DFD has already been cleared out, so does
+     * not attempt to clean out elements that it contains (since those are best
+     * removed by their own functions, not by the DFD).
+     * 
+     * @param String $id
+     */
+    public function deleteDFD($id)
+    {
+        // Start by isolating the child from its parents
+        $delete = $this->dbh->prepare("DELETE FROM dfd_ancestry WHERE descendant_id = ?");
+        $delete->bindParam(1, $id);
+        $delete->execute();
+        
+        // Removing the child itself from the DB
+        $delete = $this->dbh->prepare("DELETE FROM entity WHERE id=?");
+        $delete->bindParam(1, $id);
+        $delete->execute();
+    }
 }
 
 ?>
