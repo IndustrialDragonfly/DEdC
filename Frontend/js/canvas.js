@@ -265,7 +265,7 @@ Raphael.st.draggable = function (callback, element) {
             });
             
             return c;
-        }
+        };
         
         var getDfd = function (url) {
             var onSuccess = function(response) {
@@ -290,7 +290,7 @@ Raphael.st.draggable = function (callback, element) {
             
             var onFail = function(response) {
                 // TODO: Handle error better
-                console.log("Request to get DFD failed.");
+                console.log("Request to get DFD failed. " + response.getError());
             };
             
             Connector.get(url, onSuccess, onFail);
