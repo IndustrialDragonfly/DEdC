@@ -60,29 +60,6 @@ Raphael.st.draggable = function (callback, element) {
             tabs, // jQuery tab widget
             canvases = []; // Array of all open canvases
 
-        var ELETYPE = {
-            PROCESS: {
-                value: 0,
-                name: "Process",
-                code: "P"
-            },
-            MULTIPROCESS: {
-                value: 1,
-                name: "Multiprocess",
-                code: "MP"
-            },
-            DATASTORE: {
-                value: 1,
-                name: "Datastore",
-                code: "D"
-            },
-            EXTINTERACTOR: {
-                value: 1,
-                name: "External-Interactor",
-                code: "EI"
-            }
-        };
-
         /**
          * The the canvas object from the currently selected tab
          */
@@ -93,33 +70,33 @@ Raphael.st.draggable = function (callback, element) {
 
         /**
          * Setup the UI for the browser
-         * @param {string} content - Center DOM element - tabs
-         * @param {string} sidebar - Sidebar DOM element - accordion
-         * @param {string} users - Users DOM element - accordion
-         * @param {string} tabContainer - DOM element for the individual tabs
-         * @param {string} process - Process DOM element to be made draggable
-         * @param {string} multiprocess - Multiprocess DOM element to be made draggable
-         * @param {string} datastore - Datastore DOM element to be made draggable
-         * @param {string} extinteractor - ExtInteractor DOM element to be made draggable
-         * @param {string} connect - Dataflow creation DOM button
-         * @param {string} deleteButton - Delete element DOM button
-         * @param {string} load - Load DOM button
-         * @param {string} newTab - New Tab DOM button
+         * @param {string} contentText - Center DOM element - tabs
+         * @param {string} sidebarText - Sidebar DOM element - accordion
+         * @param {string} usersText - Users DOM element - accordion
+         * @param {string} tabContainerText - DOM element for the individual tabs
+         * @param {string} processText - Process DOM element to be made draggable
+         * @param {string} multiprocessText - Multiprocess DOM element to be made draggable
+         * @param {string} datastoreText - Datastore DOM element to be made draggable
+         * @param {string} extinteractorText - ExtInteractor DOM element to be made draggable
+         * @param {string} connectText - Dataflow creation DOM button
+         * @param {string} deleteButtonText - Delete element DOM button
+         * @param {string} loadText - Load DOM button
+         * @param {string} newTabText - New Tab DOM button
          */
         var publicSetupUi = function (
-            contentName, sidebarName, usersName, tabContainerName, processName, multiprocessName, datastoreName, extinteractorName, connectName, deleteButtonName, loadName, newTabName) {
-            content = contentName;
-            sidebar = sidebarName;
-            users = usersName;
-            tabContainer = tabContainerName;
-            process = processName;
-            multiprocess = multiprocessName;
-            datastore = datastoreName;
-            extinteractor = extinteractorName;
-            connect = connectName;
-            deleteButton = deleteButtonName;
-            load = loadName;
-            newTab = newTabName;
+            contentText, sidebarText, usersText, tabContainerText, processText, multiprocessText, datastoreText, extinteractorText, connectText, deleteButtonText, loadText, newTabText) {
+            content = contentText;
+            sidebar = sidebarText;
+            users = usersText;
+            tabContainer = tabContainerText;
+            process = processText;
+            multiprocess = multiprocessText;
+            datastore = datastoreText;
+            extinteractor = extinteractorText;
+            connect = connectText;
+            deleteButton = deleteButtonText;
+            load = loadText;
+            newTab = newTabText;
 
             /**
              * Resize the currently selected canvas
@@ -256,11 +233,17 @@ Raphael.st.draggable = function (callback, element) {
                     var c = getCurrentCanvas();
 
                     // Check the type of the dropped element and an element to the canvas
-                    if ($(ui.draggable).data("type") === ELETYPE.PROCESS) c.addProcess(posx, posy);
-                    else if ($(ui.draggable).data("type") === ELETYPE.MULTIPROCESS) c.addMultiProcess(posx, posy);
-                    else if ($(ui.draggable).data("type") === ELETYPE.DATASTORE) c.addDatastore(posx, posy);
-                    else if ($(ui.draggable).data("type") === ELETYPE.EXTINTERACTOR) c.addExtInteractor(posx, posy);
-                    else console.log("Draggable Element was malformed.");
+                    if ($(ui.draggable).data("type") === ELETYPE.PROCESS) { 
+                        c.addProcess(posx, posy); 
+                    } else if ($(ui.draggable).data("type") === ELETYPE.MULTIPROCESS) {
+                        c.addMultiProcess(posx, posy);
+                    } else if ($(ui.draggable).data("type") === ELETYPE.DATASTORE) {
+                        c.addDatastore(posx, posy);
+                    } else if ($(ui.draggable).data("type") === ELETYPE.EXTINTERACTOR) {
+                        c.addExtInteractor(posx, posy);
+                    } else {
+                        console.log("Draggable Element was malformed.");
+                    }
                 }
             });
 
@@ -292,12 +275,60 @@ Raphael.st.draggable = function (callback, element) {
 
             Connector.get(url, onSuccess, onFail);
         };
+        
         // Expose methods to be public
         return {
             setupUi: publicSetupUi
         };
     })();
+    
+    // Element types
+    var ELETYPE = {
+        PROCESS: {
+            value: 0,
+            name: "Process",
+            code: "P"
+        },
+        MULTIPROCESS: {
+            value: 1,
+            name: "Multiprocess",
+            code: "MP"
+        },
+        DATASTORE: {
+            value: 1,
+            name: "Datastore",
+            code: "D"
+        },
+        EXTINTERACTOR: {
+            value: 1,
+            name: "External-Interactor",
+            code: "EI"
+        }
+    };
 
+    // Keyboard events
+    var KEYSTATE = {
+        DOWN: {
+            value: 0,
+            name: "Down",
+            code: "D"
+        },
+        UP: {
+            value: 1,
+            name: "Up",
+            code: "U"
+        }
+    };
+
+    // Keyboard keys
+    var KEYS = {
+        CTRL: {
+            value: 17,
+            name: "Ctrl",
+            code: "C"
+        }
+    };
+    
     /**
      * Create a canvas
      * @constructor
@@ -316,29 +347,6 @@ Raphael.st.draggable = function (callback, element) {
         // Curent selection
         var selection = [];
         var dataflowSelection = [];
-
-        // Keyboard events
-        var KEYSTATE = {
-            DOWN: {
-                value: 0,
-                name: "Down",
-                code: "D"
-            },
-            UP: {
-                value: 1,
-                name: "Up",
-                code: "U"
-            }
-        };
-
-        // Keyboard keys
-        var KEYS = {
-            CTRL: {
-                value: 17,
-                name: "Ctrl",
-                code: "C"
-            }
-        };
 
         // Register key events
         var ctrlState = KEYSTATE.UP; // Default state for ctrl
