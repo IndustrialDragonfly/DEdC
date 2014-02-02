@@ -369,21 +369,21 @@ Raphael.st.draggable = function (callback, element) {
          * @param {Element} element - Element that was clicked
          */
         this.elementClicked = function (element) {
-            if (ctrlState === KEYSTATE.UP) // CTRL is not pressed
-            {
+            if (ctrlState === KEYSTATE.UP) {
+                // CTRL is not pressed
                 // Replace selection
                 this.unselectAllElements();
                 selection.push(element);
                 element.setSelected();
-            } else // CTRL is pressed
-            {
+            } else {
+                // CTRL is pressed
                 var index = selection.indexOf(element);
-                if (index < 0) // Not in selection, add it
-                {
+                if (index < 0) {
+                    // Not in selection, add it
                     selection.push(element);
                     element.setSelected();
-                } else // Element was selected, remove it
-                {
+                } else {
+                    // Element was selected, remove it
                     selection.splice(index, 1);
                     element.setUnselected();
                 }
@@ -396,21 +396,21 @@ Raphael.st.draggable = function (callback, element) {
          * @param {Dataflow} dataflow - Dataflow that was clicked
          */
         this.dataflowClicked = function (dataflow) {
-            if (ctrlState === KEYSTATE.UP) // CTRL is not pressed
-            {
+            if (ctrlState === KEYSTATE.UP) {
+                // CTRL is not pressed
                 // Replace selection
                 this.unselectAllDataflows();
                 dataflowSelection.push(dataflow);
                 dataflow.setSelected();
-            } else // CTRL is pressed
-            {
+            } else {
+                // CTRL is pressed
                 var index = selection.indexOf(dataflow);
-                if (index < 0) // Not in selection, add it
-                {
+                if (index < 0) {
+                    // Not in selection, add it
                     dataflowSelection.push(dataflow);
                     dataflow.setSelected();
-                } else // Element was selected, remove it
-                {
+                } else {
+                    // Element was selected, remove it
                     dataflowSelection.splice(index, 1);
                     dataflow.setUnselected();
                 }
