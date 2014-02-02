@@ -256,15 +256,26 @@ Raphael.st.draggable = function (callback, element) {
                 var canvas = createNewTab(response.getData().name);
 
                 response.getData().elements.forEach(function (entry) {
+                    var e;
                     if (entry.type === "process") {
-                        canvas.addProcess(entry.x, entry.y);
+                        e = canvas.addProcess(entry.x, entry.y);
                     } else if (entry.type === "multiprocess") {
-                        canvas.addMultiProcess(entry.x, entry.y);
+                        e = canvas.addMultiProcess(entry.x, entry.y);
                     } else if (entry.type === "datastore") {
-                        canvas.addDatastore(entry.x, entry.y);
+                        e = canvas.addDatastore(entry.x, entry.y);
                     } else if (entry.type === "extinteractor") {
-                        canvas.addExtInteractor(entry.x, entry.y);
+                        e = canvas.addExtInteractor(entry.x, entry.y);
+                    } else {
+                        console.log("\"" + entry.type + "\" was not a recognized element type.");
+                        return;
                     }
+                    
+                    e.setId(entry.id);
+                });
+                
+                response.getData().dataflows.forEach(function (entry) {
+                    // Find source element
+                    canvas.addDataflowById(entry.origin_id, entry.dest_id);
                 });
             };
 
@@ -609,6 +620,21 @@ Raphael.st.draggable = function (callback, element) {
             dataflows.push(d);
             return d;
         };
+        
+        this.addDataflowById = function (sourceId, targetId) {
+            var source,
+                target;
+        
+            elements.forEach(function (entry) {
+                if (entry.getId() === sourceId) {
+                    source = entry;
+                } else if (entry.getId() === targetId) {
+                    target = entry;
+                }
+            });
+            
+            this.addDataflow(source, target);
+        }
 
         /**
          * Connect the current selection with Dataflows
@@ -694,7 +720,16 @@ Raphael.st.draggable = function (callback, element) {
             myCanvas = canvas, // Internal reference to canvas
             set = canvas.createSet(), // Raphael.Set for shapes
             textBox,
-            hasMoved = false;
+            hasMoved = false,
+            id;
+    
+       this.getId = function() {
+           return id;
+       };
+       
+       this.setId = function(newId) {
+           id = newId;
+       };
 
         /**
          * Add a shape to the Element

@@ -27,9 +27,16 @@ class SimpleResponse extends Response
                                     "id": "1235",
                                     "type": "process",
                                     "label": "Example Process 2",
-                                    "x": "100",
+                                    "x": "200",
                                     "y": "50"
                             }
+                    ],
+                    "dataflows": [
+                        {
+                            "id": "1236",
+                            "origin_id": "1234",
+                            "dest_id": "1235"
+                        }
                     ]
                 }
 EOT;
