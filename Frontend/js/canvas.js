@@ -59,7 +59,7 @@ Raphael.st.draggable = function (callback, element) {
             newTab,
             tabs, // jQuery tab widget
             canvases = []; // Array of all open canvases
-        
+
         var ELETYPE = {
             PROCESS: {
                 value: 0,
@@ -82,7 +82,7 @@ Raphael.st.draggable = function (callback, element) {
                 code: "EI"
             }
         };
-        
+
         /**
          * The the canvas object from the currently selected tab
          */
@@ -210,19 +210,19 @@ Raphael.st.draggable = function (callback, element) {
                 createNewTab();
             });
         };
-        
+
         var createNewTab = function (name) {
             var tabTemplate = "<li><a href='#{href}'>#{label}</a></li>",
-               // Template for the tabs
-               label = "Tab" + canvases.length,
-               // Name of the tab
-               id = "tab" + canvases.length;
-          
+                // Template for the tabs
+                label = "Tab" + canvases.length,
+                // Name of the tab
+                id = "tab" + canvases.length;
+
             // Support custom tab names
             if (name) {
                 label = name;
             }
-            
+
             // Id of the tabs
             var li = $(tabTemplate.replace(/#\{href\}/g, "#" + id).replace(/#\{label\}/g, label)); // List item HTML
 
@@ -248,51 +248,48 @@ Raphael.st.draggable = function (callback, element) {
 
             // Setup drop for the new tab
             $("#" + id).droppable({
-               drop: function (event, ui) {
-                   // Executed when something is dropped onto the tab
-                   var posx = event.pageX - $(tabContainer).offset().left,
-                       posy = event.pageY - $(tabContainer).offset().top;
+                drop: function (event, ui) {
+                    // Executed when something is dropped onto the tab
+                    var posx = event.pageX - $(tabContainer).offset().left,
+                        posy = event.pageY - $(tabContainer).offset().top;
 
-                   var c = getCurrentCanvas();
+                    var c = getCurrentCanvas();
 
-                   // Check the type of the dropped element and an element to the canvas
-                   if ($(ui.draggable).data("type") === ELETYPE.PROCESS) c.addProcess(posx, posy);
-                   else if ($(ui.draggable).data("type") === ELETYPE.MULTIPROCESS) c.addMultiProcess(posx, posy);
-                   else if ($(ui.draggable).data("type") === ELETYPE.DATASTORE) c.addDatastore(posx, posy);
-                   else if ($(ui.draggable).data("type") === ELETYPE.EXTINTERACTOR) c.addExtInteractor(posx, posy);
-                   else console.log("Draggable Element was malformed.");
-               }
+                    // Check the type of the dropped element and an element to the canvas
+                    if ($(ui.draggable).data("type") === ELETYPE.PROCESS) c.addProcess(posx, posy);
+                    else if ($(ui.draggable).data("type") === ELETYPE.MULTIPROCESS) c.addMultiProcess(posx, posy);
+                    else if ($(ui.draggable).data("type") === ELETYPE.DATASTORE) c.addDatastore(posx, posy);
+                    else if ($(ui.draggable).data("type") === ELETYPE.EXTINTERACTOR) c.addExtInteractor(posx, posy);
+                    else console.log("Draggable Element was malformed.");
+                }
             });
-            
+
             return c;
         };
-        
+
         var getDfd = function (url) {
-            var onSuccess = function(response) {
+            var onSuccess = function (response) {
                 // Load SimpleMediaType DFD
                 var canvas = createNewTab(response.getData().name);
-                
-                response.getData().elements.forEach(function(entry) {
+
+                response.getData().elements.forEach(function (entry) {
                     if (entry.type === "process") {
-                            canvas.addProcess(entry.x, entry.y);
-                    }
-                    else if (entry.type === "multiprocess") {
-                            canvas.addMultiProcess(entry.x, entry.y);
-                    }
-                    else if (entry.type === "datastore") {
-                            canvas.addDatastore(entry.x, entry.y);
-                    }
-                    else if (entry.type === "extinteractor") {
-                            canvas.addExtInteractor(entry.x, entry.y);
+                        canvas.addProcess(entry.x, entry.y);
+                    } else if (entry.type === "multiprocess") {
+                        canvas.addMultiProcess(entry.x, entry.y);
+                    } else if (entry.type === "datastore") {
+                        canvas.addDatastore(entry.x, entry.y);
+                    } else if (entry.type === "extinteractor") {
+                        canvas.addExtInteractor(entry.x, entry.y);
                     }
                 });
             };
-            
-            var onFail = function(response) {
+
+            var onFail = function (response) {
                 // TODO: Handle error better
                 console.log("Request to get DFD failed. " + response.getError());
             };
-            
+
             Connector.get(url, onSuccess, onFail);
         };
         // Expose methods to be public
@@ -474,7 +471,19 @@ Raphael.st.draggable = function (callback, element) {
          * @return {Process} Element on canvas
          */
         this.addProcess = function (x, y) {
-            var e = new Process(this, x, y);
+            var e = new Element(this, x, y);
+            e.push(paper.add([
+                {
+                    type: "circle",
+                    cx: x,
+                    cy: y,
+                    r: 25
+                }
+            ]));
+            
+            e.applyDefaultStyle();
+            e.draggable();
+
             elements.push(e);
 
             return e;
@@ -487,7 +496,25 @@ Raphael.st.draggable = function (callback, element) {
          * @return {MultiProcess} Element on canvas
          */
         this.addMultiProcess = function (x, y) {
-            var e = new MultiProcess(this, x, y);
+            var e = new Element(this, x, y);
+            e.push(paper.add([
+                {
+                    type: "circle",
+                    cx: x,
+                    cy: y,
+                    r: 25
+                },
+                {
+                    type: "circle",
+                    cx: x,
+                    cy: y,
+                    r: 18
+                }
+            ]));
+            
+            e.applyDefaultStyle();
+            e.draggable();
+
             elements.push(e);
 
             return e;
@@ -500,7 +527,35 @@ Raphael.st.draggable = function (callback, element) {
          * @return {Datastore} Element on canvas
          */
         this.addDatastore = function (x, y) {
-            var e = new Datastore(this, x, y);
+            var e = new Element(this, x, y);
+            
+            x = x - 25;
+            y = y - 25;
+            
+            e.push(paper.add([
+                {
+                    type: "path",
+                    path: "M" + x + " " + y + " L" + (x + 50) + " " + y + " Z"
+                },
+                {
+                    type: "path",
+                    path: "M" + x + " " + (y + 50) + " L" + (x + 50) + " " + (y + 50) + " Z"
+                },
+                {
+                    type: "rect",
+                    x: x,
+                    y: y +1,
+                    width: 50,
+                    height: 48,
+                    "stroke-width": 0,
+                    fill: "#FFF"
+                }
+
+            ]));
+
+            //e.applyDefaultStyle();
+            e.draggable();
+
             elements.push(e);
 
             return e;
@@ -513,7 +568,20 @@ Raphael.st.draggable = function (callback, element) {
          * @return {ExtInteractor} Element on canvas
          */
         this.addExtInteractor = function (x, y) {
-            var e = new ExtInteractor(this, x, y);
+            var e = new Element(this, x, y);
+            e.push(paper.add([
+                {
+                    type: "rect",
+                    x: x - 25,
+                    y: y - 25,
+                    width: 50,
+                    height: 50
+                }
+            ]));
+            
+            e.applyDefaultStyle();
+            e.draggable();
+
             elements.push(e);
 
             return e;
@@ -594,363 +662,291 @@ Raphael.st.draggable = function (callback, element) {
                 dataflows[i].calcPath();
             }
         };
+        
+        this.createSet = function () {
+            return paper.set();
+        };
+        
+        this.createText = function (x, y, text) {
+            return paper.text(x, y, text);
+        };
+    }
+
+    /**
+     * Base Class for all Elements
+     * @constructor
+     * @param {Cavas} canvas - Canvas Object
+     */
+    function Element(canvas) {
+        var me = this,
+            myCanvas = canvas, // Internal reference to canvas
+            set = canvas.createSet(), // Raphael.Set for shapes
+            textBox,
+            hasMoved = false;
 
         /**
-         * Base Class for all Elements
-         * @constructor
-         * @param {Cavas} canvas - Canvas Object
+         * Add a shape to the Element
+         * @param {Raphael.Shape} shape - Shape to add
          */
-        var Element = function (canvas) {
-            var me = this;
-            var set = paper.set(); // Raphael.Set for shapes
-            var textBox;
-            var myCanvas = canvas; // Internal reference to canvas
-            var hasMoved = false;
-
-            /**
-             * Add a shape to the Element
-             * @param {Raphael.Shape} shape - Shape to add
-             */
-            this.push = function (shape) {
-                for (var i = 0; i < arguments.length; i++) {
-                    set.push(arguments[i]);
-                    arguments[i].mouseup(onMouseClick);
-                }
-            };
-
-            /**
-             * Get Set of Shapes
-             * @returns {Raphael.Set} Set of Shapes
-             */
-            this.getSet = function () {
-                return set;
-            };
-
-            /**
-             * Make the Element draggable, any elements added after
-             * draggable is called will not function properly
-             */
-            this.draggable = function () {
-                set.draggable(myCanvas.calcDataflows, me);
-            };
-
-            /**
-             * Style all of the Shapes with the default styling
-             */
-            this.applyDefaultStyle = function () {
-                set.attr("fill", "#FFF");
-                set.attr("stroke", "#000");
-                set.attr("stroke-width", "1px");
-            };
-
-            /**
-             * Get the bounding box for the Element
-             * @returns {Raphael.BBox}
-             */
-            this.getBBox = function () {
-                return set.getBBox();
-            };
-
-            /**
-             * Called when the Element is selected
-             */
-            this.setSelected = function () {
-                set.animate({
-                    "fill-opacity": 0.2
-                }, 100);
-            };
-
-            /**
-             * Called when the Element is unselected
-             */
-            this.setUnselected = function () {
-                set.animate({
-                    "fill-opacity": 1.0
-                }, 100);
-            };
-
-            /**
-             * Get whether the element has moved
-             * @returns {Boolean} True if element has moved, false otherwise
-             */
-            this.getHasMoved = function () {
-                return hasMoved;
-            };
-
-            /**
-             * Get whether the element has moved
-             * @param {Boolean} moved - Set to true when moved, false when updated
-             */
-            this.setHasMoved = function (moved) {
-                hasMoved = moved;
-            };
-
-            /**
-             * Get the attach points for the Element
-             * @returns {Array} Array of four points (x,y)
-             */
-            this.getAttachPoints = function () {
-                var bb = this.getBBox();
-                var points = [];
-
-                points.push({
-                    x: bb.x,
-                    y: bb.y + bb.height / 2
-                }); // Left
-                points.push({
-                    x: bb.x + bb.width / 2,
-                    y: bb.y
-                }); // Top
-                points.push({
-                    x: bb.x + bb.width,
-                    y: bb.y + bb.height / 2
-                }); // Right
-                points.push({
-                    x: bb.x + bb.width / 2,
-                    y: bb.y + bb.height
-                }); // Bottom
-                return points;
-            };
-
-            /**
-             * Set the text label for the element
-             * @param {String} text - Text to set label to
-             */
-            this.setText = function (text) {
-                if (!textBox) {
-                    var points = this.getAttachPoints();
-                    textBox = paper.text(points[3].x, points[3].y + 10, text);
-                } else {
-                    textBox.attr("text", text);
-                }
-            };
-
-            /**
-             * Called when any Shape in the set is clicked
-             */
-            var onMouseClick = function () {
-                // Using "this" would result in the wrong object being used
-                myCanvas.elementClicked(me);
-            };
-
-            /**
-             * Update the position of the text label
-             */
-            this.updateText = function () {
-                if (textBox) {
-                    var points = this.getAttachPoints();
-                    textBox.attr("x", points[3].x);
-                    textBox.attr("y", points[3].y + 10);
-                }
-            };
-
-            /**
-             * Remove the element from the canvas
-             */
-            this.remove = function () {
-                if (textBox) {
-                    textBox.remove();
-                }
-
-                if (set) {
-                    set.remove();
-                }
-            };
+        this.push = function (shape) {
+            for (var i = 0; i < arguments.length; i++) {
+                set.push(arguments[i]);
+                arguments[i].mouseup(onMouseClick);
+            }
         };
 
         /**
-         * Create a Process element
-         * @constructor
-         * @augments Element
-         * @param {Cavas} canvas - Canvas Object
-         * @param {number} x - Coordinate in pixels
-         * @param {number} y - Coordinate in pixels
+         * Get Set of Shapes
+         * @returns {Raphael.Set} Set of Shapes
          */
-        var Process = function (canvas, x, y) {
-            Element.call(this, canvas); // Call parent constructor
-            this.push(paper.circle(x, y, 25));
-            this.applyDefaultStyle();
-            this.draggable();
+        this.getSet = function () {
+            return set;
         };
-        Process.prototype = new Element(); // Inherit Element
-        Process.prototype.constructor = Process; // Fix the constructor pointer
-        /**
-         * Create a MultiProcess element
-         * @constructor
-         * @augments Element
-         * @param {Cavas} canvas - Canvas Object
-         * @param {number} x - Coordinate in pixels
-         * @param {number} y - Coordinate in pixels
-         */
-        var MultiProcess = function (canvas, x, y) {
-            Element.call(this, canvas);
-
-            this.push(paper.circle(x, y, 25), paper.circle(x, y, 18));
-            this.applyDefaultStyle();
-            this.draggable();
-        };
-        MultiProcess.prototype = new Element();
-        MultiProcess.prototype.constructor = MultiProcess;
 
         /**
-         * Create a Datastore element
-         * @constructor
-         * @augments Element
-         * @param {Cavas} canvas - Canvas Object
-         * @param {number} x - Coordinate in pixels
-         * @param {number} y - Coordinate in pixels
+         * Make the Element draggable, any elements added after
+         * draggable is called will not function properly
          */
-        var Datastore = function (canvas, x, y) {
-            Element.call(this, canvas);
-
-            x = x - 25;
-            y = y - 25;
-
-            this.push(
-                paper.path("M" + x + " " + y + " L" + (x + 50) + " " + y + " Z"), paper.path("M" + x + " " + (y + 50) + " L" + (x + 50) + " " + (y + 50) + " Z"));
-            this.applyDefaultStyle();
-
-            var rec = paper.rect((x), (y + 1), 50, 48);
-            rec.attr("stroke-width", 0);
-            rec.attr("fill", "#FFF");
-            this.push(rec);
-
-            this.draggable();
+        this.draggable = function () {
+            set.draggable(myCanvas.calcDataflows, me);
         };
-        Datastore.prototype = new Element();
-        Datastore.prototype.constructor = Datastore;
 
         /**
-         * Create a External-interactor element
-         * @constructor
-         * @augments Element
-         * @param {Cavas} canvas - Canvas Object
-         * @param {number} x - Coordinate in pixels
-         * @param {number} y - Coordinate in pixels
+         * Style all of the Shapes with the default styling
          */
-        var ExtInteractor = function (canvas, x, y) {
-            Element.call(this, canvas);
-
-            this.push(paper.rect(x - 25, y - 25, 50, 50));
-            this.applyDefaultStyle();
-            this.draggable();
+        this.applyDefaultStyle = function () {
+            set.attr("fill", "#FFF");
+            set.attr("stroke", "#000");
+            set.attr("stroke-width", "1px");
         };
-        ExtInteractor.prototype = new Element();
-        ExtInteractor.prototype.constructor = ExtInteractor;
 
         /**
-         * Create a Dataflow from source to target
-         * @constructor
-         * @param {Canvas} canvas - Canvas Object
-         * @param {Element} source - Source of the Dataflow
-         * @param {Element} target - Target of the Dataflow
+         * Get the bounding box for the Element
+         * @returns {Raphael.BBox}
          */
-        var Dataflow = function (canvas, source, target) {
-            var me = this;
-            var mySource = source;
-            var myTarget = target;
-            var myCanvas = canvas;
-            var path;
-            var arrow;
+        this.getBBox = function () {
+            return set.getBBox();
+        };
 
-            // Make sure this dataflow will get drawn
-            myTarget.setHasMoved(true);
-            mySource.setHasMoved(true);
+        /**
+         * Called when the Element is selected
+         */
+        this.setSelected = function () {
+            set.animate({
+                "fill-opacity": 0.2
+            }, 100);
+        };
 
-            /**
-             * Called when the Element is selected
-             */
-            this.setSelected = function () {
-                path.animate({
-                    "stroke-width": 5
-                }, 100);
-            };
+        /**
+         * Called when the Element is unselected
+         */
+        this.setUnselected = function () {
+            set.animate({
+                "fill-opacity": 1.0
+            }, 100);
+        };
 
-            /**
-             * Called when the Element is unselected
-             */
-            this.setUnselected = function () {
-                path.animate({
-                    "stroke-width": 3
-                }, 100);
-            };
+        /**
+         * Get whether the element has moved
+         * @returns {Boolean} True if element has moved, false otherwise
+         */
+        this.getHasMoved = function () {
+            return hasMoved;
+        };
 
-            /**
-             * Called when any Shape in the set is clicked
-             */
-            var onMouseClick = function () {
-                // Using "this" would result in the wrong object being used
-                myCanvas.dataflowClicked(me);
-            };
+        /**
+         * Get whether the element has moved
+         * @param {Boolean} moved - Set to true when moved, false when updated
+         */
+        this.setHasMoved = function (moved) {
+            hasMoved = moved;
+        };
 
-            /**
-             * Calculate Dataflow's path as the minium between the two Elements
-             */
-            this.calcPath = function () {
-                if (!mySource.getHasMoved() || !myTarget.getHasMoved()) {
-                    return;
-                }
+        /**
+         * Get the attach points for the Element
+         * @returns {Array} Array of four points (x,y)
+         */
+        this.getAttachPoints = function () {
+            var bb = this.getBBox();
+            var points = [];
 
-                var sourcePoint = mySource.getAttachPoints();
-                var targetPoint = myTarget.getAttachPoints();
-                var sourceIndex = 0; // Shortest point index for source
-                var targetIndex = 0; // Shortest point index for source
-                var min; // Minimum length
+            points.push({
+                x: bb.x,
+                y: bb.y + bb.height / 2
+            }); // Left
+            points.push({
+                x: bb.x + bb.width / 2,
+                y: bb.y
+            }); // Top
+            points.push({
+                x: bb.x + bb.width,
+                y: bb.y + bb.height / 2
+            }); // Right
+            points.push({
+                x: bb.x + bb.width / 2,
+                y: bb.y + bb.height
+            }); // Bottom
+            return points;
+        };
 
-                // Loop through all of the attach points for both Elements
-                for (var i = 0; i < sourcePoint.length; i++) {
-                    for (var j = 0; j < targetPoint.length; j++) {
-                        // Calculate vector's length (sqrt(a^2 + b^2))
-                        var dx = Math.abs(sourcePoint[i].x - targetPoint[j].x);
-                        var dy = Math.abs(sourcePoint[i].y - targetPoint[j].y);
-                        var length = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-                        if (min) {
-                            // Check if new vector is minimum
-                            if (length < min) {
-                                sourceIndex = i;
-                                targetIndex = j;
-                                min = length;
-                            }
-                        } else // No previous minimum existed
-                        {
+        /**
+         * Set the text label for the element
+         * @param {String} text - Text to set label to
+         */
+        this.setText = function (text) {
+            if (!textBox) {
+                var points = this.getAttachPoints();
+                textBox = myCanvas.createText(points[3].x, points[3].y + 10, text);
+            } else {
+                textBox.attr("text", text);
+            }
+        };
+
+        /**
+         * Called when any Shape in the set is clicked
+         */
+        var onMouseClick = function () {
+            // Using "this" would result in the wrong object being used
+            myCanvas.elementClicked(me);
+        };
+
+        /**
+         * Update the position of the text label
+         */
+        this.updateText = function () {
+            if (textBox) {
+                var points = this.getAttachPoints();
+                textBox.attr("x", points[3].x);
+                textBox.attr("y", points[3].y + 10);
+            }
+        };
+
+        /**
+         * Remove the element from the canvas
+         */
+        this.remove = function () {
+            if (textBox) {
+                textBox.remove();
+            }
+
+            if (set) {
+                set.remove();
+            }
+        };
+    };
+
+    /**
+     * Create a Dataflow from source to target
+     * @constructor
+     * @param {Canvas} canvas - Canvas Object
+     * @param {Element} source - Source of the Dataflow
+     * @param {Element} target - Target of the Dataflow
+     */
+    function Dataflow(canvas, source, target) {
+        var me = this;
+        var mySource = source;
+        var myTarget = target;
+        var myCanvas = canvas;
+        var path;
+        var arrow;
+
+        // Make sure this dataflow will get drawn
+        myTarget.setHasMoved(true);
+        mySource.setHasMoved(true);
+
+        /**
+         * Called when the Element is selected
+         */
+        this.setSelected = function () {
+            path.animate({
+                "stroke-width": 5
+            }, 100);
+        };
+
+        /**
+         * Called when the Element is unselected
+         */
+        this.setUnselected = function () {
+            path.animate({
+                "stroke-width": 3
+            }, 100);
+        };
+
+        /**
+         * Called when any Shape in the set is clicked
+         */
+        var onMouseClick = function () {
+            // Using "this" would result in the wrong object being used
+            myCanvas.dataflowClicked(me);
+        };
+
+        /**
+         * Calculate Dataflow's path as the minium between the two Elements
+         */
+        this.calcPath = function () {
+            if (!mySource.getHasMoved() || !myTarget.getHasMoved()) {
+                return;
+            }
+
+            var sourcePoint = mySource.getAttachPoints();
+            var targetPoint = myTarget.getAttachPoints();
+            var sourceIndex = 0; // Shortest point index for source
+            var targetIndex = 0; // Shortest point index for source
+            var min; // Minimum length
+
+            // Loop through all of the attach points for both Elements
+            for (var i = 0; i < sourcePoint.length; i++) {
+                for (var j = 0; j < targetPoint.length; j++) {
+                    // Calculate vector's length (sqrt(a^2 + b^2))
+                    var dx = Math.abs(sourcePoint[i].x - targetPoint[j].x);
+                    var dy = Math.abs(sourcePoint[i].y - targetPoint[j].y);
+                    var length = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+                    if (min) {
+                        // Check if new vector is minimum
+                        if (length < min) {
                             sourceIndex = i;
                             targetIndex = j;
                             min = length;
                         }
+                    } else // No previous minimum existed
+                    {
+                        sourceIndex = i;
+                        targetIndex = j;
+                        min = length;
                     }
                 }
-                var pathString = "M" + sourcePoint[sourceIndex].x + " " + sourcePoint[sourceIndex].y + " L" + targetPoint[targetIndex].x + " " + targetPoint[targetIndex].y + " Z";
+            }
+            var pathString = "M" + sourcePoint[sourceIndex].x + " " + sourcePoint[sourceIndex].y + " L" + targetPoint[targetIndex].x + " " + targetPoint[targetIndex].y + " Z";
 
-                var angle = Math.atan2(targetPoint[targetIndex].x - sourcePoint[sourceIndex].x, targetPoint[targetIndex].y - sourcePoint[sourceIndex].y);
-                angle = (angle / (2 * Math.PI)) * 360;
-                var arrowString = "M" + targetPoint[targetIndex].x + " " + targetPoint[targetIndex].y + " L" + (targetPoint[targetIndex].x - 5) + " " + (targetPoint[targetIndex].y - 5) + " L" + (targetPoint[targetIndex].x - 5) + " " + (targetPoint[targetIndex].y + 5) + " L" + targetPoint[targetIndex].x + " " + targetPoint[targetIndex].y;
-                var arrowRotationString = "r" + ((-90 + angle) * -1) + "," + targetPoint[targetIndex].x + "," + targetPoint[targetIndex].y;
+            var angle = Math.atan2(targetPoint[targetIndex].x - sourcePoint[sourceIndex].x, targetPoint[targetIndex].y - sourcePoint[sourceIndex].y);
+            angle = (angle / (2 * Math.PI)) * 360;
+            var arrowString = "M" + targetPoint[targetIndex].x + " " + targetPoint[targetIndex].y + " L" + (targetPoint[targetIndex].x - 5) + " " + (targetPoint[targetIndex].y - 5) + " L" + (targetPoint[targetIndex].x - 5) + " " + (targetPoint[targetIndex].y + 5) + " L" + targetPoint[targetIndex].x + " " + targetPoint[targetIndex].y;
+            var arrowRotationString = "r" + ((-90 + angle) * -1) + "," + targetPoint[targetIndex].x + "," + targetPoint[targetIndex].y;
 
-                if (path && arrow) {
-                    // Path existed, update
-                    path.attr({
-                        path: pathString
-                    });
-                    arrow.attr({
-                        path: arrowString
-                    });
-                    arrow.transform(arrowRotationString);
-                } else {
-                    if (path) path.remove();
-                    if (arrow) arrow.remove();
+            if (path && arrow) {
+                // Path existed, update
+                path.attr({
+                    path: pathString
+                });
+                arrow.attr({
+                    path: arrowString
+                });
+                arrow.transform(arrowRotationString);
+            } else {
+                if (path) path.remove();
+                if (arrow) arrow.remove();
 
-                    // Path did not exist, create
-                    path = paper.path(pathString).attr("stroke-width", 3);
-                    path.mouseup(onMouseClick);
-                    arrow = paper.path(arrowString).attr("fill", "black");
-                    arrow.transform(arrowRotationString);
-                }
-            };
-
-            // Initially calculate the path
-            this.calcPath();
+                // Path did not exist, create
+                path = paper.path(pathString).attr("stroke-width", 3);
+                path.mouseup(onMouseClick);
+                arrow = paper.path(arrowString).attr("fill", "black");
+                arrow.transform(arrowRotationString);
+            }
         };
-    }
+
+        // Initially calculate the path
+        this.calcPath();
+    };
 
     /**
      * Base Response for requests
@@ -1041,14 +1037,14 @@ Raphael.st.draggable = function (callback, element) {
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 // Request failed for some reason
                 var response = new Response();
-                
+
                 response.setStatus(textStatus);
                 response.setError("GET " + url + " " + jqXHR.status + " (" + jqXHR.statusText + ")");
-                
+
                 failCallback(response);
             });
         };
-        
+
         /**
          * Parse a JSON object
          * @param {jsonObject} jsonObject JSON document that has been translated by jQuery to an Object
@@ -1056,10 +1052,10 @@ Raphael.st.draggable = function (callback, element) {
          */
         var parseJson = function (jsonObject, textStatus) {
             var response = new Response();
-            
+
             response.setData(jsonObject);
             response.setStatus(textStatus);
-            
+
             return response;
         };
 
