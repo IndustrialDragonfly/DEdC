@@ -45,10 +45,44 @@ Raphael.st.draggable = function (callback, element) {
 
 (function () {
     var DEdC = (function () {
-        var tabs, // jQuery tab widget
-            tabCount = 0,
-            // Count of number of tabs
+        var content,
+            sidebar,
+            users,
+            tabContainer,
+            process,
+            multiprocess,
+            datastore,
+            extinteractor,
+            connect,
+            deleteButton,
+            load,
+            newTab,
+            tabs, // jQuery tab widget
             canvases = []; // Array of all open canvases
+        
+        var ELETYPE = {
+            PROCESS: {
+                value: 0,
+                name: "Process",
+                code: "P"
+            },
+            MULTIPROCESS: {
+                value: 1,
+                name: "Multiprocess",
+                code: "MP"
+            },
+            DATASTORE: {
+                value: 1,
+                name: "Datastore",
+                code: "D"
+            },
+            EXTINTERACTOR: {
+                value: 1,
+                name: "External-Interactor",
+                code: "EI"
+            }
+        };
+        
         /**
          * The the canvas object from the currently selected tab
          */
@@ -73,7 +107,19 @@ Raphael.st.draggable = function (callback, element) {
          * @param {string} newTab - New Tab DOM button
          */
         var publicSetupUi = function (
-            content, sidebar, users, tabContainer, process, multiprocess, datastore, extinteractor, connect, deleteButton, load, newTab) {
+            contentName, sidebarName, usersName, tabContainerName, processName, multiprocessName, datastoreName, extinteractorName, connectName, deleteButtonName, loadName, newTabName) {
+            content = contentName;
+            sidebar = sidebarName;
+            users = usersName;
+            tabContainer = tabContainerName;
+            process = processName;
+            multiprocess = multiprocessName;
+            datastore = datastoreName;
+            extinteractor = extinteractorName;
+            connect = connectName;
+            deleteButton = deleteButtonName;
+            load = loadName;
+            newTab = newTabName;
 
             /**
              * Resize the currently selected canvas
@@ -115,29 +161,6 @@ Raphael.st.draggable = function (callback, element) {
                 return $(this).clone().appendTo('body').css('zIndex', 5).show();
             };
 
-            var ELETYPE = {
-                PROCESS: {
-                    value: 0,
-                    name: "Process",
-                    code: "P"
-                },
-                MULTIPROCESS: {
-                    value: 1,
-                    name: "Multiprocess",
-                    code: "MP"
-                },
-                DATASTORE: {
-                    value: 1,
-                    name: "Datastore",
-                    code: "D"
-                },
-                EXTINTERACTOR: {
-                    value: 1,
-                    name: "External-Interactor",
-                    code: "EI"
-                }
-            };
-
             // Make the elements in the toolbox draggable
             $(process).draggable({
                 helper: draggableHelper
@@ -158,70 +181,120 @@ Raphael.st.draggable = function (callback, element) {
             // Setup toolbar
             // Connect Dataflow button
             $(connect).button().click(function () {
-                getCurrentCanvas().addDataflowFromSelection();
+                var c = getCurrentCanvas();
+                if (c) {
+                    c.addDataflowFromSelection();
+                } else {
+                    console.log("No tab currently selected.");
+                }
             });
 
             // Delete Element button
             $(deleteButton).button().click(function () {
-                getCurrentCanvas().removeElementFromSelection();
+                var c = getCurrentCanvas();
+                if (c) {
+                    getCurrentCanvas().removeElementFromSelection();
+                } else {
+                    console.log("No tab currently selected.");
+                }
             });
 
             // Load DFD button
             $(load).button().click(function () {
                 // Controller.php is required until the rewrite rules work correctly
-                Connector.get("Controller.php/test_dfd");
+                getDfd("Controller.php/test_dfd");
             });
 
             // New tab button
             $(newTab).button().click(function () {
-                var tabTemplate = "<li><a href='#{href}'>#{label}</a></li>",
-                    // Template for the tabs
-                    label = "Tab" + ++tabCount,
-                    // Name of the tab
-                    id = "tab" + tabCount,
-                    // Id of the tabs
-                    li = $(tabTemplate.replace(/#\{href\}/g, "#" + id).replace(/#\{label\}/g, label)); // List item HTML
-
-                // Add the new tab to the tab list
-                tabs.find(".ui-tabs-nav").append(li);
-
-                // Add the body of the tab to the container
-                $(tabContainer).prepend("<div id='" + id + "'></div>");
-
-                // Create the canvas
-                var c = new Canvas(id, 640, 480);
-                canvases.push(c);
-                c.setBackground('#A8A8A8');
-
-                // Update the tab view
-                $(content).tabs("refresh");
-
-                // Set the initial size of the canvas
-                // Cannot call resizeCanvas because it hasn't been selected yet
-                var width = $(tabContainer).width();
-                var height = $(tabContainer).height();
-                c.setSize(width, height);
-
-                // Setup drop for the new tab
-                $("#" + id).droppable({
-                    drop: function (event, ui) {
-                        // Executed when something is dropped onto the tab
-                        var posx = event.pageX - $(tabContainer).offset().left,
-                            posy = event.pageY - $(tabContainer).offset().top;
-
-                        var c = getCurrentCanvas();
-
-                        // Check the type of the dropped element and an element to the canvas
-                        if ($(ui.draggable).data("type") === ELETYPE.PROCESS) c.addProcess(posx, posy);
-                        else if ($(ui.draggable).data("type") === ELETYPE.MULTIPROCESS) c.addMultiProcess(posx, posy);
-                        else if ($(ui.draggable).data("type") === ELETYPE.DATASTORE) c.addDatastore(posx, posy);
-                        else if ($(ui.draggable).data("type") === ELETYPE.EXTINTERACTOR) c.addExtInteractor(posx, posy);
-                        else alert("Draggable Element was malformed.");
-                    }
-                });
+                createNewTab();
             });
         };
+        
+        var createNewTab = function (name) {
+            var tabTemplate = "<li><a href='#{href}'>#{label}</a></li>",
+               // Template for the tabs
+               label = "Tab" + canvases.length,
+               // Name of the tab
+               id = "tab" + canvases.length;
+          
+            // Support custom tab names
+            if (name) {
+                label = name;
+            }
+            
+            // Id of the tabs
+            var li = $(tabTemplate.replace(/#\{href\}/g, "#" + id).replace(/#\{label\}/g, label)); // List item HTML
 
+            // Add the new tab to the tab list
+            tabs.find(".ui-tabs-nav").append(li);
+
+            // Add the body of the tab to the container
+            $(tabContainer).prepend("<div id='" + id + "'></div>");
+
+            // Create the canvas
+            var c = new Canvas(id, 640, 480);
+            canvases.push(c);
+            c.setBackground('#A8A8A8');
+
+            // Update the tab view
+            $(content).tabs("refresh");
+
+            // Set the initial size of the canvas
+            // Cannot call resizeCanvas because it hasn't been selected yet
+            var width = $(tabContainer).width();
+            var height = $(tabContainer).height();
+            c.setSize(width, height);
+
+            // Setup drop for the new tab
+            $("#" + id).droppable({
+               drop: function (event, ui) {
+                   // Executed when something is dropped onto the tab
+                   var posx = event.pageX - $(tabContainer).offset().left,
+                       posy = event.pageY - $(tabContainer).offset().top;
+
+                   var c = getCurrentCanvas();
+
+                   // Check the type of the dropped element and an element to the canvas
+                   if ($(ui.draggable).data("type") === ELETYPE.PROCESS) c.addProcess(posx, posy);
+                   else if ($(ui.draggable).data("type") === ELETYPE.MULTIPROCESS) c.addMultiProcess(posx, posy);
+                   else if ($(ui.draggable).data("type") === ELETYPE.DATASTORE) c.addDatastore(posx, posy);
+                   else if ($(ui.draggable).data("type") === ELETYPE.EXTINTERACTOR) c.addExtInteractor(posx, posy);
+                   else console.log("Draggable Element was malformed.");
+               }
+            });
+            
+            return c;
+        }
+        
+        var getDfd = function (url) {
+            var onSuccess = function(response) {
+                // Load SimpleMediaType DFD
+                var canvas = createNewTab(response.getData().name);
+                
+                response.getData().elements.forEach(function(entry) {
+                    if (entry.type === "process") {
+                            canvas.addProcess(entry.x, entry.y);
+                    }
+                    else if (entry.type === "multiprocess") {
+                            canvas.addMultiProcess(entry.x, entry.y);
+                    }
+                    else if (entry.type === "datastore") {
+                            canvas.addDatastore(entry.x, entry.y);
+                    }
+                    else if (entry.type === "extinteractor") {
+                            canvas.addExtInteractor(entry.x, entry.y);
+                    }
+                });
+            };
+            
+            var onFail = function(response) {
+                // TODO: Handle error better
+                console.log("Request to get DFD failed.");
+            };
+            
+            Connector.get(url, onSuccess, onFail);
+        };
         // Expose methods to be public
         return {
             setupUi: publicSetupUi
@@ -944,6 +1017,9 @@ Raphael.st.draggable = function (callback, element) {
         };
     };
 
+    /**
+     * Connector will handel all Ajax code
+     */
     var Connector = (function () {
 
         /**
@@ -961,7 +1037,7 @@ Raphael.st.draggable = function (callback, element) {
                 dataType: "json" // Do not let jQuery automatically parse the JSON response
             }).done(function (data, textStatus) {
                 // Request was successful
-                successCallback(parseJson(data), textStatus);
+                successCallback(parseJson(data));
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 // Request failed for some reason
                 var response = new Response();
@@ -983,6 +1059,8 @@ Raphael.st.draggable = function (callback, element) {
             
             response.setData(jsonObject);
             response.setStatus(textStatus);
+            
+            return response;
         };
 
         return {
