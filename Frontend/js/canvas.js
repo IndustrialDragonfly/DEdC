@@ -678,6 +678,10 @@ Raphael.st.draggable = function (callback, element) {
         this.createText = function (x, y, text) {
             return paper.text(x, y, text);
         };
+        
+        this.createPath = function (pathString) {
+            return paper.path(pathString);
+        };
     }
 
     /**
@@ -941,13 +945,18 @@ Raphael.st.draggable = function (callback, element) {
                 });
                 arrow.transform(arrowRotationString);
             } else {
-                if (path) path.remove();
-                if (arrow) arrow.remove();
+                if (path) {
+                    path.remove();
+                }
+                
+                if (arrow) {
+                    arrow.remove();
+                }
 
                 // Path did not exist, create
-                path = paper.path(pathString).attr("stroke-width", 3);
+                path = canvas.createPath(pathString).attr("stroke-width", 3);
                 path.mouseup(onMouseClick);
-                arrow = paper.path(arrowString).attr("fill", "black");
+                arrow = canvas.createPath(arrowString).attr("fill", "black");
                 arrow.transform(arrowRotationString);
             }
         };
