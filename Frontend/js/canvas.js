@@ -1036,7 +1036,6 @@ Raphael.st.draggable = function (callback, element) {
             $.ajax({
                 accepts: "application/json",
                 url: url,
-                async: false,
                 // If async is true, response will be returned before query executes
                 dataType: "json" // Do not let jQuery automatically parse the JSON response
             }).done(function (data, textStatus) {
