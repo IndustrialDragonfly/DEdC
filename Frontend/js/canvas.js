@@ -634,7 +634,7 @@ Raphael.st.draggable = function (callback, element) {
             });
             
             this.addDataflow(source, target);
-        }
+        };
 
         /**
          * Connect the current selection with Dataflows
