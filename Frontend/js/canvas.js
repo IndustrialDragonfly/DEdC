@@ -270,6 +270,7 @@ Raphael.st.draggable = function (callback, element) {
                         return;
                     }
                     
+                    e.setText(entry.label);
                     e.setId(entry.id);
                 });
                 
