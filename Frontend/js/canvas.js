@@ -256,27 +256,11 @@ Raphael.st.draggable = function (callback, element) {
                 var canvas = createNewTab(response.getData().name);
 
                 response.getData().elements.forEach(function (entry) {
-                    var e;
-                    if (entry.type === "process") {
-                        e = canvas.addProcess(entry.x, entry.y);
-                    } else if (entry.type === "multiprocess") {
-                        e = canvas.addMultiProcess(entry.x, entry.y);
-                    } else if (entry.type === "datastore") {
-                        e = canvas.addDatastore(entry.x, entry.y);
-                    } else if (entry.type === "extinteractor") {
-                        e = canvas.addExtInteractor(entry.x, entry.y);
-                    } else {
-                        console.log("\"" + entry.type + "\" was not a recognized element type.");
-                        return;
-                    }
-                    
-                    e.setText(entry.label);
-                    e.setId(entry.id);
+                    loadElement(canvas, entry);
                 });
                 
                 response.getData().dataflows.forEach(function (entry) {
-                    // Find source element
-                    canvas.addDataflowById(entry.origin_id, entry.dest_id);
+                    loadDataflow(canvas, entry);
                 });
             };
 
@@ -286,6 +270,29 @@ Raphael.st.draggable = function (callback, element) {
             };
 
             Connector.get(url, onSuccess, onFail);
+        };
+        
+        var loadElement = function(canvas, entry) {
+            var e;
+            if (entry.type === "process") {
+                e = canvas.addProcess(entry.x, entry.y);
+            } else if (entry.type === "multiprocess") {
+                e = canvas.addMultiProcess(entry.x, entry.y);
+            } else if (entry.type === "datastore") {
+                e = canvas.addDatastore(entry.x, entry.y);
+            } else if (entry.type === "extinteractor") {
+                e = canvas.addExtInteractor(entry.x, entry.y);
+            } else {
+                console.log("\"" + entry.type + "\" was not a recognized element type.");
+                return;
+            }
+
+            e.setText(entry.label);
+            e.setId(entry.id);
+        };
+        
+        var loadDataflow = function(canvas, entry) {
+            canvas.addDataflowById(entry.origin_id, entry.dest_id);
         };
         
         // Expose methods to be public
