@@ -19,16 +19,30 @@ class SimpleResponse extends Response
                             {
                                     "id": "1234",
                                     "type": "process",
-                                    "label": "Example Process 1",
+                                    "label": "Example Process",
                                     "x": "50",
                                     "y": "50"
                             },
                             {
                                     "id": "1235",
-                                    "type": "process",
-                                    "label": "Example Process 2",
+                                    "type": "multiprocess",
+                                    "label": "Example Multiprocess",
                                     "x": "200",
                                     "y": "50"
+                            },
+                            {
+                                    "id": "1237",
+                                    "type": "datastore",
+                                    "label": "Example Datastore",
+                                    "x": "50",
+                                    "y": "200"
+                            },
+                            {
+                                    "id": "1238",
+                                    "type": "extinteractor",
+                                    "label": "Example Ext. Interactor",
+                                    "x": "200",
+                                    "y": "200"
                             }
                     ],
                     "dataflows": [
@@ -36,6 +50,16 @@ class SimpleResponse extends Response
                             "id": "1236",
                             "origin_id": "1234",
                             "dest_id": "1235"
+                        },
+                        {
+                            "id": "1239",
+                            "origin_id": "1238",
+                            "dest_id": "1234"
+                        },
+                        {
+                            "id": "1240",
+                            "origin_id": "1237",
+                            "dest_id": "1234"
                         }
                     ]
                 }
