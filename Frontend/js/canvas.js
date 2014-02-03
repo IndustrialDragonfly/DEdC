@@ -963,12 +963,29 @@ Raphael.st.draggable = function (callback, element) {
                     }
                 }
             }
-            var pathString = "M" + sourcePoint[sourceIndex].x + " " + sourcePoint[sourceIndex].y + " L" + targetPoint[targetIndex].x + " " + targetPoint[targetIndex].y + " Z";
+            
+            var pathString = "M#{sourceX} #{sourceY} L#{targetX} #{targetY} Z";
+            pathString = pathString.replace(/#\{sourceX\}/g, sourcePoint[sourceIndex].x)
+                    .replace(/#\{sourceY\}/g, sourcePoint[sourceIndex].y)
+                    .replace(/#\{targetX\}/g, targetPoint[targetIndex].x)
+                    .replace(/#\{targetY\}/g, targetPoint[targetIndex].y);
 
             var angle = Math.atan2(targetPoint[targetIndex].x - sourcePoint[sourceIndex].x, targetPoint[targetIndex].y - sourcePoint[sourceIndex].y);
             angle = (angle / (2 * Math.PI)) * 360;
-            var arrowString = "M" + targetPoint[targetIndex].x + " " + targetPoint[targetIndex].y + " L" + (targetPoint[targetIndex].x - 5) + " " + (targetPoint[targetIndex].y - 5) + " L" + (targetPoint[targetIndex].x - 5) + " " + (targetPoint[targetIndex].y + 5) + " L" + targetPoint[targetIndex].x + " " + targetPoint[targetIndex].y;
-            var arrowRotationString = "r" + ((-90 + angle) * -1) + "," + targetPoint[targetIndex].x + "," + targetPoint[targetIndex].y;
+            var arrowString = "M#{targetX1} #{targetY1} L#{targetX2} #{targetY2} L#{targetX3} #{targetY3} L#{targetX4} #{targetY4}";
+            arrowString = arrowString.replace(/#\{targetX1\}/g, targetPoint[targetIndex].x)
+                    .replace(/#\{targetY1\}/g, targetPoint[targetIndex].y)
+                    .replace(/#\{targetX2\}/g, targetPoint[targetIndex].x - 5)
+                    .replace(/#\{targetY2\}/g, targetPoint[targetIndex].y - 5)
+                    .replace(/#\{targetX3\}/g, targetPoint[targetIndex].x - 5)
+                    .replace(/#\{targetY3\}/g, targetPoint[targetIndex].y + 5)
+                    .replace(/#\{targetX4\}/g, targetPoint[targetIndex].x)
+                    .replace(/#\{targetY4\}/g, targetPoint[targetIndex].y);
+
+            var arrowRotationString = "r #{angle},#{targetX},#{targetY}";
+            arrowRotationString = arrowRotationString.replace(/#\{angle\}/g, (-90 + angle) * -1)
+                    .replace(/#\{targetX\}/g, targetPoint[targetIndex].x)
+                    .replace(/#\{targetY\}/g, targetPoint[targetIndex].y);
 
             if (path && arrow) {
                 // Path existed, update
