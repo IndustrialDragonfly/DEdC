@@ -7,7 +7,38 @@ only providing one level.
 Definition for a DFD (note there are no nested DFDs in this definition)
 {
     "name": "string",
-    "elements": []
+    "type": "string",
+    "nodes": 
+    [
+        {
+            "id": "string",
+            "type": "string",
+            "label": "string",
+            "x": "value",
+            "y": "value"
+        }
+    ],
+    "links": 
+        [
+            {
+                "id": "string",
+                "type": "string",
+                "origin_id": "string",
+                "dest_id": "string",
+                "x": "value",
+                "y": "value"
+            }
+        ],
+    "subDFDNodes": 
+    [
+        {
+            "id": "string",
+            "type": "string",
+            "label": "string",
+            "x": "value",
+            "y": "value"
+        }
+    ]
 }
 
 Definition for a single node
@@ -18,13 +49,28 @@ Definition for a single node
     "x": "value",
     "y": "value",
     "originator": "string",
-    "dataflows": []
+    "links": []
 }
 
-
-Definition for a single dataflow
+Definition for a single subDFDNode
 {
     "id": "string",
+    "type": "string",
+    "label": "string",
+    "x": "value",
+    "y": "value",
+    "originator": "string",
+    "subDFD": "string",
+    "links": []
+}
+
+Definition for a single link
+{
+    "id": "string",
+    "type": "string",
     "origin_id": "string",
-    "dest_id": "string"
+    "dest_id": "string",
+    "originator": "string",
+    "x": "value",
+    "y": "value"
 }
