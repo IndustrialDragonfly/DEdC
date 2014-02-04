@@ -14,14 +14,6 @@ require_once 'Element.php';
 {
    //<editor-fold desc="Attributes" defaultstate="collapsed">
    protected $links;
-   
-   protected $storage;
-   
-   /**
-    * Containing DFD diagram for the link object
-    * @var DataFlowDiagram
-    */
-   protected $parent;
    //</editor-fold>
    
    //<editor-fold desc="Constructor" defaultstate="collapsed">
@@ -73,7 +65,7 @@ require_once 'Element.php';
    
    /**
     * function that gets the number of links that connect to this node
-    * @return type the number of links 
+    * @return int the number of links 
     */
    public function getNumberOfLinks()
    {
@@ -82,7 +74,7 @@ require_once 'Element.php';
    
    /**
     * Function that return the links that connect to a node
-    * @return string[]
+    * @return string[] an array of all the uuid of the links to this node
     */
    public function getLinks()
    {

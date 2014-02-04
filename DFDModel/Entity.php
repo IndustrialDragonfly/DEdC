@@ -1,16 +1,49 @@
 <?php
 /**
- * Description of Entity
+ * this class represents an object that has a UUID, a label and can be stored 
+ * into some manner of storage medium
+ * 
+ * known direct subclasses:
+ *    Element
+ *    DataFlowDiagram
  *
  * @author Josh Clark
  */
 abstract class Entity 
 {
    //<editor-fold desc="Attributes" defaultstate="collapsed">
+   /**
+    * this is a container which holds the name of the object
+    * @var String
+    */
    protected $label;
+   
+   /**
+    * this contains a universally unique identifier
+    * @var String
+    */
    protected $id;
+   
+   /**
+    *this is a container for the creator of this object
+    * @var String
+    */
    protected $originator;
+   
+   /**
+    * this is a container for the organization that this object belongs to
+    * @var String
+    */
    protected $organization;
+   
+   
+   /**
+    * Storage object, should be readable and/or writable (depending on whether
+    * this is a normal data store, import data source, or export data format)
+    * @var Readable/Writable
+    */
+   protected $storage;
+   
    //</editor-fold>
    
    //<editor-fold desc="Constructor" defaultstate="collapsed">

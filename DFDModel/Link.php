@@ -16,23 +16,13 @@ abstract class Link extends Element
     * @var String
     */
    protected $originNode;
+   
    /**
     * UUID of a node object
     * @var String
     */
    protected $destinationNode;
-   
-   /**
-    * Storage object
-    * @var Writeable AND/OR Readable 
-    */
-   protected $storage;
-   
-   /**
-    * Containing DFD diagram for the link object
-    * @var DataFlowDiagram
-    */
-   protected $parent;
+
    //</editor-fold>
    
 //<editor-fold desc="Constructor" defaultstate="collapsed">
@@ -87,7 +77,7 @@ abstract class Link extends Element
 //<editor-fold desc="originNode functions" defaultstate="collapsed">
    /**
     * function that returns the Node that this dataflow originates from
-    * @return Node 
+    * @return String 
     */
    public function getOriginNode()
    {
@@ -217,15 +207,6 @@ abstract class Link extends Element
       }
    }
    //</editor-fold>
-   
-   /**
-    * Gets the parent DFD UUID and returns it to the caller.
-    * @returns String
-    */
-   public function getParent()
-   {
-       $this->parent;
-   }
    
    /**
     * Removes the specified node
