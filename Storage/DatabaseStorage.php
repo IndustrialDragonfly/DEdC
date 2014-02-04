@@ -204,7 +204,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     {
         //<editor-fold desc="save to multiprocess table" defaultstate="collapsed">
       // Prepare the statement
-      $insert_stmt = $this->dbh->prepare("INSERT INTO multiprocess (dfd_id, mp_id) VALUES(?,?)");
+      $insert_stmt = $this->dbh->prepare("INSERT INTO subdfdnode (dfd_id, subdfdnode_id) VALUES(?,?)");
 
       // Bind the parameters of the prepared statement
       $insert_stmt->bindParam(1, $dfd_resource);
@@ -213,6 +213,33 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       // Execute, catch any errors resulting
       $insert_stmt->execute();
       //</editor-fold>
+    }
+    
+    /**
+     * For a given id that is of type subDFDNode, return what dfd it maps to
+     * @param String $id
+     * @return String
+     */
+    public function loadSubDFDNode($id)
+    {
+         $select_statement = $this->dbh->prepare("SELECT dfd_id FROM subdfdnode WHERE subdfdnode_id=?");
+         $select_statement->bindParam(1, $id);
+         $select_statement->execute();
+         $dfd_id = $select_statement->fetch();
+         
+         // Return the id from the associative array
+         return $dfd_id['dfd_id'];
+    }
+    
+    /**
+     * Deletes the given subDFDNode from the subDFDNode to DFD mapping
+     * @param String $id
+     */
+    public function deleteSubDFDNode($id)
+    {
+        $delete_statement = $this->dbh->prepare("DELETE FROM subdfdnode WHERE subdfdnode_id=?");
+        $delete_statement->bindParam(1, $id);
+        $delete_statement->execute();
     }
     
     /**

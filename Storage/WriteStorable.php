@@ -38,6 +38,12 @@ interface WriteStorable
      */
     public function saveSubDFDNode($dfd_resource, $subDFD_resource);
     
+     /**
+     * Deletes the given subDFDNode from the subDFDNode to DFD mapping
+     * @param String $id
+     */
+    public function deleteSubDFDNode($id);
+    
     /**
      * Stores a dataflow object into the data store
      * 

@@ -41,6 +41,13 @@ interface ReadStorable
      * @param String $id
      */
     public function loadDFD($id);
+    
+    /**
+     * For a given id that is of type subDFDNode, return what dfd it maps to
+     * @param String $id
+     * @return String
+     */
+    public function loadSubDFDNode($id);
 }
 
 ?>
