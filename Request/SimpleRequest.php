@@ -8,10 +8,9 @@ require_once "Request.php";
  */
 class SimpleRequest extends Request
 {
-    public function __construct($accept, $method, $resource)
+    public function __construct($accept, $method, $uri)
     {
-        parent::__construct($accept, $method, $resource);
+        parent::__construct($accept, $method, $uri);
     }
 }
-
 ?>
