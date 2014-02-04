@@ -25,9 +25,9 @@ abstract class Entity
    protected $id;
    
    /**
-    * This is a container for the creator of this object
-    * @var String
-    */
+     * UUID of the originator of this DFD
+     * @var String 
+     */
    protected $originator;
    
    /**
@@ -146,13 +146,15 @@ abstract class Entity
     * with this object
     * 
     * should this function exist?
+    *   -nope
     * 
     * @param Readable/Writable $newStorage
     */
+   /*
    public function setStorage($newStorage)
    {
       $this->storage = $newStorage;
-   }
+   }*/
    
    /**
     * This is a function that retrieves the Storage object that is associated 
