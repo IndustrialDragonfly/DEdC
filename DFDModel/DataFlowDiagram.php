@@ -23,7 +23,7 @@ class DataFlowDiagram extends Entity
 
     /**
      * List of all nodes contained within this DFD and basic data to use them.
-     * Stored in an associative array.
+     * Stored in an associative array. Eldest anchestor will be first in the array
      * @var String[]
      */
     protected $nodeList;
@@ -41,13 +41,6 @@ class DataFlowDiagram extends Entity
      * @var Mixed[]
      */
     protected $subDFDNodeList;
-
-    /**
-     * Storage object, should be readable and/or writable (depending on whether
-     * this is a normal data store, import data source, or export data format)
-     * @var Readable/Writable
-     */
-    protected $storage;
 
     /**
      * The SubDFDNode UUID that this DFD is linked to 
@@ -292,6 +285,64 @@ class DataFlowDiagram extends Entity
     //</editor-fold>
     //<editor-fold desc="subDFDNodeList Accessors" defaultstate="collapsed">
     /**
+     * This is a function that returns the number of sub-DFD contained within 
+     * this DFD
+     * @return int
+     */
+    public function getNumberOfSubDFDs()
+    {
+        return count($this->subDFDNodeList);
+    }
+    
+    /**
+     * This function returns the list of UUIDs of every subDFDNodes within this 
+     * DFD
+     * @return String[]
+     */
+    public function getSubDFDNodes()
+    {
+        return $this->subDFDNodeList;
+    }
+    
+    /**
+     * This fucnction returns a specific subDFDNode within this DFD based uppon 
+     * its location in the list
+     * @param int $position
+     * @return String[] the UUID of the SubDFDNode
+     * @throws BadFunctionCallException if the input was out of bounds
+     */
+    public function getSubDFDNode($position)
+    {
+        if ($position <= count($this->subDFDNodeList) - 1 && $position >= 0)
+        {
+            return $this->subDFDNodeList[$position];
+        }
+        else
+        {
+            throw new BadFunctionCallException("input parameter was out of bounds");
+        }
+    }
+    
+    /**
+     * This is a function that will add an ID of a SubDFDNode to the list of subDFDs
+     * @param SubDFDNode $node the SubDFDNode whose id is to be added
+     * @throws BadFunctionCallException if you pass a variable that does not inherit from subDFDNode
+     */
+    public function addSubDFDNode($node)
+    {
+        //ensure that a valid Node child was passed
+        if (is_subclass_of($node, 'subDFDNode')  )
+        {
+            //add it to the list
+            array_push($this->subDFDNodeList, $node->getId());
+        }
+        else
+        {
+            throw new BadFunctionCallException("Input parameter not a vaild Node");
+        }
+    }
+    
+    /**
      * Finds and deletes the subDFDNode at the given UUID from the subDFDNode
      * @param String $subdfdnodeid
      * @return boolean
@@ -318,6 +369,64 @@ class DataFlowDiagram extends Entity
         }
     }
 
+    //</editor-fold>
+    //<editor-fold desc="$ancestry Accessors" defaultstate="collapsed">
+    /**
+     * This function returns the number of ancestors of this DFD
+     * @return int
+     */
+    public function getNumberOfAncestors()
+    {
+        return count($this->ancestry);
+    }
+    
+    /**
+     * This is a function that returns the immediate parent to this DFD
+     * @return String
+     */
+    public function getParent()
+    {
+        return $this->ancestry[count($this->ancestry)-1];
+    }
+    
+    /**
+     * This is a function the returns the eldest parent to this node (the one 
+     * whose parent would be null)
+     * @return String
+     */
+    public function getEldestParent()
+    {
+        return $this->ancestry[0];
+    }
+    
+    /**
+     * This is a function that retrieves the UUID of the specified ancestor if 
+     * it is in bounds
+     * @param int $postion
+     * @return String
+     * @throws BadFunctionCallException
+     */
+    public function getNthAncestor($postion)
+    {
+        if($position < count($this->ancestry) && $postion >= 0)
+        {
+            return $this->ancestry[$postion];
+        }
+        else
+        {
+            throw new BadFunctionCallException("Specified postion was out of bounds");
+        }
+    }
+    
+    /**
+     * This is a function that returns the entire list of ancestors starting
+     * with the oldest and working back to the newest
+     * @return String[]
+     */
+    public function getAncestry()
+    {
+        return $this->ancestry;
+    }
     //</editor-fold>
     //</editor-fold>
     //<editor-fold desc="Storage functions" defaultstate="collapsed">
