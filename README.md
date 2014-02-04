@@ -8,6 +8,7 @@ Use git to clone the repository:
     
 Build DEd C's Frontend
 ----------------------
+	sudo apt-get install ant
     sudo apt-get install npm
     sudo npm install -g grunt-cli
     ln -sf /usr/bin/nodejs /usr/bin/node
