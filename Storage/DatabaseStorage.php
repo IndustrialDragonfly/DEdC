@@ -67,7 +67,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     }
     
 //<editor-fold desc="Node Related Functions" defaultstate="collapsed">
-    public function saveNode($id, $label, $type, $originator, $x, $y, $links, $numLinks)
+    public function saveNode($id, $label, $type, $originator, $x, $y, $links, $numLinks, $parentId)
     {
         //<editor-fold desc="save to Entity table" defaultstate="collapsed">
         // Prepare the statement
@@ -106,6 +106,12 @@ class DatabaseStorage implements ReadStorable, WriteStorable
             $insert_stmt->execute();
         }
         //</editor-fold>
+        
+        // Save into the DFD (element_list table)
+        $insert_stmt = $this->dbh->prepare("INSERT INTO element_list (dfd_id, el_id) VALUES (?,?)");
+        $insert_stmt->bindParam(1, $parentId);
+        $insert_stmt->bindParam(2, $id);
+        $insert_stmt->execute();
     }
     
     /**
@@ -198,7 +204,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     {
         //<editor-fold desc="save to multiprocess table" defaultstate="collapsed">
       // Prepare the statement
-      $insert_stmt = $this->dbh->prepare("INSERT INTO multiprocess (dfd_id, mp_id) VALUES(?,?)");
+      $insert_stmt = $this->dbh->prepare("INSERT INTO subdfdnode (dfd_id, subdfdnode_id) VALUES(?,?)");
 
       // Bind the parameters of the prepared statement
       $insert_stmt->bindParam(1, $dfd_resource);
@@ -207,6 +213,33 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       // Execute, catch any errors resulting
       $insert_stmt->execute();
       //</editor-fold>
+    }
+    
+    /**
+     * For a given id that is of type subDFDNode, return what dfd it maps to
+     * @param String $id
+     * @return String
+     */
+    public function loadSubDFDNode($id)
+    {
+         $select_statement = $this->dbh->prepare("SELECT dfd_id FROM subdfdnode WHERE subdfdnode_id=?");
+         $select_statement->bindParam(1, $id);
+         $select_statement->execute();
+         $dfd_id = $select_statement->fetch();
+         
+         // Return the id from the associative array
+         return $dfd_id['dfd_id'];
+    }
+    
+    /**
+     * Deletes the given subDFDNode from the subDFDNode to DFD mapping
+     * @param String $id
+     */
+    public function deleteSubDFDNode($id)
+    {
+        $delete_statement = $this->dbh->prepare("DELETE FROM subdfdnode WHERE subdfdnode_id=?");
+        $delete_statement->bindParam(1, $id);
+        $delete_statement->execute();
     }
     
     /**
@@ -221,7 +254,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * @param string $origin_resource
      * @param string $dest_resource
      */
-    public function saveLink($resource, $label, $type, $originator, $x, $y, $origin_resource, $dest_resource)
+    public function saveLink($resource, $label, $type, $originator, $x, $y, $origin_resource, $dest_resource, $parentId)
     {
       //<editor-fold desc="save to Entity table" defaultstate="collapsed">
       // Prepare the statement
@@ -289,6 +322,12 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $insert_stmt->execute();
       }
       //</editor-fold>
+      
+      // Save to dfd 
+        $insert_stmt = $this->dbh->prepare("INSERT INTO element_list (dfd_id, el_id) VALUES (?,?)");
+        $insert_stmt->bindParam(1, $parentId);
+        $insert_stmnt->bindParam(2, $id);
+        $insert_stmnt->execute();
     }
     
      /**
@@ -366,7 +405,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $loadAncestry = $this->dbh->prepare("SELECT ancestor_id
             FROM dfd_ancestry 
             WHERE descendant_id=?
-            ORDER BY ancestor_id DESC");
+            ORDER BY depth DESC");
         $loadAncestry->bindParam(1, $id);
         
         // Iterate through the results until all have been pulled out
@@ -510,6 +549,117 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $vars['ancestry'] = getAncestry($id);
          
          return $vars;
+    }
+    
+    /**
+     * Adds the ancestry stack of the current DFD into the DFD tree
+     * 
+     * @param string $id
+     * @param string[] $ancestry
+     */
+    private function saveAncestry($id, $ancestry)
+    {
+      $insert_stmt = $this->dbh->prepare("INSERT INTO dfd_ancestry (ancestor_id, descendant_id, depth) VALUES(?,?,?)");
+      
+      for ($i = 0; $i < count($ancestry); $i++)
+      {
+          $insert_stmt->bindParam(1, $ancestry[$i]);
+          $insert_stmt->bindParam(2, $id);
+          $insert_stmt>-bindParam(3, $i);
+          
+          $insert_stmt->execute();
+      }
+    }
+    
+    /**
+     * Saves the DFD with the given input parameters
+     * 
+     * @param string $id
+     * @param string $type
+     * @param string $label
+     * @param string $originator
+     * @param string[] $ancestry
+     * @param string[] $nodeList
+     * @param string[] $linkList
+     * @param string[] $subDFDNodeList
+     * @param string $subDFDNode
+     */
+    public function saveDFD($id, $type, $label, $originator, $ancestry, 
+            $nodeList, $linkList, $subDFDNodeList, $subDFDNode)
+    {
+      // Prepare the statement
+      $insert_stmt = $this->dbh->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
+
+      // Bind the parameters of the prepared statement
+      $insert_stmt->bindParam(1, $id);
+      $insert_stmt->bindParam(2, $label);
+      $insert_stmt->bindParam(3, $type);
+      $insert_stmt->bindParam(4, $originator);
+
+      // Execute, catch any errors resulting
+      $insert_stmt->execute();
+      
+      // Prepare the statement to store the elements into the elmenet_list table
+      $insert_stmt = $this->dbh->prepare("INSERT INTO element_list (dfd_id, el_id) VALUES(?,?)");
+      
+      // Save each element in the nodeList to the table
+      foreach ($nodeList as $node)
+      {
+         // Bind the parameters of the prepared statement
+         $insert_stmt->bindParam(1, $id);
+         $insert_stmt->bindParam(2, $node);
+         // Execute, catch any errors resulting
+         $insert_stmt->execute();
+      }
+      
+      // Save each element in the linkList to the table
+      foreach ($linkList as $link)
+      {
+         // Bind the parameters of the prepared statement
+         $insert_stmt->bindParam(1, $id);
+         $insert_stmt->bindParam(2, $link);
+         // Execute, catch any errors resulting
+         $insert_stmt->execute();
+      }
+      
+      // Save each element in the suDFDNodeList to the table
+      foreach ($subDFDNodeList as $subDFDNode_id)
+      {
+         // Bind the parameters of the prepared statement
+         $insert_stmt->bindParam(1, $id);
+         $insert_stmt->bindParam(2, $subDFDNode_id);
+         // Execute, catch any errors resulting
+         $insert_stmt->execute();
+      }
+          // Prepare the statement
+      $insert_stmt = $this->dbh->prepare("INSERT INTO subDFDNode (subdfdnode_id, dfd_id) VALUES(?,?)");
+
+      // Bind the parameters of the prepared statement
+      $insert_stmt->bindParam(1, $subDFDNode);
+      $insert_stmt->bindParam(2, $id);
+      
+      $this->saveAncestry($id, $ancestry);
+    }
+    
+    /**
+     * Deletes the DFD information itself from the dfd_ancestry table and the
+     * entity table. Expects that the DFD has already been cleared out, so does
+     * not attempt to clean out elements that it contains (since those are best
+     * removed by their own functions, not by the DFD).
+     * 
+     * @param String $id
+     */
+    public function deleteDFD($id)
+    {
+        // Start by isolating the child from its parents
+        $delete = $this->dbh->prepare("DELETE FROM dfd_ancestry WHERE descendant_id = ?");
+        $delete->bindParam(1, $id);
+        $delete->execute();
+        
+        // Removing the child itself from the DB
+        $delete = $this->dbh->prepare("DELETE FROM entity WHERE id=?");
+        $delete->bindParam(1, $id);
+        $delete->execute();
     }
 }
 

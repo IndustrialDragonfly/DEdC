@@ -21,7 +21,7 @@ interface WriteStorable
      * @param int $y
      * @param String array $links
      */
-    public function saveNode($resource, $label, $type, $originator, $x, $y, $links, $numLinks);
+    public function saveNode($resource, $label, $type, $originator, $x, $y, $links, $numLinks, $parentId);
     
     /**
      * Deletes the node ID passed in from the data store
@@ -38,6 +38,12 @@ interface WriteStorable
      */
     public function saveSubDFDNode($dfd_resource, $subDFD_resource);
     
+     /**
+     * Deletes the given subDFDNode from the subDFDNode to DFD mapping
+     * @param String $id
+     */
+    public function deleteSubDFDNode($id);
+    
     /**
      * Stores a dataflow object into the data store
      * 
@@ -50,7 +56,7 @@ interface WriteStorable
      * @param string $origin_resource
      * @param string $dest_resource
      */
-    public function saveLink($resource, $label, $type, $originator, $x, $y, $origin_resource, $dest_resource);
+    public function saveLink($resource, $label, $type, $originator, $x, $y, $origin_resource, $dest_resource, $parentId);
     
     /**
      * Deletes the link from the data store.
@@ -58,6 +64,16 @@ interface WriteStorable
      * @param String $id
      */
     public function deleteLink($id);
+    
+    /**
+     * Saves the DFD to the database
+     */
+   public function saveDFD($id, $type, $label, $originator, $ancestry, 
+            $nodeList, $linkList, $subDFDNodeList, $subDFDNode);   
+    /**
+     * Deletes the DFD from the database
+     */
+    public function deleteDFD($id);
 }
 
 ?>

@@ -38,15 +38,9 @@ abstract class Link extends Element
    {
        parent::__construct();
        $this->storage = func_get_arg(0);
-      // if only one argument is passed, then parent is null
-      if(func_num_args() == 1)
-      {
-         $this->originNode = NULL;
-         $this->destinationNode = NULL;
-         $this->parent = NULL;
-      }
+
       // Find if the type of the second argument is DFD, if so, its a new DFD
-      elseif (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DataFlowDiagram"))
+      if (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DataFlowDiagram"))
       {
         $this->parent = func_get_arg(1);
       }
@@ -258,7 +252,7 @@ abstract class Link extends Element
        // Send info required to save dataflow to the data store
        $this->storage->saveLink($this->id, $this->label, get_class($this), 
                $this->originator, $this->x, $this->y, $this->originNode, 
-               $this->destinationNode);
+               $this->destinationNode, $this->parent);
    }
    
    /**

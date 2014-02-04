@@ -30,13 +30,9 @@ require_once 'Element.php';
       parent::__construct();
       $this->links = array();
       $this->storage = func_get_arg(0);
-      // If only one argument, parent is NULL
-      if (func_num_args() == 1)
-      {
-          $this->parent = NULL;
-      }
+
       // Find if the type of the second argument is DFD, if so, its a new DFD
-      elseif (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DataFlowDiagram"))
+      if (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DataFlowDiagram"))
       {
         $this->parent = func_get_arg(1);
       }
@@ -211,7 +207,7 @@ require_once 'Element.php';
     {
         $this->storage->saveNode($this->id, $this->label, get_class($this), 
                 $this->originator, $this->x, $this->y, $this->links, 
-                $this->getNumberOfLinks());
+                $this->getNumberOfLinks(), $this->parent);
     }
 
     /**

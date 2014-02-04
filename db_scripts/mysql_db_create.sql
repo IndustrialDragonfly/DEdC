@@ -88,12 +88,8 @@ ON UPDATE CASCADE
 
 CREATE TABLE subdfdnode
 (
-dfd_id CHAR(44) NOT NULL,
+dfd_id CHAR(44),
 subdfdnode_id CHAR(44) NOT NULL,
-FOREIGN KEY (dfd_id)
-REFERENCES entity(id)
-ON DELETE CASCADE
-ON UPDATE CASCADE,
 FOREIGN KEY (subdfdnode_id)
 REFERENCES entity(id)
 ON DELETE CASCADE

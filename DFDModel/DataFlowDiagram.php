@@ -3,53 +3,64 @@
 require_once '../Entity.php';
 require_once '../Multiprocess.php';
 /**
- * This class represents a Dataflow Diagram, which contains nodes and thier 
- * connections.
- * 
- * inherits from Entity
- *
- * @author Josh Clark
- * @author Eugene Davis
- */
+* Description of DataFlowDiagram
+*
+* @author Josh Clark
+* @author Eugene Davis
+*/
 class DataFlowDiagram extends Entity
 {
    //<editor-fold desc="Attributes" defaultstate="collapsed">
-   /**
-    * Stack of the ancestors of this DFD, starting at the root DFD
-    * and going back to the immediate parent.
-    * Used to figure out how to route links that connect outside of this DFD.
-    * Can be null if root
-    * @var String[]
-    */
+    /**
+     * Stack of the ancestors of this DFD, starting at the root DFD
+     * and going back to the immediate parent.
+     * Used to figure out how to route links that connect outside of this DFD.
+     * Can be null if root
+     * @var String[]
+     */
    protected $ancestry;
-
    /**
     * List of all nodes contained within this DFD and basic data to use them.
     * Stored in an associative array.
     * @var String[]
     */
    protected $nodeList;
-
-   /**
+    /**
     * List of all links contained within this DFD and basic data to used them.
     * Stored in an associative array.
     * @var String[]
     */
    protected $linkList;
-
    /**
     * List of all the the subDFDNodes contained with this DFD and basic data
     * for the frontend to use them. Stored in an associative array.
     * @var Mixed[]
     */
    protected $subDFDNodeList;
-
+   /**
+    * Storage object, should be readable and/or writable (depending on whether
+    * this is a normal data store, import data source, or export data format)
+    * @var Readable/Writable
+    */
+   protected $storage;
    /**
     * The SubDFDNode UUID that this DFD is linked to 
     * Can be null if root
     * @var String 
     */
    protected $subDFDNode;
+   
+   /**
+    * UUID of the originator of this DFD
+    * @var String 
+    */
+   protected $originator;
+   
+   /**
+    * Label for this DFD
+    * @var string
+    */
+   protected $label;
 
    //</editor-fold>
    //<editor-fold desc="Constructor" defaultstate="collapsed">
@@ -65,6 +76,7 @@ class DataFlowDiagram extends Entity
    public function __construct()
    {
       parent::__construct();
+      $this->storage = func_get_arg(0);
       // If there is only one argument (the storage object) then this is a
       // root DFD
       // DataFlowDiagram($storage)
@@ -73,41 +85,38 @@ class DataFlowDiagram extends Entity
          $this->elementList = array();
          $this->parentStack = null;
          $this->subDFDNode = null;
-         $this->storage = func_get_arg(0);
       }
       // If creating a new DFD connected to a SubDFDNode
       // DataFlowDiagram($storage, $SubDFDNode)
-      else if (func_num_args() == 2 &&
+      else if (func_num_args() == 2 && 
               is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "SubDFDNode"))
       {
-         $this->storage = func_get_arg(0);
-         $this->elementList = array();
-         $this->subDFDNode = func_get_arg(1);
-
-         // Initialize the linked SubDFDNode so we can get its parent and link
-         // ourselves into it
-         $type = getTypeFromUUID($this->subDFDNode);
-         $subDFDNode = new $type($this->storage);
-
-         $parentDFD_id = $subDFDNode->getParent();
-
-         // Initialize the parent DFD and get its ancenstry
-         $type = getTypeFromUUID($parentDFD_id);
-         $parentDFD = new $type($parentDFD_id);
-         $this->ancestry = $parentDFD->getAncestry();
-         // Add immediate parent to stack
-         array_push($this->ancestry, $parentDFD->getId());
+           $this->elementList = array();
+           $this->subDFDNode = func_get_arg(1);
+           
+           // Initialize the linked SubDFDNode so we can get its parent and link
+           // ourselves into it
+           $type = getTypeFromUUID($this->subDFDNode);
+           $subDFDNode = new $type($this->storage);
+           
+           $parentDFD_id = $subDFDNode->getParent();
+           
+           // Initialize the parent DFD and get its ancenstry
+           $type = getTypeFromUUID($parentDFD_id);
+           $parentDFD = new $type($parentDFD_id);
+           $this->ancestry = $parentDFD->getAncestry();
+           // Add immediate parent to stack
+           array_push($this->ancestry, $parentDFD->getId());          
       }
       // If this is an existing DFD to load, get the ID of the DFD
       // DataFlowDiagram($storage, $DFD)
-      else if (func_num_args() == 2 &&
+      else if (func_num_args() == 2 && 
               is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DataFlowDiagram"))
       {
          $this->elementList = array();
-         $this->storage = func_get_arg(0);
          $this->id = func_get_arg(1);
          $vars = $this->storage->loadDFD($this->id);
-
+         
          // Load up values from the associative array
          $this->label = $vars['label'];
          $this->originator = $vars['originator'];
@@ -120,162 +129,134 @@ class DataFlowDiagram extends Entity
 
    //</editor-fold>
    //<editor-fold desc="Accessor functions" defaultstate="collapsed">
-   //<editor-fold desc="elementList functions" defaultstate="collapsed">
    /**
-    * function that returns the number of nodes in this DFD
-    * @return int
-    */
-   public function getNumberOfNodes()
-   {
-      return count($this->nodeList);
-   }
-
-   /**
-    * function that adds a new element to the DFD and sets this DFD as the
-    * element's parent
-    * @param Element $newElement
+    * Finds and deletes the link at the given UUID from the linkList
+    * @param String $linkid
+    * @return boolean
     * @throws BadFunctionCallException
     */
-   public function addNode($newNode)
+   public function removeLink($linkid)
    {
-      if ($newNode instanceof Node)
-      {
-         array_push($this->nodeList, $newNode);
-         $newNode->setParent($this);
-      }
-      else
-      {
-         throw new BadFunctionCallException("input parameter was not an Element");
-      }
-   }
-
-   /**
-    * function that removes a specified element from the DFD
-    * @param Element $element
-    * @return boolean true if the element was in the DFD and was removed
-    * false if the element was not in the DFD
-    * @throws BadFunctionCallException if a bad paramenter is passed
-    */
-   public function removeElement($element)
-   {
-      if ($element instanceof Element)
-      {
-         //find if the element is in the list and get its location if it is
-         $loc = array_search($element, $this->elementList);
-         if ($loc !== false)
+       $type = $this->storage->getTypeFromUUID($linkid);
+       $link = new $type($this->storage, $linkid);
+       $link->delete();
+       $loc = array_search($linkid, $this->linkList);
+         if ($loc !== FALSE)
          {
-            if ($element instanceof DataFlow)
-            {
-               $element->removeAllLinks();
-            }
-            elseif ($element instanceof Node)
-            {
-               $element->removeAllLinks();
-            }
-            //remove the element from the list
-            unset($this->elementList[$loc]);
+            
+            //remove the link from the list
+            unset($this->linkList[$loc]);
             //normalize the indexes of the list
-            $this->elementList = array_values($this->elementList);
+            $this->linkList = array_values($this->linkList);
             return true;
          }
          else
          {
-            return false;
+            throw new BadFunctionCallException("Input parameter not contained in DFD");
          }
-      }
-      else
-      {
-         throw new BadFunctionCallException("input parameter was not a Element");
-      }
-   }
-
+   }   
    /**
-    * retrieves and element from the list of objects, use getby ID instead
-    * @param integer $index
-    * @return Element
+    * Finds and deletes the link at the given UUID from the linkList
+    * @param String $nodeid
+    * @return boolean
     * @throws BadFunctionCallException
     */
-   public function getElementByPosition($index)
+   public function removeNode($nodeid)
    {
-      if ($index <= count($this->elementList) - 1 && $index >= 0)
-      {
-         return $this->elementList[$index];
-      }
-      else
-      {
-         throw new BadFunctionCallException("input parameter was out of bounds");
-      }
-   }
-
-   /**
-    * fuction the returns a specific element from the list if it present, will return null if the element was not present
-    * @param string $elementId
-    * @return Element the specified element or null if not present
-    */
-   public function getElementById($elementId)
-   {
-      for ($i = 0; $i < count($this->elementList); $i++)
-      {
-         if ($this->elementList[$i]->getId() == $elementId)
+       $type = $this->storage->getTypeFromUUID($nodeid);
+       $node = new $type($this->storage, $nodeid);
+       $node->delete();
+       $loc = array_search($nodeid, $this->nodeList);
+         if ($loc !== FALSE)
          {
-            return $this->elementList[$i];
+            
+            //remove the node from the list
+            unset($this->nodeList[$loc]);
+            //normalize the indexes of the list
+            $this->nodeList = array_values($this->nodeList);
+            return true;
          }
-      }
-      return null;
+         else
+         {
+            throw new BadFunctionCallException("Input parameter not contained in DFD");
+         }
    }
-
-   //</editor-fold>
-   //<editor-fold desc="linkList functions" defaultstate="collapsed">
-   //</editor-fold>
-   //</editor-fold>
-   //<editor-fold desc="DB functions" defaultstate="collapsed">
-   /**
-    * function that will save this object to the database
-    * this will also save every element in the element list
-    * @param PDO $pdo this is the connection to the Database
+   
+    /**
+    * Finds and deletes the subDFDNode at the given UUID from the subDFDNode
+    * @param String $subdfdnodeid
+    * @return boolean
+    * @throws BadFunctionCallException
     */
-   public function save($pdo)
+   public function removesubDFDNode($subdfdnodeid)
    {
-      //<editor-fold desc="save to Entity table" defaultstate="collapsed">
-      // Prepare the statement
-      $insert_stmt = $pdo->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
-
-      // Bind the parameters of the prepared statement
-      $type = Types::DataFlowDiagram;
-      $insert_stmt->bindParam(1, $this->id);
-      $insert_stmt->bindParam(2, $this->label);
-      $insert_stmt->bindParam(3, $type);
-      $insert_stmt->bindParam(4, $this->originator);
-
-      // Execute, catch any errors resulting
-      $insert_stmt->execute();
-      //</editor-fold>
-      //<editor-fold desc="save to Element List table" defaultstate="collapsed">
-      // Prepare the statement
-      $insert_stmt = $pdo->prepare("INSERT INTO element_list (dfd_id, el_id) VALUES(?,?)");
-      for ($i = 0; $i < $this->getNumberOfElements(); $i++)
-      {
-         // Bind the parameters of the prepared statement
-         $insert_stmt->bindParam(1, $this->id);
-         $insert_stmt->bindParam(2, $this->elementList[$i]->getId());
-         // Execute, catch any errors resulting
-         $insert_stmt->execute();
-      }
-      //</editor-fold>
-      //<editor-fold desc="save to External link List table" defaultstate="collapsed">
-      // Prepare the statement
-      $insert_stmt = $pdo->prepare("INSERT INTO external_links (dfd_id, df_id) VALUES(?,?)");
-      for ($i = 0; $i < $this->getNumberOfExternalLinks(); $i++)
-      {
-         // Bind the parameters of the prepared statement
-         $insert_stmt->bindParam(1, $this->id);
-         $insert_stmt->bindParam(2, $this->externalLinks[$i]->getId());
-         // Execute, catch any errors resulting
-         $insert_stmt->execute();
-      }
-      //</editor-fold>
+       $type = $this->storage->getTypeFromUUID($subdfdnodeid);
+       $subDFDNode = new $type($this->storage, $subdfdnodeid);
+       $subDFDNode->delete();
+       $loc = array_search($subdfdnodeid, $this->subDFDNodeList);
+         if ($loc !== FALSE)
+         {
+            
+            //remove the link from the list
+            unset($this->subDFDNodeList[$loc]);
+            //normalize the indexes of the list
+            $this->subDFDNodeList = array_values($this->subDFDNodeList);
+            return true;
+         }
+         else
+         {
+            throw new BadFunctionCallException("Input parameter not contained in DFD");
+         }
+   }
+   
+   
+   //</editor-fold>
+   //<editor-fold desc="Storage functions" defaultstate="collapsed">
+   /**
+* function that will save this object to the database
+* this will also save every element in the element list
+*/
+   public function save()
+   {
+      $this->storage->saveDFD($this->id, get_class($this), $this->label, $this->originator, $this->ancestry, 
+            $this->nodeList, $this->linkList, $this->subDFDNodeList, $this->subDFDNode);
    }
 
+   /**
+    * This function updates the data store. Currently unoptimized, as it just
+    * calls delete then save.
+    */
+   public function update()
+   {
+       $this->delete();
+       $this->save();
+   }
+   
+   public function delete()
+   {
+       // Start by constructing all elements contained within and then deleting them.
+
+        // Remove its links
+        foreach ($this->linkList as $link)
+        {
+            $this->removeLink($link);
+        }
+        // Remove its nodes
+        foreach ($this->nodeList as $node)
+        {
+            $this->removeNode($node);
+        }
+        // Remove its subDFDNodes
+        foreach ($this->subDFDNodeList as $subDFDNode)
+        {
+            $this->removesubDFDNode($subDFDNode);
+        }
+        
+        // Remove the remaining portions of the DFD from the database.
+        // Note that this will NOT delete the children DFDs but leave them
+        // orphaned instead
+       $this->storage->deleteDFD($this->id);
+   }
    //</editor-fold>
 }
 ?>
