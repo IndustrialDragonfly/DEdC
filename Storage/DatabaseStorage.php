@@ -67,7 +67,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     }
     
 //<editor-fold desc="Node Related Functions" defaultstate="collapsed">
-    public function saveNode($id, $label, $type, $originator, $x, $y, $links, $numLinks)
+    public function saveNode($id, $label, $type, $originator, $x, $y, $links, $numLinks, $parentId)
     {
         //<editor-fold desc="save to Entity table" defaultstate="collapsed">
         // Prepare the statement
@@ -106,6 +106,12 @@ class DatabaseStorage implements ReadStorable, WriteStorable
             $insert_stmt->execute();
         }
         //</editor-fold>
+        
+        // Save into the DFD (element_list table)
+        $insert_stmt = $this->dbh->prepare("INSERT INTO element_list (dfd_id, el_id) VALUES (?,?)");
+        $insert_stmt->bindParam(1, $parentId);
+        $insert_stmt->bindParam(2, $id);
+        $insert_stmt->execute();
     }
     
     /**
@@ -221,7 +227,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * @param string $origin_resource
      * @param string $dest_resource
      */
-    public function saveLink($resource, $label, $type, $originator, $x, $y, $origin_resource, $dest_resource)
+    public function saveLink($resource, $label, $type, $originator, $x, $y, $origin_resource, $dest_resource, $parentId)
     {
       //<editor-fold desc="save to Entity table" defaultstate="collapsed">
       // Prepare the statement
@@ -289,6 +295,12 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $insert_stmt->execute();
       }
       //</editor-fold>
+      
+      // Save to dfd 
+        $insert_stmt = $this->dbh->prepare("INSERT INTO element_list (dfd_id, el_id) VALUES (?,?)");
+        $insert_stmt->bindParam(1, $parentId);
+        $insert_stmnt->bindParam(2, $id);
+        $insert_stmnt->execute();
     }
     
      /**
