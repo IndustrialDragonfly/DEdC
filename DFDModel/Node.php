@@ -16,12 +16,6 @@ require_once 'Element.php';
    protected $links;
    
    protected $storage;
-   
-   /**
-    * Containing DFD diagram for the link object
-    * @var DataFlowDiagram
-    */
-   protected $parent;
    //</editor-fold>
    
    //<editor-fold desc="Constructor" defaultstate="collapsed">
@@ -144,6 +138,28 @@ require_once 'Element.php';
          }
       }
       return null;
+   }
+   
+   /**
+    * Returns an assocative array representing the entity object. This 
+    * assocative array has the following elements and types:
+    * id String
+    * label String
+    * originator String
+    * organization String 
+    * x Int
+    * y Int
+    * parent String
+    * links String[]
+    * 
+    * @return Mixed[]
+    */
+   public function getAssociativeArray()
+   {
+       $nodeArray = parent::getAssocativeArray();
+       $nodeArray['links'] = $this->links;
+       
+       return $nodeArray;
    }
    //</editor-fold>
     

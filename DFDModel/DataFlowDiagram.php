@@ -49,18 +49,6 @@ class DataFlowDiagram extends Entity
     * @var String 
     */
    protected $subDFDNode;
-   
-   /**
-    * UUID of the originator of this DFD
-    * @var String 
-    */
-   protected $originator;
-   
-   /**
-    * Label for this DFD
-    * @var string
-    */
-   protected $label;
 
    //</editor-fold>
    //<editor-fold desc="Constructor" defaultstate="collapsed">
@@ -209,7 +197,33 @@ class DataFlowDiagram extends Entity
          }
    }
    
-   
+   /**
+    * Returns an assocative array representing the DFD object. This assocative
+    * array has the following elements and types:
+    * id String
+    * label String
+    * originator String
+    * organization String 
+    * ancestry String[]
+    * nodeList String[]
+    * linkList String[]
+    * subDFDNodeList String[]
+    * subDFDNode String 
+    * 
+    * @returns Mixed[]
+    */
+   public function getAssociativeArray()
+   {
+       // Parent Attributes
+       $dfdArray = parent::getAssocativeArray();
+       
+       // DFD Attributes
+       $dfdArray['ancestry'] = $this->ancestry;
+       $dfdArray['nodeList'] = $this->nodeList;
+       $dfdArray['linkList'] = $this->linkList;
+       $dfdArray['subDFDNodeList'] = $this->subDFDNodeList;
+       $dfdArray['subDFDNode'] = $this->subDFDNode;
+   }
    //</editor-fold>
    //<editor-fold desc="Storage functions" defaultstate="collapsed">
    /**
