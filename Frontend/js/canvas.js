@@ -296,7 +296,8 @@ Raphael.st.draggable = function (callback, element) {
         };
         
         var loadDataflow = function(canvas, entry) {
-            canvas.addDataflowById(entry.origin_id, entry.dest_id);
+            var d = canvas.addDataflowById(entry.origin_id, entry.dest_id);
+            d.setId(entry.id);
         };
         
         // Expose methods to be public
@@ -645,7 +646,7 @@ Raphael.st.draggable = function (callback, element) {
                 }
             });
             
-            this.addDataflow(source, target);
+            return this.addDataflow(source, target);
         };
 
         /**
@@ -902,13 +903,22 @@ Raphael.st.draggable = function (callback, element) {
      * @param {Element} target - Target of the Dataflow
      */
     function Dataflow(canvas, source, target) {
-        var me = this;
-        var mySource = source;
-        var myTarget = target;
-        var myCanvas = canvas;
-        var path;
-        var arrow;
+        var me = this,
+                mySource = source,
+                myTarget = target,
+                myCanvas = canvas,
+                path,
+                arrow,
+                id;
 
+       this.getId = function() {
+           return id;
+       };
+       
+       this.setId = function(newId) {
+           id = newId;
+       };
+       
         // Make sure this dataflow will get drawn
         myTarget.setHasMoved(true);
         mySource.setHasMoved(true);
