@@ -253,13 +253,13 @@ Raphael.st.draggable = function (callback, element) {
         var getDfd = function (url) {
             var onSuccess = function (response) {
                 // Load SimpleMediaType DFD
-                var canvas = createNewTab(response.getData().name);
+                var canvas = createNewTab(response.getData().label);
 
-                response.getData().elements.forEach(function (entry) {
+                response.getData().nodes.forEach(function (entry) {
                     loadElement(canvas, entry);
                 });
                 
-                response.getData().dataflows.forEach(function (entry) {
+                response.getData().links.forEach(function (entry) {
                     loadDataflow(canvas, entry);
                 });
             };
