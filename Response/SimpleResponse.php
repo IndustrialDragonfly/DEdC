@@ -138,7 +138,7 @@ EOT;
                  break;
             case "Node":
                 // Convert the linkList array into a string
-                $links = implode(",\n", $this->rawData['linkList']);
+                $links = implode("_id,\n", $this->rawData['linkList']);
                 $this->representation = <<<EOT
                     {
                         "id": "{$this->rawData['id']}_id",
@@ -154,7 +154,7 @@ EOT;
                 break;
             case "SubDFDNode":
                 // Convert the linkList array into a string
-                $links = implode(",\n", $this->rawData['linkList']);
+                $links = implode("_id,\n", $this->rawData['linkList']);
                 $this->representation = <<<EOT
                     {
                         "id": "{$this->rawData['id']}_id",
@@ -174,8 +174,8 @@ EOT;
                         "id": "{$this->rawData['id']}_id",
                         "type": "{$this->rawData['type']}",
                         "genericType": "{$this->rawData['genericType']}",
-                        "origin_id": "{$this->rawData['originNode']}",
-                        "dest_id": "{$this->rawData['destinationNode']}",
+                        "origin_id": "{$this->rawData['originNode']}_id",
+                        "dest_id": "{$this->rawData['destinationNode']}_id",
                         "originator": "{$this->rawData['originator']}",
                         "x": "{$this->rawData['x']}",
                         "y": "{$this->rawData['y']}"
