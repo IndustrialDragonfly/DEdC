@@ -148,6 +148,7 @@ require_once 'Element.php';
     * originator String
     * organization String 
     * type String
+    * genericType String
     * x Int
     * y Int
     * parent String

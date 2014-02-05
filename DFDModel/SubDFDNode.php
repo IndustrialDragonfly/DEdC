@@ -84,6 +84,7 @@ class SubDFDNode extends Node
     * originator String
     * organization String 
     * type String
+    * genericType String
     * x Int
     * y Int
     * parent String

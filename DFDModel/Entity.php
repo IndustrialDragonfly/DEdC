@@ -87,6 +87,7 @@ abstract class Entity
     * originator String
     * organization String
     * type String
+    * genericType String
     *  
     * @returns Mixed[]
     */
@@ -99,6 +100,30 @@ abstract class Entity
        $entityArray['originator'] = $this->originator;
        $entityArray['organization'] = $this->organization;
        $entityArray['type'] = get_class($this);
+       
+       // Figure out the generic type - i.e. Link, Node, SubDFDNode or DataFlowDiagram
+       if (is_subclass_of($this, "DataFlowDiagram"))
+       {
+           $genericType = "DataFlowDiagram";
+       }
+       elseif (is_subclass_of($this, "Node"))
+       {
+           $genericType = "Node";
+       }
+       elseif (is_subclass_of($this, "SubDFDNode"))
+       {
+           $genericType = "SubDFDNode";
+       }
+       elseif (is_subclass_of($this, "Link"))
+       {
+           $genericType = "Link";
+       }
+       else
+       {
+           // Throw relevant exception
+       }
+       
+       $entityArray['genericType'] = $genericType;
        
        return $entityArray;
    }
