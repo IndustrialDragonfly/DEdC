@@ -259,6 +259,10 @@ Raphael.st.draggable = function (callback, element) {
                     loadElement(canvas, entry);
                 });
                 
+                response.getData().subDFDNodes.forEach(function (entry) {
+                    loadElement(canvas, entry);
+                });
+                
                 response.getData().links.forEach(function (entry) {
                     loadDataflow(canvas, entry);
                 });
