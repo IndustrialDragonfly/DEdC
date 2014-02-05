@@ -26,6 +26,7 @@ Definition for a DFD (note there are no nested DFDs in this definition)
             {
                 "id": "string",
                 "type": "string",
+                "label": "string",
                 "origin_id": "string",
                 "dest_id": "string",
                 "x": "value",
