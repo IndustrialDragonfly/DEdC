@@ -27,58 +27,24 @@ class SubDFDNode extends Node
 */
    public function __construct()
    {
-      if (func_num_args() == 0)
+      // Case when the constructor is passed only a storage object
+      // and a parent DFD
+      if (func_num_args() == 2)
       {
-         parent::__construct();
-         $this->subDataFlowDiagram = new DataFlowDiagram();
+         // Since we don't require linking up to a DFD on construction,
+         // the construction is almost identical to a node object'
+         parent::__construct(func_get_arg(0), func_get_arg(1));
+         $this->subDataFlowDiagram = NULL;
       }
-      //if 3 parameters are passed load the object with values from the DB
+      // If constructor is passed a storage object, parent DFD, and an ID,
+      // load from storage
       else if (func_num_args() == 3)
       {
-         parent::__construct();
-         $pdo = func_get_arg(0);
-         $this->id = func_get_arg(1);
-         $parent = func_get_arg(2);
+         parent::__construct(func_get_arg(0), func_get_arg(1), func_get_arg(2));
          
-         $this->setParent($parent);
-         
-         //$Entity_var = $pdo->query("SELECT * FROM entity WHERE id = '" . $this->getId() . "'")->fetch();
-         $mySQLstatement = $pdo->prepare("SELECT * FROM entity WHERE id=?");
-         $mySQLstatement->bindParam(1, $this->getId());
-         $mySQLstatement->execute();
-         $Entity_var = $mySQLstatement->fetch();
-         if($Entity_var == FALSE )
-         {
-            throw new BadFunctionCallException("no matching id found in entity DB");
-         }
-         $this->id = $Entity_var['id'];
-         $this->label = $Entity_var['label'];
-         $this->originator = $Entity_var['originator'];
-         
-
-         //retrieve the data for the element part of the object
-         $mySQLstatement = $pdo->prepare("SELECT * FROM element WHERE id=?");
-         $mySQLstatement->bindParam(1, $this->getId());
-         $mySQLstatement->execute();
-         $Element_var = $mySQLstatement->fetch();
-         if($Element_var == FALSE)
-         {
-            throw new BadFunctionCallException("no matching id found in element DB");
-         }
-         $this->x = $Element_var['x'];
-         $this->y = $Element_var['y'];
-         
-         //skip loading the list of links as they should be generated when you load the dataflows
-         
-         //load the sub DFD
-         //get the id of the DFD
-         $mySQLstatement = $pdo->prepare("SELECT * FROM multiprocess WHERE mp_id=?");
-         $mySQLstatement->bindParam(1, $this->getId());
-         $mySQLstatement->execute();
-         $multiprocess_var = $mySQLstatement->fetch();
-         //pass the DB handler, the id of the dfd to load, and this multiprocess object
-         $this->subDataFlowDiagram = new DataFlowDiagram($pdo, $multiprocess_var['dfd_id'], $this);
-         
+         // Load mapping of subDFDNode to DFD, unlike most load functions
+         // this one returns a single value rather than an assocative array
+         $this->subDataFlowDiagram = $this->storage->loadSubDFDNode($this->id);         
       }
    }
 
@@ -108,6 +74,31 @@ class SubDFDNode extends Node
       {
          throw new BadFunctionCallException("input parameter was not a DataFlowDiagram");
       }
+   }
+   
+   /**
+    * Returns an assocative array representing the entity object. This 
+    * assocative array has the following elements and types:
+    * id String
+    * label String
+    * originator String
+    * organization String 
+    * type String
+    * genericType String
+    * x Int
+    * y Int
+    * parent String
+    * links String[]
+    * subDataFlowDiagram String
+    * 
+    * @return Mixed
+    */
+   public function getAssociativeArray()
+   {
+       $subDFDNodeArray = parent::getAssocativeArray();
+       $subDFDNodeArray['subDataFlowDiagram'] = $this->subDataFlowDiagram;
+       
+       return $subDFDNodeArray;
    }
 
    //</editor-fold>
@@ -174,67 +165,38 @@ class SubDFDNode extends Node
    }
 
    //</editor-fold>
-   //<editor-fold desc="DB functions" defaultstate="collapsed">
+   //<editor-fold desc="Save/Delete/Update" defaultstate="collapsed">
    /**
 * function that will save this object to the database
-* @param PDO $pdo this is the connection to the Database
 */
-   public function save($pdo)
+   public function save()
    {
-      //save the sub DFD
-      $this->subDataFlowDiagram->save($pdo);
-      //<editor-fold desc="save to Entity table" defaultstate="collapsed">
-      // Prepare the statement
-      $insert_stmt = $pdo->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
-
-      // Bind the parameters of the prepared statement
-      $type = Types::Multiprocess;
-      $insert_stmt->bindParam(1, $this->id);
-      $insert_stmt->bindParam(2, $this->label);
-      $insert_stmt->bindParam(3, $type);
-      $insert_stmt->bindParam(4, $this->originator);
-
-      // Execute, catch any errors resulting
-      $insert_stmt->execute();
-      //</editor-fold>
-      //<editor-fold desc="save to Element table" defaultstate="collapsed">
-      // Prepare the statement
-      $insert_stmt = $pdo->prepare("INSERT INTO element (id, x, y) VALUES(?,?,?)");
-
-      // Bind the parameters of the prepared statement
-      $insert_stmt->bindParam(1, $this->id);
-      $insert_stmt->bindParam(2, $this->x);
-      $insert_stmt->bindParam(3, $this->y);
-
-      // Execute, catch any errors resulting
-      $insert_stmt->execute();
-      //</editor-fold>
-      //<editor-fold desc="save to Node table" defaultstate="collapsed">
-      // Prepare the statement
-      $insert_stmt = $pdo->prepare("INSERT INTO node (id, df_id) VALUES(?,?)");
-      for ($i = 0; $i < $this->getNumberOfLinks(); $i++)
-      {
-         // Bind the parameters of the prepared statement
-         $insert_stmt->bindParam(1, $this->id);
-         $insert_stmt->bindParam(2, $this->links[$i]->getId());
-         // Execute, catch any errors resulting
-         $insert_stmt->execute();
-      }
-      //</editor-fold>
-      //<editor-fold desc="save to multiprocess table" defaultstate="collapsed">
-      // Prepare the statement
-      //$this->subDataFlowDiagram->save($pdo);
-      $insert_stmt = $pdo->prepare("INSERT INTO multiprocess (dfd_id, mp_id) VALUES(?,?)");
-
-      // Bind the parameters of the prepared statement
-      $insert_stmt->bindParam(1, $this->subDataFlowDiagram->getId());
-      $insert_stmt->bindParam(2, $this->id);
-
-      // Execute, catch any errors resulting
-      $insert_stmt->execute();
-      //</editor-fold>
+       // Call the Node object save function to do most of the work
+       parent::save();
+      // Call storage object's saveSubDFDNode
+       $this->storage->saveSubDFDNode($this->parent, $this->id);
    }
 
+   /**
+    * Function that deletes this object from the database
+    */
+   public function delete()
+   {
+       // Call the parent delete function AFTER child delete function
+       $this->storage->deleteSubDFDNode($this->id);
+       
+       parent::delete();
+   }
+   
+   /**
+    * Refreshes the object in the storage medium, probably should later have a 
+    * dedicated function in the storage medium in the future.
+    */
+   public function update()
+   {
+       $this->delete();
+       $this->save();
+   }
    //</editor-fold>
 }
 ?>

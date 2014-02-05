@@ -1,4 +1,6 @@
 <?php
+require_once 'Requestable.php';
+
 /**
   * Abstract object which parses the incoming requests objects and provides
  * getters for all the data contained within
@@ -7,7 +9,7 @@
  */
 require_once 'MethodException.php';
 
-abstract class Request {
+abstract class Request implements Requestable {
     //<editor-fold desc="Attributes" defaultstate="collapsed">
     protected $method; // HTTP method in use, stored as a MethodsEnum type
                        // but looks like an int here
@@ -16,10 +18,10 @@ abstract class Request {
      * @access protected
      * @var string
      */
-    protected $resource; 
+    protected $id; 
+    protected $path; // Path to the object from a root DFD
     protected $query; // Query data from the URL (optional)
-    protected $body; // Contains the body of the message (optional)
-    protected $type; // Media type the request in/has requested
+    private $uuidTag = "_id"; // Tag that identifies a UUID
         //<editor-fold desc="Header Attributes" defaultstate="expanded">
         /**
          * Array of the acceptable content types according to the client.
@@ -31,7 +33,7 @@ abstract class Request {
     //</editor-fold>
     
     //<editor-fold desc="Setter functions" defaultstate="collapsed">
-    protected function setMethod($method) 
+    protected function setMethod($method)
     {
         switch ($method)
         {
@@ -56,46 +58,41 @@ abstract class Request {
                 
         }
     }
-    protected function setResource($resource) {
-        $this->resource = $resource;
-    }
-    protected function setQuery($query)
+    protected function setId($id) 
     {
-        $this->query = $query;
+        if ($id !== NULL)
+        {
+            $idLength = strlen($id);
+            $tagLength = strlen($this->uuidTag);
+            $this->id = substr($id, 0, $idLength - $tagLength);
+        }
     }
-    
-    protected function setBody($body)
-    {
-        $this->body = $body;
-    }
-    protected function setType($type)
+    protected function setAcceptTypes($type)
     {
         $this->type = $type;
+    }
+    protected function setPath($path)
+    {
+        $this->path = $path;
     }
     //</editor-fold>
     
     //<editor-fold desc="Getter functions" defaultstate="collapsed">
-    public function getMethod() {
+    public function getMethod()
+    {
         return $this->method;
     }
-    public function getResource()
+    public function getId()
     {
-        return $this->resource;
+        return $this->id;
     }
-    public function getQuery() {
-        return $this->query;
-    }
-    public function getBody()
-    {
-        return $this->body;
-    }
-    public function getType()
-    {
-        return $this->type;
-    }
-    public function getAccept()
+    public function getAcceptTypes()
     {
         return $this->accept;
+    }
+    public function getPath()
+    {
+        return $this->path;
     }
     //</editor-fold>
     /**
@@ -104,9 +101,8 @@ abstract class Request {
      * 
      * @param String $accept
      * @param String $method
-     * @param String $resource
      */
-    public function __construct($accept, $method, $resource)
+    public function __construct($accept, $method, $uri)
     {
         // Save method type used to access (from enum)
         $this->setMethod($method);
@@ -114,6 +110,21 @@ abstract class Request {
         $delim = ", "; // Delimiter between acceptable content types
         $this->accept = explode($delim, $accept);
         
-        $this->setResource($resource);
+        // Figure out if URI is UUID or path
+        
+        // If it is a UUID, it should have the uuidTag on it
+        if (FALSE !== stripos($uri, $this->uuidTag))
+        {
+            // Get the last / in the URI, and return everything after it
+            $uriId = substr($uri, strrpos($uri, "/") + 1);
+            $this->setId($uriId);
+            $this->setPath(NULL);
+        }
+        // If it is a path, set it as the path
+        else 
+        {
+            $this->setPath($uri);
+            $this->setId(NULL);
+        }
     }
 }

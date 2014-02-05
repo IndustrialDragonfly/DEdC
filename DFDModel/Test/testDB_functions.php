@@ -49,11 +49,11 @@ class testDB_functions
         {
             $pdo->query('BEGIN');
             $pdo->query('TRUNCATE TABLE element;');
-            $pdo->query('TRUNCATE TABLE dataflow;');
+            $pdo->query('TRUNCATE TABLE link;');
             $pdo->query('TRUNCATE TABLE node;');
-            $pdo->query('TRUNCATE TABLE external_links;');
             $pdo->query('TRUNCATE TABLE element_list;');
-            $pdo->query('TRUNCATE TABLE multiprocess;');
+            $pdo->query('TRUNCATE TABLE subdfdnode;');
+            $pdo->query('TRUNCATE TABLE dfd_ancestry;');
 
             // Truncate the foreign key restricted entity table in mysql
             if (Database::mysql === self::$db_type)

@@ -42,6 +42,10 @@ function __autoload($classname)
     {
         require_once "Response/" . $classname . ".php";
     }
+    elseif (file_exists("DFDModel/" . $classname . ".php"))
+    {
+        require_once "DFDModel/" . $classname . ".php";
+    }
     else
     {
         // Make throw an exception later
@@ -53,6 +57,7 @@ function __autoload($classname)
 require_once "MethodsEnum.php";
 require_once "Authentication.php";
 require_once "AuthorizeUser.php";
+require_once 'Storage/DatabaseStorage.php';
 
 
     // Decode URL if needed
@@ -84,11 +89,17 @@ require_once "AuthorizeUser.php";
     // Retrieve information about request and put it in a request object
     $request = new SimpleRequest($_SERVER['HTTP_ACCEPT'], $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
     
-    // Request[type] should be an enum of available operations [get, put, etc]
-    // Obviously cases will involve more processing and will have the ability to 
-    // send a fail header if that situation arises
-    // Also needs to address the problem of updates since the copy of the data
-    // that the client has once we get to multi-user
+    // Demonstrate ability to retrieve the type of an existing element
+    // from the DB. Not really controller code, just a convient place to
+    // demo, absolutely should be deleted soon
+    $storage_access = new DatabaseStorage();
+    $test_element = new Process();
+    $test_element->save($storage_access);
+    $id = $test_element->getId();
+    $test_type = $storage_access->getTypeFromUUID($id);
+    echo $test_type;
+    
+    
     
     switch ($request->getMethod())
     {
