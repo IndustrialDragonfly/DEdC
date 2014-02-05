@@ -60,9 +60,12 @@ abstract class Request implements Requestable {
     }
     protected function setId($id) 
     {
-        $idLength = strlen($id);
-        $tagLength = strlen($this->uuidTag);
-        $this->id = substr($id, 0, $idLength - $tagLength);
+        if ($id !== NULL)
+        {
+            $idLength = strlen($id);
+            $tagLength = strlen($this->uuidTag);
+            $this->id = substr($id, 0, $idLength - $tagLength);
+        }
     }
     protected function setAcceptTypes($type)
     {
@@ -113,7 +116,7 @@ abstract class Request implements Requestable {
         if (FALSE !== stripos($uri, $this->uuidTag))
         {
             // Get the last / in the URI, and return everything after it
-            $uriId = substr($uri, strrpos($uri, "/"));
+            $uriId = substr($uri, strrpos($uri, "/") + 1);
             $this->setId($uriId);
             $this->setPath(NULL);
         }

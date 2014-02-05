@@ -45,7 +45,7 @@ class SimpleRequestTest extends PHPUnit_Framework_TestCase
         $accept = $testType;
         $method = "GET";
         $singleMedia = new SimpleRequest($accept, $method, $resource);
-        $result = $singleMedia->getAccept();
+        $result = $singleMedia->getAcceptTypes();
         $this->assertEquals($testType, $result[0]);
     }
     /**
@@ -60,7 +60,7 @@ class SimpleRequestTest extends PHPUnit_Framework_TestCase
         $accept = implode(", ", $testTypes);
         $method = "GET";
         $multiMedia = new SimpleRequest($accept, $method, $resource);
-        $result = $multiMedia->getAccept();
+        $result = $multiMedia->getAcceptTypes();
         
         // First ensure that the same number of results are returned
         // as there were inputs
@@ -92,7 +92,7 @@ class SimpleRequestTest extends PHPUnit_Framework_TestCase
      */
     public function testGoodMethods()
     {
-        $resource = "dfd/uuid100";
+        $resource = "dfd/uuid100_id";
         $accept = "text/json";
         
         // Test with GET
@@ -115,16 +115,27 @@ class SimpleRequestTest extends PHPUnit_Framework_TestCase
         $this->object = new SimpleRequest($accept, "PATCH", $resource);
         $this->assertEquals(MethodsEnum::PATCH, $this->object->getMethod());
     }
+    
     /**
-     * @covers Request::__construct, Request::setResource, Request::getResource
+     * Test the URI input to see that it will set a properly tagged UUID
+     * and if it will set a path if not handed a UUID
+     * @covers Request::__construct, Request::getId, Request::getpath
      */
-    public function testResource()
+    public function testURI_smoke()
     {
-        $resource = "dfd/uuid100";
+        $resource = "/dfd/ab/uuid100_id";
         $accept = "text/json";
         $method = "GET";
         
-        $this->object = new SimpleRequest($accept, $method, $resource);        
-        $this->assertEquals($resource, $this->object->getResource());
+        // Test with a UUID
+        $this->object = new SimpleRequest($accept, "$method", $resource);
+        $this->assertEquals("uuid100", $this->object->getId());
+        $this->assertNull($this->object->getPath());
+        
+        // Test with a path
+        $resource = "/dfd/ab/some_element";
+        $this->object = new SimpleRequest($accept, "$method", $resource);
+        $this->assertNull($this->object->getId());
+        $this->assertEquals("/dfd/ab/some_element", $this->object->getPath());
     }
 }
