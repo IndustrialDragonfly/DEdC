@@ -94,6 +94,32 @@ require_once 'Entity.php';
    {
       return $this->parent;
    }
+   
+   /**
+    * Returns an assocative array representing the element object. This 
+    * assocative array has the following elements and types:
+    * id String
+    * label String
+    * originator String
+    * organization String 
+    * x Int
+    * y Int
+    * parent String
+    * 
+    * @return Mixed[]
+    */
+   public function getAssociativeArray()
+   {
+       // Get Entity array
+       $elementArray = parent::getAssocativeArray();
+       
+       // Add Entity attributes to entity array
+       $elementArray['x'] = $this->x;
+       $elementArray['y'] = $this->y;
+       $elementArray['parent'] = $this->parent;
+       
+       return $elementArray;
+   }
    //</editor-fold>
 }
 ?>

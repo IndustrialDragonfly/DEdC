@@ -75,6 +75,29 @@ class SubDFDNode extends Node
          throw new BadFunctionCallException("input parameter was not a DataFlowDiagram");
       }
    }
+   
+   /**
+    * Returns an assocative array representing the entity object. This 
+    * assocative array has the following elements and types:
+    * id String
+    * label String
+    * originator String
+    * organization String 
+    * x Int
+    * y Int
+    * parent String
+    * links String[]
+    * subDataFlowDiagram String
+    * 
+    * @return Mixed
+    */
+   public function getAssociativeArray()
+   {
+       $subDFDNodeArray = parent::getAssocativeArray();
+       $subDFDNodeArray['subDataFlowDiagram'] = $this->subDataFlowDiagram;
+       
+       return $subDFDNodeArray;
+   }
 
    //</editor-fold>
    //<editor-fold desc="overriding functions" defaultstate="collapsed">

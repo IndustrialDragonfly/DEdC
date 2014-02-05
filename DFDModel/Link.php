@@ -27,12 +27,6 @@ abstract class Link extends Element
     * @var Writeable AND/OR Readable 
     */
    protected $storage;
-   
-   /**
-    * Containing DFD diagram for the link object
-    * @var DataFlowDiagram
-    */
-   protected $parent;
    //</editor-fold>
    
 //<editor-fold desc="Constructor" defaultstate="collapsed">
@@ -258,6 +252,33 @@ abstract class Link extends Element
    {
       $this->clearOriginNode();
       $this->clearDestinationNode();
+   }
+   
+   /**
+    * Returns an assocative array representing the link object. This 
+    * assocative array has the following elements and types:
+    * id String
+    * label String
+    * originator String
+    * organization String 
+    * x Int
+    * y Int
+    * parent String
+    * originNode String
+    * destinationNode String
+    * 
+    * @return Mixed[]
+    */
+   public function getAssociativeArray()
+   {
+       // Get Entity and Element array
+       $linkArray = parent::getAssocativeArray();
+       
+       // Add Link Attributes to array
+       $linkArray['originNode'] = $this->originNode;
+       $linkArray['destinationNode'] = $this->destinationNode;
+       
+       return $linkArray;
    }
    //</editor-fold>
    

@@ -75,10 +75,31 @@ abstract class Entity
    {
        return $this->organization;
    }
-   //</editor-fold>
+   //</editor-fold
    
    //</editor-fold>
    
+   /**
+    * Returns an assocative array representing the entity object. This 
+    * assocative array has the following elements and types:
+    * id String
+    * label String
+    * originator String
+    * organization String 
+    *  
+    * @returns Mixed[]
+    */
+   public function getAssociativeArray()
+   {
+       $entityArray = array();
+       
+       $entityArray['id'] = $this->id;
+       $entityArray['label'] = $this->label;
+       $entityArray['originator'] = $this->originator;
+       $entityArray['organization'] = $this->organization;
+       
+       return $entityArray;
+   }
 }
 
 ?>
