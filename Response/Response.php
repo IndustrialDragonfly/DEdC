@@ -4,7 +4,7 @@
  *
  * @author eugene
  */
-abstract class Response
+abstract class Response implements Responsable
 {
     //<editor-fold desc="Attributes" defaultstate="collapsed">
     /**
@@ -13,21 +13,7 @@ abstract class Response
      * @var String
      */
     protected $header;
-    /**
-     * Contains data for the body.
-     * @var String
-     */
-    protected $body;
-    /**
-     * The element object being returned, can be a node, DFD, or dataflow
-     * Optional
-     * @var Element
-     */
-    protected $element;    
     
-    public function __construct($element) {
-        $this->setElement($element);
-    }
     
     //</editor-fold>
     
@@ -72,22 +58,6 @@ abstract class Response
         }
         $this->header = $header;
     }
-    /**
-     * Sets the element that is being returned to the client
-     * @param Element Object $element
-     */
-    protected function setElement($element)
-    {
-        $this->element = $element;
-    }
-    /**
-     * Sets the body function in whatever data format it is passed.
-     * @param String $body
-     */
-    protected function setBody($body)
-    {
-        $this->body = $body;
-    }
     //</editor-fold>
     
     //<editor-fold desc="Getters" defaultstate="collapsed">
@@ -98,24 +68,6 @@ abstract class Response
     public function getHeader()
     {
         return $this->header;
-    }
-    
-    /**
-     * Returns the data for the body.
-     * @return String
-     */
-    public function getBody()
-    {
-        return $this->body;
-    }
-    /**
-     * Returns the element that is to be converted into a different format and
-     * returned to the client
-     * @return Element
-     */
-    public function getElement()
-    {
-        return $this->element;
     }
     //</editor-fold>
 }

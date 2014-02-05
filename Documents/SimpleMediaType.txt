@@ -8,6 +8,8 @@ Definition for a DFD (note there are no nested DFDs in this definition)
 {
     "name": "string",
     "type": "string",
+    "originator": "string",
+    "genericType": "string",
     "nodes": 
     [
         {
@@ -45,6 +47,7 @@ Definition for a single node
 {
     "id": "string",
     "type": "string",
+    "genericType": "string",
     "label": "string",
     "x": "value",
     "y": "value",
@@ -56,6 +59,7 @@ Definition for a single subDFDNode
 {
     "id": "string",
     "type": "string",
+    "genericType": "string",
     "label": "string",
     "x": "value",
     "y": "value",
@@ -68,6 +72,7 @@ Definition for a single link
 {
     "id": "string",
     "type": "string",
+    "genericType": "string",
     "origin_id": "string",
     "dest_id": "string",
     "originator": "string",
