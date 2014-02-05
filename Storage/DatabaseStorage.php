@@ -546,7 +546,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $vars['subDFDNodeList'] = $subDFDNodeList;         
          
          // Get the stack of the DFDs ancestry from the database
-         $vars['ancestry'] = getAncestry($id);
+         $vars['ancestry'] = $this->getAncestry($id);
          
          return $vars;
     }

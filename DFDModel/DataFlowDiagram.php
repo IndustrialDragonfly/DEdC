@@ -205,6 +205,7 @@ class DataFlowDiagram extends Entity
     * originator String
     * organization String 
     * type String
+    * genericType String
     * ancestry String[]
     * nodeList String[]
     * linkList String[]
