@@ -1,5 +1,6 @@
 <?php
-require_once "Response.php";
+require_once 'Response.php';
+require_once 'GETResponsable.php';
 /**
  * Simple class to allow for testing of the abstract Request object.
  *
@@ -58,40 +59,40 @@ final class SimpleResponse extends Response implements GETResponsable
                 {
                     // Using a heredoc - ugly but easy to understand
                     $nodeJson =<<<EOT
-                                   {
-                                        "id": "{$node['id']}_id",
-                                        "type": "{$node['type']}",
-                                        "label": "{$node['label']}",
-                                        "x": "{$node['x']}",
-                                        "y": "{$node['y']}"
-                                    }
+        {
+            "id": "{$node['id']}_id",
+            "type": "{$node['type']}",
+            "label": "{$node['label']}",
+            "x": "{$node['x']}",
+            "y": "{$node['y']}"
+        }
 EOT;
                     
                     array_push($nodeList, $nodeJson);
                 }
                 // Convert nodes into a comma delimited string
-                $nodeList = implode(", ", $nodeList);
+                $nodeList = implode(",\n", $nodeList);
                 
                 $linkList = array();
                 foreach ($this->rawData['linkList'] as $link)
                 {
                     // Using a heredoc - ugly but easy to understand
                     $linkJson =<<<EOT
-                                   {
-                                        "id": "{$link['id']}_id",
-                                        "type": "{$link['type']}",
-                                        "label": "{$link['label']}",
-                                        "origin_id": {$link['originNode']},
-                                        "dest_id": {$link['destinationNode']},
-                                        "x": "{$link['x']}",
-                                        "y": "{$link['y']}"
-                                    }
+            {
+                "id": "{$link['id']}_id",
+                "type": "{$link['type']}",
+                "label": "{$link['label']}",
+                "origin_id": "{$link['originNode']}_id",
+                "dest_id": "{$link['destinationNode']}_id",
+                "x": "{$link['x']}",
+                "y": "{$link['y']}"
+            }
 EOT;
                     
                     array_push($linkList, $linkJson);
                 }
                 // Convert nodes into a comma delimited string
-                $linkList = implode(", ", $linkList);
+                $linkList = implode(",\n", $linkList);
                 
                 
                 // Parse and setup subDFDNodes list
@@ -100,44 +101,44 @@ EOT;
                 {
                     // Using a heredoc - ugly but easy to understand
                     $subDFDNodeJson =<<<EOT
-                                   {
-                                        "id": "{$subDFDnode['id']}_id",
-                                        "type": "{$subDFDnode['type']}",
-                                        "label": "{$subDFDnode['label']}",
-                                        "x": "{$subDFDnode['x']}",
-                                        "y": "{$subDFDnode['y']}"
-                                    }
+        {
+            "id": "{$subDFDnode['id']}_id",
+            "type": "{$subDFDnode['type']}",
+            "label": "{$subDFDnode['label']}",
+            "x": "{$subDFDnode['x']}",
+            "y": "{$subDFDnode['y']}"
+        }
 EOT;
                     
                     array_push($subDFDNodeList, $subDFDNodeJson);
                 }
-                $subDFDnodes = implode(", ", $subDFDNodeList);
+                $subDFDNodeList = implode(",\n", $subDFDNodeList);
                     
                 $this->representation =<<<EOT
-                {
-                    "id": "{$this->rawData['id']}_id",
-                    "label": "{$this->rawData['label']}",
-                    "type": "{$this->rawData['type']}",
-                    "genericType": "{$this->rawData['genericType']}",
-                    "originator": "{$this->rawData['originator']}",
-                    "nodes": 
-                    [
-                        {$nodeList}
-                    ],
-                    "links": 
-                        [
-                            $linkList
-                        ],
-                    "subDFDNodes": 
-                    [
-                        {$subDFDNodeList}
-                    ]
-                }
+{
+    "id": "{$this->rawData['id']}_id",
+    "label": "{$this->rawData['label']}",
+    "type": "{$this->rawData['type']}",
+    "originator": "{$this->rawData['originator']}",
+    "genericType": "{$this->rawData['genericType']}",
+    "nodes": 
+    [
+{$nodeList}
+    ],
+    "links": 
+        [
+$linkList
+        ],
+    "subDFDNodes": 
+    [
+{$subDFDNodeList}
+    ]
+}
 EOT;
                  break;
             case "Node":
                 // Convert the linkList array into a string
-                $links = implode(", ", $this->rawData['linkList']);
+                $links = implode(",\n", $this->rawData['linkList']);
                 $this->representation = <<<EOT
                     {
                         "id": "{$this->rawData['id']}_id",
@@ -153,7 +154,7 @@ EOT;
                 break;
             case "SubDFDNode":
                 // Convert the linkList array into a string
-                $links = implode(", ", $this->rawData['linkList']);
+                $links = implode(",\n", $this->rawData['linkList']);
                 $this->representation = <<<EOT
                     {
                         "id": "{$this->rawData['id']}_id",
