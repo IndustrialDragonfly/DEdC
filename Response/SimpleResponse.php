@@ -59,7 +59,7 @@ final class SimpleResponse extends Response implements GETResponsable
                     // Using a heredoc - ugly but easy to understand
                     $nodeJson =<<<EOT
                                    {
-                                        "id": "{$node['id']}",
+                                        "id": "{$node['id']}_id",
                                         "type": "{$node['type']}",
                                         "label": "{$node['label']}",
                                         "x": "{$node['x']}",
@@ -78,7 +78,7 @@ EOT;
                     // Using a heredoc - ugly but easy to understand
                     $linkJson =<<<EOT
                                    {
-                                        "id": "{$link['id']}",
+                                        "id": "{$link['id']}_id",
                                         "type": "{$link['type']}",
                                         "label": "{$link['label']}",
                                         "origin_id": {$link['originNode']},
@@ -101,7 +101,7 @@ EOT;
                     // Using a heredoc - ugly but easy to understand
                     $subDFDNodeJson =<<<EOT
                                    {
-                                        "id": "{$subDFDnode['id']}",
+                                        "id": "{$subDFDnode['id']}_id",
                                         "type": "{$subDFDnode['type']}",
                                         "label": "{$subDFDnode['label']}",
                                         "x": "{$subDFDnode['x']}",
@@ -115,7 +115,7 @@ EOT;
                     
                 $this->representation =<<<EOT
                 {
-                    "id": "{$this->rawData['id']}",
+                    "id": "{$this->rawData['id']}_id",
                     "label": "{$this->rawData['label']}",
                     "type": "{$this->rawData['type']}",
                     "genericType": "{$this->rawData['genericType']}",
@@ -140,7 +140,7 @@ EOT;
                 $links = implode(", ", $this->rawData['linkList']);
                 $this->representation = <<<EOT
                     {
-                        "id": "{$this->rawData['id']}",
+                        "id": "{$this->rawData['id']}_id",
                         "type": "{$this->rawData['type']}",
                         "genericType": "{$this->rawData['genericType']}",
                         "label": "{$this->rawData['label']}",
@@ -156,7 +156,7 @@ EOT;
                 $links = implode(", ", $this->rawData['linkList']);
                 $this->representation = <<<EOT
                     {
-                        "id": "{$this->rawData['id']}",
+                        "id": "{$this->rawData['id']}_id",
                         "type": "{$this->rawData['type']}",
                         "genericType": "{$this->rawData['genericType']}",
                         "label": "{$this->rawData['label']}",
@@ -170,7 +170,7 @@ EOT;
             case "Link":
                 $this->representation = <<<EOT
                     {
-                        "id": "{$this->rawData['id']}",
+                        "id": "{$this->rawData['id']}_id",
                         "type": "{$this->rawData['type']}",
                         "genericType": "{$this->rawData['genericType']}",
                         "origin_id": "{$this->rawData['originNode']}",
