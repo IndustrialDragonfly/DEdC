@@ -261,6 +261,7 @@ abstract class Link extends Element
     * label String
     * originator String
     * organization String 
+    * type String
     * x Int
     * y Int
     * parent String

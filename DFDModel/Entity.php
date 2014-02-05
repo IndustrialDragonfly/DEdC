@@ -85,7 +85,8 @@ abstract class Entity
     * id String
     * label String
     * originator String
-    * organization String 
+    * organization String
+    * type String
     *  
     * @returns Mixed[]
     */
@@ -97,6 +98,7 @@ abstract class Entity
        $entityArray['label'] = $this->label;
        $entityArray['originator'] = $this->originator;
        $entityArray['organization'] = $this->organization;
+       $entityArray['type'] = get_class($this);
        
        return $entityArray;
    }

@@ -101,7 +101,8 @@ require_once 'Entity.php';
     * id String
     * label String
     * originator String
-    * organization String 
+    * organization String
+    * type String 
     * x Int
     * y Int
     * parent String
