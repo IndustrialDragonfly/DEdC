@@ -20,6 +20,12 @@ final class SimpleResponse extends Response implements GETResponsable
      */
     private $representation;
     
+    /**
+     * Constructs a SimpleMediaType response, with the input consisting of
+     * an associative array that contains the information for an entity of the
+     * data model
+     * @param Mixed[] $data
+     */
     public function __construct($data)
     {
         $this->setRawData($data);
@@ -41,7 +47,7 @@ final class SimpleResponse extends Response implements GETResponsable
      * Just switches between templates for different objects, hopefully
      * more sophisticated media types can be created in a cleaner way.
      */
-    public function createRepresentation()
+    private function createRepresentation()
     {
         switch($this->rawData['genericType'])
         {
@@ -64,7 +70,7 @@ EOT;
                     array_push($nodeList, $nodeJson);
                 }
                 // Convert nodes into a comma delimited string
-                $nodeList = implode(",", $nodeList);
+                $nodeList = implode(", ", $nodeList);
                 
                 $linkList = array();
                 foreach ($this->rawData['linkList'] as $link)
@@ -85,7 +91,7 @@ EOT;
                     array_push($linkList, $linkJson);
                 }
                 // Convert nodes into a comma delimited string
-                $linkList = implode(",", $linkList);
+                $linkList = implode(", ", $linkList);
                 
                 
                 // Parse and setup subDFDNodes list
@@ -105,11 +111,12 @@ EOT;
                     
                     array_push($subDFDNodeList, $subDFDNodeJson);
                 }
-                $subDFDnodes = implode(",", $subDFDNodeList);
+                $subDFDnodes = implode(", ", $subDFDNodeList);
                     
                 $this->representation =<<<EOT
                 {
-                    "name": "{$this->rawData['id']}",
+                    "id": "{$this->rawData['id']}",
+                    "label": "{$this->rawData['label']}",
                     "type": "{$this->rawData['type']}",
                     "genericType": "{$this->rawData['genericType']}",
                     "originator": "{$this->rawData['originator']}",
@@ -130,7 +137,7 @@ EOT;
                  break;
             case "Node":
                 // Convert the linkList array into a string
-                $links = implode(",", $this->rawData['linkList']);
+                $links = implode(", ", $this->rawData['linkList']);
                 $this->representation = <<<EOT
                     {
                         "id": "{$this->rawData['id']}",
@@ -146,7 +153,7 @@ EOT;
                 break;
             case "SubDFDNode":
                 // Convert the linkList array into a string
-                $links = implode(",", $this->rawData['linkList']);
+                $links = implode(", ", $this->rawData['linkList']);
                 $this->representation = <<<EOT
                     {
                         "id": "{$this->rawData['id']}",

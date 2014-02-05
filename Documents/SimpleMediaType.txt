@@ -6,7 +6,8 @@ only providing one level.
 
 Definition for a DFD (note there are no nested DFDs in this definition)
 {
-    "name": "string",
+    "id": "string",
+    "label": "string",
     "type": "string",
     "originator": "string",
     "genericType": "string",
