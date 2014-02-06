@@ -475,14 +475,8 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $loadDFD->execute();
          
          // Extract all the data of the nodes
-         $nodeList = array();
-         $newNode = $loadDFD->fetch();
-         while ($newNode != FALSE)
-         {
-            array_push($nodeList,$newNode);
-            $newNode = $loadDFD->fetch();
-         }
-         
+         $nodeList = $loadDFD->fetchAll();
+
          // Add the data of the nodes to the $vars array that is
          // to be returned
          $vars['nodeList'] = $nodeList;
@@ -503,13 +497,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $loadDFD->execute();
          
          // Extract all the data of the nodes
-         $linkList = array();
-         $newLink = $loadDFD->fetch();
-         while ($newNode != FALSE)
-         {
-            array_push($linkList,$newLink);
-            $newLink = $loadDFD->fetch();
-         }
+         $linkList = $loadDFD->fetchAll();
          
          // Add the data of the links to the $vars array that is
          // to be returned
@@ -534,9 +522,8 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          // Scarier looking work around version
          $loadDFD = $this->dbh->prepare("
              SELECT *
-                FROM node id
+                FROM entity id
                         NATURAL JOIN element
-                        NATURAL JOIN entity
                         JOIN subdfdnode subdfdnode_id ON subdfdnode_id=id
                 WHERE id IN (SELECT el_id FROM element_list WHERE dfd_id=?);
                 ");
@@ -544,13 +531,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $loadDFD->execute();
          
          // Extract all the data of the nodes
-         $subDFDNodeList = array();
-         $newsubDFDNode = $loadDFD->fetch();
-         while ($newNode != FALSE)
-         {
-            array_push($subDFDNodeList,$newsubDFDNode);
-            $newsubDFDNode = $loadDFD->fetch();
-         }
+         $subDFDNodeList = $loadDFD->fetchAll();
          
          // Add the data from subdfdnodes to the $vars array that is
          // to be returned
