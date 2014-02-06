@@ -95,7 +95,7 @@ class SubDFDNode extends Node
     */
    public function getAssociativeArray()
    {
-       $subDFDNodeArray = parent::getAssocativeArray();
+       $subDFDNodeArray = parent::getAssociativeArray();
        $subDFDNodeArray['subDataFlowDiagram'] = $this->subDataFlowDiagram;
        
        return $subDFDNodeArray;

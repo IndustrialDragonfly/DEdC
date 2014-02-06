@@ -157,7 +157,7 @@
     */
    public function getAssociativeArray()
    {
-       $nodeArray = parent::getAssocativeArray();
+       $nodeArray = parent::getAssociativeArray();
        $nodeArray['links'] = $this->links;
        
        return $nodeArray;
