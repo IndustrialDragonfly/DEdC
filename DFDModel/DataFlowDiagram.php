@@ -217,7 +217,7 @@ class DataFlowDiagram extends Diagram
    public function getAssociativeArray()
    {
        // Parent Attributes
-       $dfdArray = parent::getAssocativeArray();
+       $dfdArray = parent::getAssociativeArray();
        
        // DFD Attributes
        $dfdArray['ancestry'] = $this->ancestry;
