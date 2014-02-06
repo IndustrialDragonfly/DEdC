@@ -82,8 +82,8 @@ EOT;
                 "id": "{$link['id']}_id",
                 "type": "{$link['type']}",
                 "label": "{$link['label']}",
-                "origin_id": "{$link['originNode']}_id",
-                "dest_id": "{$link['destinationNode']}_id",
+                "origin_id": "{$link['origin_id']}_id",
+                "dest_id": "{$link['dest_id']}_id",
                 "x": "{$link['x']}",
                 "y": "{$link['y']}"
             }
@@ -175,8 +175,8 @@ EOT;
                         "id": "{$this->rawData['id']}_id",
                         "type": "{$this->rawData['type']}",
                         "genericType": "{$this->rawData['genericType']}",
-                        "origin_id": "{$this->rawData['originNode']}_id",
-                        "dest_id": "{$this->rawData['destinationNode']}_id",
+                        "origin_id": "{$this->rawData['origin_id']}_id",
+                        "dest_id": "{$this->rawData['dest_id']}_id",
                         "originator": "{$this->rawData['originator']}",
                         "x": "{$this->rawData['x']}",
                         "y": "{$this->rawData['y']}"
