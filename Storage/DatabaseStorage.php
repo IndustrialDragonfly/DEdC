@@ -200,15 +200,15 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * @param String $dfd_resource
      * @param String $mp_resource
      */
-    public function saveSubDFDNode($dfd_resource, $subDFD_resource)
+    public function saveSubDFDNode($dfd_id, $subDFDNode_id)
     {
         //<editor-fold desc="save to multiprocess table" defaultstate="collapsed">
       // Prepare the statement
       $insert_stmt = $this->dbh->prepare("INSERT INTO subdfdnode (dfd_id, subdfdnode_id) VALUES(?,?)");
 
       // Bind the parameters of the prepared statement
-      $insert_stmt->bindParam(1, $dfd_resource);
-      $insert_stmt->bindParam(2, $subDFD_resource);
+      $insert_stmt->bindParam(1, $dfd_id);
+      $insert_stmt->bindParam(2, $subDFDNode_id);
 
       // Execute, catch any errors resulting
       $insert_stmt->execute();
