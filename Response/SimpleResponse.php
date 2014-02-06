@@ -139,7 +139,22 @@ EOT;
                  break;
             case "Node":
                 // Convert the linkList array into a string
-                $links = implode("_id,\n", $this->rawData['linkList']);
+                $linkList = array();
+                foreach ($this->rawData['linkList'] as $link)
+                {
+                    // Using a heredoc - ugly but easy to understand
+                    $linkJson =<<<EOT
+            {
+                "id": "{$link['id']}_id",
+                "label": "{$link['label']}"
+            }
+EOT;
+                    
+                    array_push($linkList, $linkJson);
+                }
+                // Convert nodes into a comma delimited string
+                $linkList = implode(",\n", $linkList);
+ 
                 $this->representation = <<<EOT
                     {
                         "id": "{$this->rawData['id']}_id",
@@ -149,13 +164,28 @@ EOT;
                         "x": "{$this->rawData['x']}",
                         "y": "{$this->rawData['y']}",
                         "originator": "{$this->rawData['originator']}",
-                        "links": [$links]
+                        "links": [$linkList]
                     }
 EOT;
                 break;
             case "SubDFDNode":
                 // Convert the linkList array into a string
-                $links = implode("_id,\n", $this->rawData['linkList']);
+                $linkList = array();
+                foreach ($this->rawData['linkList'] as $link)
+                {
+                    // Using a heredoc - ugly but easy to understand
+                    $linkJson =<<<EOT
+            {
+                "id": "{$link['id']}_id",
+                "label": "{$link['label']}"
+            }
+EOT;
+                    
+                    array_push($linkList, $linkJson);
+                }
+                // Convert nodes into a comma delimited string
+                $linkList = implode(",\n", $linkList);
+                
                 $this->representation = <<<EOT
                     {
                         "id": "{$this->rawData['id']}_id",
@@ -165,7 +195,7 @@ EOT;
                         "x": "{$this->rawData['x']}",
                         "y": "{$this->rawData['y']}",
                         "originator": "{$this->rawData['originator']}",
-                        "links": [$links]
+                        "links": [$linkList]
                     }
 EOT;
                 break;
@@ -175,8 +205,16 @@ EOT;
                         "id": "{$this->rawData['id']}_id",
                         "type": "{$this->rawData['type']}",
                         "genericType": "{$this->rawData['genericType']}",
-                        "origin_id": "{$this->rawData['origin_id']}_id",
-                        "dest_id": "{$this->rawData['dest_id']}_id",
+                        "origin_id": 
+                            {
+                                "id": "{$this->rawData['originNode']['id']}_id",
+                                "label": "{$this->rawData['originNode']['label']}"
+                            },
+                        "dest_id": 
+                            {
+                                "id": "{$this->rawData['destinationNode']['id']}_id",
+                                "label": "{$this->rawData['destinationNode']['label']}"
+                            },
                         "originator": "{$this->rawData['originator']}",
                         "x": "{$this->rawData['x']}",
                         "y": "{$this->rawData['y']}"
