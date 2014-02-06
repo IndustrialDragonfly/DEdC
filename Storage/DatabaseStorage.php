@@ -439,7 +439,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         // subDFDNode the DFD is linked to
          $loadDFD = $this->dbh->prepare("SELECT * 
              FROM entity id
-                JOIN subdfdnode subdfdnode_id ON id=subdfdnode
+                JOIN subdfdnode dfd_id ON id=dfd_id
              WHERE id=?");
          $loadDFD->bindParam(1, $id);
          $loadDFD->execute();
