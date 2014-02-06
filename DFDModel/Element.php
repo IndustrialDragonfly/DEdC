@@ -112,7 +112,7 @@ require_once 'Entity.php';
    public function getAssociativeArray()
    {
        // Get Entity array
-       $elementArray = parent::getAssocativeArray();
+       $elementArray = parent::getAssociativeArray();
        
        // Add Entity attributes to entity array
        $elementArray['x'] = $this->x;

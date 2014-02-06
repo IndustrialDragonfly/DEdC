@@ -100,7 +100,7 @@ class DataFlowDiagram extends Diagram
       // If this is an existing DFD to load, get the ID of the DFD
       // DataFlowDiagram($storage, $DFD)
       else if (func_num_args() == 2 && 
-              is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DataFlowDiagram"))
+              is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Diagram"))
       {
          $this->id = func_get_arg(1);
          $vars = $this->storage->loadDFD($this->id);
@@ -217,7 +217,7 @@ class DataFlowDiagram extends Diagram
    public function getAssociativeArray()
    {
        // Parent Attributes
-       $dfdArray = parent::getAssocativeArray();
+       $dfdArray = parent::getAssociativeArray();
        
        // DFD Attributes
        $dfdArray['ancestry'] = $this->ancestry;
@@ -225,6 +225,8 @@ class DataFlowDiagram extends Diagram
        $dfdArray['linkList'] = $this->linkList;
        $dfdArray['subDFDNodeList'] = $this->subDFDNodeList;
        $dfdArray['subDFDNode'] = $this->subDFDNode;
+       
+       return $dfdArray;
    }
    //</editor-fold>
    //<editor-fold desc="Storage functions" defaultstate="collapsed">

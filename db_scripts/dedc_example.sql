@@ -1,13 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.0.6deb1
+-- version 3.4.11.1deb1
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 06, 2014 at 12:35 AM
--- Server version: 5.5.35-0ubuntu0.13.10.2
--- PHP Version: 5.5.3-1ubuntu2.1
+-- Generation Time: Feb 06, 2014 at 04:16 AM
+-- Server version: 5.5.35
+-- PHP Version: 5.4.6-1ubuntu1.5
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 
@@ -52,11 +52,11 @@ CREATE TABLE IF NOT EXISTS `element` (
 --
 
 INSERT INTO `element` (`id`, `x`, `y`) VALUES
-('BP8GFaaoQ4fZFtJxmLJa/lTQr4TOEOFluwISCq5jKAI=', 0, 0),
-('csxEwfIe5rxo8hg10KSGhxK7PaoJukMUUjYcDes4up4=', 0, 0),
-('DbzJoVaABoa8CfGttydpJRnIo15UhT9A9u4qJ269nW4=', 0, 0),
-('fQCd3d7WToOEEXwWnAiemD5JMaladMyrdQamw6lBAgg=', 0, 0),
-('neYl5HHmoE1SlnFUBAJhyrZpCyrIxVdMTqjJfCVfusc=', 0, 0);
+('cabumEiAZdExZKbHDaumNT9KEoN0lwUJZwgyISIDre4x', 20, 50),
+('hClaOolenANwol8HZhcIK7ulTfDiEwFtRM2CMo9Ppxgx', 15, 22),
+('mmWyh0gmygRejKr2meuRGSfLAl9oceUAhrG7foCquFox', 30, 50),
+('nDnIae2poYlZu6x87lYuoSg7XYZ8jmxpx6xthnrp3qcx', 35, 10),
+('TgRGVyTIh0srk2zw7OndjUx9AcyNx4AymEWiOMnDMPwx', 10, 50);
 
 -- --------------------------------------------------------
 
@@ -75,11 +75,11 @@ CREATE TABLE IF NOT EXISTS `element_list` (
 --
 
 INSERT INTO `element_list` (`dfd_id`, `el_id`) VALUES
-('6ueuj947ERrcl2bBEs/orw4NrSWIX/Zchcl3Fxz3Thw=', 'neYl5HHmoE1SlnFUBAJhyrZpCyrIxVdMTqjJfCVfusc='),
-('6ueuj947ERrcl2bBEs/orw4NrSWIX/Zchcl3Fxz3Thw=', 'csxEwfIe5rxo8hg10KSGhxK7PaoJukMUUjYcDes4up4='),
-('6ueuj947ERrcl2bBEs/orw4NrSWIX/Zchcl3Fxz3Thw=', 'BP8GFaaoQ4fZFtJxmLJa/lTQr4TOEOFluwISCq5jKAI='),
-('6ueuj947ERrcl2bBEs/orw4NrSWIX/Zchcl3Fxz3Thw=', 'DbzJoVaABoa8CfGttydpJRnIo15UhT9A9u4qJ269nW4='),
-('6ueuj947ERrcl2bBEs/orw4NrSWIX/Zchcl3Fxz3Thw=', 'fQCd3d7WToOEEXwWnAiemD5JMaladMyrdQamw6lBAgg=');
+('0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx', 'mmWyh0gmygRejKr2meuRGSfLAl9oceUAhrG7foCquFox'),
+('0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx', 'cabumEiAZdExZKbHDaumNT9KEoN0lwUJZwgyISIDre4x'),
+('0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx', 'TgRGVyTIh0srk2zw7OndjUx9AcyNx4AymEWiOMnDMPwx'),
+('0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx', 'nDnIae2poYlZu6x87lYuoSg7XYZ8jmxpx6xthnrp3qcx'),
+('0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx', 'hClaOolenANwol8HZhcIK7ulTfDiEwFtRM2CMo9Ppxgx');
 
 -- --------------------------------------------------------
 
@@ -101,12 +101,12 @@ CREATE TABLE IF NOT EXISTS `entity` (
 --
 
 INSERT INTO `entity` (`id`, `label`, `type`, `originator`) VALUES
-('6ueuj947ERrcl2bBEs/orw4NrSWIX/Zchcl3Fxz3Thw=', '', 'DataFlowDiagram', ''),
-('BP8GFaaoQ4fZFtJxmLJa/lTQr4TOEOFluwISCq5jKAI=', '', 'Process', ''),
-('csxEwfIe5rxo8hg10KSGhxK7PaoJukMUUjYcDes4up4=', '', 'Multiprocess', ''),
-('DbzJoVaABoa8CfGttydpJRnIo15UhT9A9u4qJ269nW4=', '', 'DataStore', ''),
-('fQCd3d7WToOEEXwWnAiemD5JMaladMyrdQamw6lBAgg=', '', 'DataFlow', ''),
-('neYl5HHmoE1SlnFUBAJhyrZpCyrIxVdMTqjJfCVfusc=', '', 'ExternalInteractor', '');
+('0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx', 'New_DFD!', 'DataFlowDiagram', 'The Eugene'),
+('cabumEiAZdExZKbHDaumNT9KEoN0lwUJZwgyISIDre4x', 'Some Interactor', 'ExternalInteractor', 'The Eugene'),
+('hClaOolenANwol8HZhcIK7ulTfDiEwFtRM2CMo9Ppxgx', 'Some Dataflow', 'DataFlow', 'The Eugene'),
+('mmWyh0gmygRejKr2meuRGSfLAl9oceUAhrG7foCquFox', 'Some Store', 'DataStore', 'The Eugene'),
+('nDnIae2poYlZu6x87lYuoSg7XYZ8jmxpx6xthnrp3qcx', 'Some Multiprocess', 'Multiprocess', 'The Eugene'),
+('TgRGVyTIh0srk2zw7OndjUx9AcyNx4AymEWiOMnDMPwx', 'Some Proc', 'Process', 'The Eugene');
 
 -- --------------------------------------------------------
 
@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS `link` (
 --
 
 INSERT INTO `link` (`id`, `origin_id`, `dest_id`) VALUES
-('fQCd3d7WToOEEXwWnAiemD5JMaladMyrdQamw6lBAgg=', 'BP8GFaaoQ4fZFtJxmLJa/lTQr4TOEOFluwISCq5jKAI=', 'DbzJoVaABoa8CfGttydpJRnIo15UhT9A9u4qJ269nW4=');
+('hClaOolenANwol8HZhcIK7ulTfDiEwFtRM2CMo9Ppxgx', 'TgRGVyTIh0srk2zw7OndjUx9AcyNx4AymEWiOMnDMPwx', 'nDnIae2poYlZu6x87lYuoSg7XYZ8jmxpx6xthnrp3qcx');
 
 -- --------------------------------------------------------
 
@@ -136,29 +136,17 @@ INSERT INTO `link` (`id`, `origin_id`, `dest_id`) VALUES
 
 CREATE TABLE IF NOT EXISTS `node` (
   `id` char(44) NOT NULL,
-  `df_id` char(44) NOT NULL,
-  KEY `id` (`id`)
+  `link_id` char(44) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `node`
 --
 
-INSERT INTO `node` (`id`, `df_id`) VALUES
-('bjENhK10xVynQZTtrSgkMNxfzvLj2QDOFthZytsGa3A=', '3WxkfyP9AOiUmK2MtucD7C66QgfCcKhhf86lg8l2qGw='),
-('MZZENoY79gA5pfTwEwYaD2grHaYRHEzZQfmDQWhglvk=', '3WxkfyP9AOiUmK2MtucD7C66QgfCcKhhf86lg8l2qGw='),
-('OVEwncbJEEKOsNnHr49xspxcsHuwUSSXMKL9pJp09lI=', 'SfxTswom8d8azHuNmpiVXnrTzzLsHBlc3BRBsnRLx/w='),
-('LxpA69Q84AX0q/VKYfUaWPimCSqDAjd0603ajdnCtiA=', 'SfxTswom8d8azHuNmpiVXnrTzzLsHBlc3BRBsnRLx/w='),
-('NXVX8AFBmzoZsLyIrm0q1ZiM3b9yQWUgBDXjlrHgdLI=', 'gsJTpxuk3wsSrmpYiqZrlphxfZQCCVfY8Zy21iqJQCA='),
-('OpSr1mEaeQKSO5lPNPjvFrMA1QWGxJpNv8uAzCZeWx0=', 'gsJTpxuk3wsSrmpYiqZrlphxfZQCCVfY8Zy21iqJQCA='),
-('zwd3HWj2tVyMDKGNENjG44cZ163AKGEm4A6YGfBBMEE=', 'ki6IDrM1ro/1QbEkvVOcqK4nVCmmVwQ2lD9PXxEPxko='),
-('drXsjeklZJ5SRIELEtPG5VLxyEDxIxdexO4QH7bDNjE=', 'ki6IDrM1ro/1QbEkvVOcqK4nVCmmVwQ2lD9PXxEPxko='),
-('vcMSHaYlAGeFAIDUvflaPvaSlnxrXBado2IvR9eh9SI=', 'ZYvvksWOxBEgAZIXs9n3IRbxJpvEg/a08loGbRRCx9w='),
-('w1e4Du9l2vSQuuT9yF11OOHXfa0slKId1iVXlVHxHgo=', 'ZYvvksWOxBEgAZIXs9n3IRbxJpvEg/a08loGbRRCx9w='),
-('xavgtYW7TUyxSnRqM0KanW8WXiso2ohZNC4f8X8MEY8=', 'omdgRUSoRQhcpJNReAq0zG0EU1hT/BZLJcxxXHq/LBs='),
-('ttoJXXFYvj9Imyi7IMQVr5GCohfJFRR9ijtBma9w2rA=', 'omdgRUSoRQhcpJNReAq0zG0EU1hT/BZLJcxxXHq/LBs='),
-('BP8GFaaoQ4fZFtJxmLJa/lTQr4TOEOFluwISCq5jKAI=', 'fQCd3d7WToOEEXwWnAiemD5JMaladMyrdQamw6lBAgg='),
-('DbzJoVaABoa8CfGttydpJRnIo15UhT9A9u4qJ269nW4=', 'fQCd3d7WToOEEXwWnAiemD5JMaladMyrdQamw6lBAgg=');
+INSERT INTO `node` (`id`, `link_id`) VALUES
+('nDnIae2poYlZu6x87lYuoSg7XYZ8jmxpx6xthnrp3qcx', 'hClaOolenANwol8HZhcIK7ulTfDiEwFtRM2CMo9Ppxgx'),
+('TgRGVyTIh0srk2zw7OndjUx9AcyNx4AymEWiOMnDMPwx', 'hClaOolenANwol8HZhcIK7ulTfDiEwFtRM2CMo9Ppxgx');
 
 -- --------------------------------------------------------
 
@@ -177,7 +165,7 @@ CREATE TABLE IF NOT EXISTS `subdfdnode` (
 --
 
 INSERT INTO `subdfdnode` (`dfd_id`, `subdfdnode_id`) VALUES
-('6ueuj947ERrcl2bBEs/orw4NrSWIX/Zchcl3Fxz3Thw=', 'csxEwfIe5rxo8hg10KSGhxK7PaoJukMUUjYcDes4up4=');
+(NULL, 'nDnIae2poYlZu6x87lYuoSg7XYZ8jmxpx6xthnrp3qcx');
 
 -- --------------------------------------------------------
 
@@ -248,205 +236,6 @@ ALTER TABLE `node`
 --
 ALTER TABLE `subdfdnode`
   ADD CONSTRAINT `subdfdnode_ibfk_1` FOREIGN KEY (`subdfdnode_id`) REFERENCES `entity` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
---
--- Database: `phpmyadmin`
---
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma_bookmark`
---
-
-CREATE TABLE IF NOT EXISTS `pma_bookmark` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `dbase` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `user` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `label` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '',
-  `query` text COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Bookmarks' AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma_column_info`
---
-
-CREATE TABLE IF NOT EXISTS `pma_column_info` (
-  `id` int(5) unsigned NOT NULL AUTO_INCREMENT,
-  `db_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `table_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `column_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `comment` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '',
-  `mimetype` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '',
-  `transformation` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `transformation_options` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `db_name` (`db_name`,`table_name`,`column_name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Column information for phpMyAdmin' AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma_designer_coords`
---
-
-CREATE TABLE IF NOT EXISTS `pma_designer_coords` (
-  `db_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `table_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `x` int(11) DEFAULT NULL,
-  `y` int(11) DEFAULT NULL,
-  `v` tinyint(4) DEFAULT NULL,
-  `h` tinyint(4) DEFAULT NULL,
-  PRIMARY KEY (`db_name`,`table_name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table coordinates for Designer';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma_history`
---
-
-CREATE TABLE IF NOT EXISTS `pma_history` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `username` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `db` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `table` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `timevalue` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `sqlquery` text COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `username` (`username`,`db`,`table`,`timevalue`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='SQL history for phpMyAdmin' AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma_pdf_pages`
---
-
-CREATE TABLE IF NOT EXISTS `pma_pdf_pages` (
-  `db_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `page_nr` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `page_descr` varchar(50) CHARACTER SET utf8 NOT NULL DEFAULT '',
-  PRIMARY KEY (`page_nr`),
-  KEY `db_name` (`db_name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='PDF relation pages for phpMyAdmin' AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma_recent`
---
-
-CREATE TABLE IF NOT EXISTS `pma_recent` (
-  `username` varchar(64) COLLATE utf8_bin NOT NULL,
-  `tables` text COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`username`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Recently accessed tables';
-
---
--- Dumping data for table `pma_recent`
---
-
-INSERT INTO `pma_recent` (`username`, `tables`) VALUES
-('root', '[{"db":"dedc","table":"entity"},{"db":"dedc","table":"element"}]');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma_relation`
---
-
-CREATE TABLE IF NOT EXISTS `pma_relation` (
-  `master_db` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `master_table` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `master_field` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `foreign_db` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `foreign_table` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `foreign_field` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  PRIMARY KEY (`master_db`,`master_table`,`master_field`),
-  KEY `foreign_field` (`foreign_db`,`foreign_table`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Relation table';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma_table_coords`
---
-
-CREATE TABLE IF NOT EXISTS `pma_table_coords` (
-  `db_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `table_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `pdf_page_number` int(11) NOT NULL DEFAULT '0',
-  `x` float unsigned NOT NULL DEFAULT '0',
-  `y` float unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`db_name`,`table_name`,`pdf_page_number`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table coordinates for phpMyAdmin PDF output';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma_table_info`
---
-
-CREATE TABLE IF NOT EXISTS `pma_table_info` (
-  `db_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `table_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `display_field` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  PRIMARY KEY (`db_name`,`table_name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table information for phpMyAdmin';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma_table_uiprefs`
---
-
-CREATE TABLE IF NOT EXISTS `pma_table_uiprefs` (
-  `username` varchar(64) COLLATE utf8_bin NOT NULL,
-  `db_name` varchar(64) COLLATE utf8_bin NOT NULL,
-  `table_name` varchar(64) COLLATE utf8_bin NOT NULL,
-  `prefs` text COLLATE utf8_bin NOT NULL,
-  `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`username`,`db_name`,`table_name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Tables'' UI preferences';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma_tracking`
---
-
-CREATE TABLE IF NOT EXISTS `pma_tracking` (
-  `db_name` varchar(64) COLLATE utf8_bin NOT NULL,
-  `table_name` varchar(64) COLLATE utf8_bin NOT NULL,
-  `version` int(10) unsigned NOT NULL,
-  `date_created` datetime NOT NULL,
-  `date_updated` datetime NOT NULL,
-  `schema_snapshot` text COLLATE utf8_bin NOT NULL,
-  `schema_sql` text COLLATE utf8_bin,
-  `data_sql` longtext COLLATE utf8_bin,
-  `tracking` set('UPDATE','REPLACE','INSERT','DELETE','TRUNCATE','CREATE DATABASE','ALTER DATABASE','DROP DATABASE','CREATE TABLE','ALTER TABLE','RENAME TABLE','DROP TABLE','CREATE INDEX','DROP INDEX','CREATE VIEW','ALTER VIEW','DROP VIEW') COLLATE utf8_bin DEFAULT NULL,
-  `tracking_active` int(1) unsigned NOT NULL DEFAULT '1',
-  PRIMARY KEY (`db_name`,`table_name`,`version`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=COMPACT COMMENT='Database changes tracking for phpMyAdmin';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma_userconfig`
---
-
-CREATE TABLE IF NOT EXISTS `pma_userconfig` (
-  `username` varchar(64) COLLATE utf8_bin NOT NULL,
-  `timevalue` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `config_data` text COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`username`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='User preferences storage for phpMyAdmin';
---
--- Database: `test`
---
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

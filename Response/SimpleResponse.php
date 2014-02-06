@@ -52,7 +52,7 @@ final class SimpleResponse extends Response implements GETResponsable
     {
         switch($this->rawData['genericType'])
         {
-            case "DataFlowDiagram":
+            case "Diagram":
                 // Parse and setup nodes list
                 $nodeList = array();
                 foreach ($this->rawData['nodeList'] as $node)
@@ -82,8 +82,8 @@ EOT;
                 "id": "{$link['id']}_id",
                 "type": "{$link['type']}",
                 "label": "{$link['label']}",
-                "origin_id": "{$link['originNode']}_id",
-                "dest_id": "{$link['destinationNode']}_id",
+                "origin_id": "{$link['origin_id']}_id",
+                "dest_id": "{$link['dest_id']}_id",
                 "x": "{$link['x']}",
                 "y": "{$link['y']}"
             }
@@ -121,6 +121,7 @@ EOT;
     "type": "{$this->rawData['type']}",
     "originator": "{$this->rawData['originator']}",
     "genericType": "{$this->rawData['genericType']}",
+    "subDFDNode": "{$this->rawData['subDFDNode']}",
     "nodes": 
     [
 {$nodeList}
@@ -138,7 +139,22 @@ EOT;
                  break;
             case "Node":
                 // Convert the linkList array into a string
-                $links = implode("_id,\n", $this->rawData['linkList']);
+                $linkList = array();
+                foreach ($this->rawData['linkList'] as $link)
+                {
+                    // Using a heredoc - ugly but easy to understand
+                    $linkJson =<<<EOT
+            {
+                "id": "{$link['id']}_id",
+                "label": "{$link['label']}"
+            }
+EOT;
+                    
+                    array_push($linkList, $linkJson);
+                }
+                // Convert nodes into a comma delimited string
+                $linkList = implode(",\n", $linkList);
+ 
                 $this->representation = <<<EOT
                     {
                         "id": "{$this->rawData['id']}_id",
@@ -148,13 +164,28 @@ EOT;
                         "x": "{$this->rawData['x']}",
                         "y": "{$this->rawData['y']}",
                         "originator": "{$this->rawData['originator']}",
-                        "links": [$links]
+                        "links": [$linkList]
                     }
 EOT;
                 break;
             case "SubDFDNode":
                 // Convert the linkList array into a string
-                $links = implode("_id,\n", $this->rawData['linkList']);
+                $linkList = array();
+                foreach ($this->rawData['linkList'] as $link)
+                {
+                    // Using a heredoc - ugly but easy to understand
+                    $linkJson =<<<EOT
+            {
+                "id": "{$link['id']}_id",
+                "label": "{$link['label']}"
+            }
+EOT;
+                    
+                    array_push($linkList, $linkJson);
+                }
+                // Convert nodes into a comma delimited string
+                $linkList = implode(",\n", $linkList);
+                
                 $this->representation = <<<EOT
                     {
                         "id": "{$this->rawData['id']}_id",
@@ -164,7 +195,7 @@ EOT;
                         "x": "{$this->rawData['x']}",
                         "y": "{$this->rawData['y']}",
                         "originator": "{$this->rawData['originator']}",
-                        "links": [$links]
+                        "links": [$linkList]
                     }
 EOT;
                 break;
@@ -174,8 +205,16 @@ EOT;
                         "id": "{$this->rawData['id']}_id",
                         "type": "{$this->rawData['type']}",
                         "genericType": "{$this->rawData['genericType']}",
-                        "origin_id": "{$this->rawData['originNode']}_id",
-                        "dest_id": "{$this->rawData['destinationNode']}_id",
+                        "origin_id": 
+                            {
+                                "id": "{$this->rawData['originNode']['id']}_id",
+                                "label": "{$this->rawData['originNode']['label']}"
+                            },
+                        "dest_id": 
+                            {
+                                "id": "{$this->rawData['destinationNode']['id']}_id",
+                                "label": "{$this->rawData['destinationNode']['label']}"
+                            },
                         "originator": "{$this->rawData['originator']}",
                         "x": "{$this->rawData['x']}",
                         "y": "{$this->rawData['y']}"

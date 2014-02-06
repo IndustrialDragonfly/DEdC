@@ -64,8 +64,8 @@ abstract class Link extends Element
          $this->originator = $vars['originator'];
          $this->x = $vars['x'];
          $this->y = $vars['y'];
-         $this->originNode = $vars['origin_id'];
-         $this->destinationNode = $vars['dest_id'];
+         $this->originNode = $vars['originNode'];
+         $this->destinationNode = $vars['destinationNode'];
          $this->parent = $vars['dfd_id'];
       }
    }
@@ -158,7 +158,7 @@ abstract class Link extends Element
    public function setDestinationNode($aNode)
    {
       //make sure a Node object was passed
-      if($aNode instanceof Node)
+      if(is_subclass_of($aNode, "Node"))
       {
          //if destination has not been set yet
          if ($this->destinationNode == NULL)
@@ -274,7 +274,7 @@ abstract class Link extends Element
    public function getAssociativeArray()
    {
        // Get Entity and Element array
-       $linkArray = parent::getAssocativeArray();
+       $linkArray = parent::getAssociativeArray();
        
        // Add Link Attributes to array
        $linkArray['originNode'] = $this->originNode;
@@ -317,7 +317,7 @@ abstract class Link extends Element
    {
        // Temporary cheaty way, should see if a more effictient way is
        // available
-       $this->delete();
+       $this->storage->deleteLink($this->id); // Cannot have removeAllNodes called
        $this->save();
    }
    //</editor-fold>
