@@ -110,13 +110,13 @@ abstract class Entity
        {
            $genericType = "Diagram";
        }
-       elseif (is_subclass_of($this, "Node"))
-       {
-           $genericType = "Node";
-       }
        elseif (is_subclass_of($this, "SubDFDNode"))
        {
            $genericType = "SubDFDNode";
+       }
+       elseif (is_subclass_of($this, "Node"))
+       {
+           $genericType = "Node";
        }
        elseif (is_subclass_of($this, "Link"))
        {

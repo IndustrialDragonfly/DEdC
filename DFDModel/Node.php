@@ -12,7 +12,7 @@
  abstract class Node extends Element
 {
    //<editor-fold desc="Attributes" defaultstate="collapsed">
-   protected $links;
+   protected $linkList;
    
    protected $storage;
    //</editor-fold>
@@ -29,7 +29,7 @@
    public function __construct()
    {
       parent::__construct();
-      $this->links = array();
+      $this->linkList = array();
       $this->storage = func_get_arg(0);
 
       // Find if the type of the second argument is DFD, if so, its a new DFD
@@ -51,7 +51,7 @@
          $this->originator = $vars['originator'];
          $this->x = $vars['x'];
          $this->y = $vars['y'];
-         $this->links = $vars['links'];
+         $this->linkList = $vars['linkList'];
          $this->parent = $vars['dfd_id'];
       }
    }
@@ -66,7 +66,7 @@
     */
    public function getNumberOfLinks()
    {
-      return count($this->links);
+      return count($this->linkList);
    }
    
    /**
@@ -75,7 +75,7 @@
     */
    public function getLinks()
    {
-       return $this->links;
+       return $this->linkList;
    }
    
    /**
@@ -91,16 +91,16 @@
        // Check that it is a link, and that it isn't already in the array
        // This allows either link or node to add link, without going into
        // infinite look
-      if($newLink instanceof Link)
+      if(is_subclass_of($newLink, "Link"))
       {
-          if (!array_search($newLink->getId(), $this->links))
+          if (!array_search($newLink->getId(), $this->linkList))
           {
-            array_push($this->links, $newLink->getId());
+            array_push($this->linkList, $newLink->getId());
           }
       }
       else
       {
-         throw new BadFunctionCallException("input parameter was not a Link");
+         throw new BadFunctionCallException("Input parameter was not a Link");
       }
    }
       
@@ -112,9 +112,9 @@
     */
    public function getLinkbyPosition($index)
    {
-      if ($index <= count($this->links) -1 && $index >= 0)
+      if ($index <= count($this->linkList) -1 && $index >= 0)
       {
-         return $this->links[$index];
+         return $this->linkList[$index];
       }
       else
       {
@@ -129,11 +129,11 @@
     */
    public function getLinkbyId($linkId)
    {
-      for ($i = 0; $i < count($this->links); $i++)
+      for ($i = 0; $i < count($this->linkList); $i++)
       {
-         if($this->links[$i] == $linkId)
+         if($this->linkList[$i] == $linkId)
          {
-            return $this->links[$i];
+            return $this->linkList[$i];
          }
       }
       return null;
@@ -158,8 +158,8 @@
    public function getAssociativeArray()
    {
        $nodeArray = parent::getAssociativeArray();
-       $nodeArray['links'] = $this->links;
-       
+       $nodeArray['linkList'] = $this->linkList;
+
        return $nodeArray;
    }
    //</editor-fold>
@@ -176,14 +176,14 @@
       if(is_subclass_of($link, "Link"))
       {
          //find if the link is in the list and get its location if it is
-         $loc = array_search($link->getId(), $this->links);
+         $loc = array_search($link->getId(), $this->linkList);
          if ($loc !== FALSE)
          {
             
             //remove the link from the list
-            unset($this->links[$loc]);
+            unset($this->linkList[$loc]);
             //normalize the indexes of the list
-            $this->links = array_values($this->links);
+            $this->linkList = array_values($this->linkList);
             return true;
          }
          else
@@ -204,10 +204,10 @@
    {
        // Counts down to avoid any ambigutity with unsetting of things in
        // links
-       for ($i = count($this->links); $i > 0; $i--)
+       for ($i = count($this->linkList); $i > 0; $i--)
        {
-           $type = $this->storage->getTypeFromUUID($this->links[0]);
-           $link = new $type($this->storage, $this->links[0]);
+           $type = $this->storage->getTypeFromUUID($this->linkList[0]);
+           $link = new $type($this->storage, $this->linkList[0]);
            $link->removeNode($this);
            $link->update();
            // The call to link will actually call removeLink in this node
@@ -218,8 +218,8 @@
        // before calling this part of code - since this is meant
        // for in memory usauge only, as the database should already
        // have been updated to reflected
-       unset($this->links);
-       $this->links = array();
+       unset($this->linkList);
+       $this->linkList = array();
    }
    
    //<editor-fold desc="Save/Delete/Update" defaultstate="collapsed">
@@ -231,7 +231,7 @@
     public function save()
     {
         $this->storage->saveNode($this->id, $this->label, get_class($this), 
-                $this->originator, $this->x, $this->y, $this->links, 
+                $this->originator, $this->x, $this->y, $this->linkList, 
                 $this->getNumberOfLinks(), $this->parent);
     }
 

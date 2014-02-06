@@ -36,22 +36,45 @@ function __autoload($classname)
 $storage = new DatabaseStorage();
 
 $dfd = new DataFlowDiagram($storage);
+$dfd->setLabel("New_DFD!");
+$dfd->setOrganization("DEdC");
+$dfd->setOriginator("The Eugene");
 $dfd->save();
 
 $process = new Process($storage, $dfd->getId());
+$process->setLabel("Some Proc");
+$process->setLocation(10, 50);
+$process->setOrganization("DEdC");
+$process->setOriginator("The Eugene");
 $process->save();
 
 $dataStore = new DataStore($storage, $dfd->getId());
+$dataStore->setLabel("Some Store");
+$dataStore->setLocation(30, 50);
+$dataStore->setOrganization("DEdC");
+$dataStore->setOriginator("The Eugene");
 $dataStore->save();
 
 $externalInteractor = new ExternalInteractor($storage, $dfd->getId());
+$externalInteractor->setLabel("Some Interactor");
+$externalInteractor->setLocation(20, 50);
+$externalInteractor->setOrganization("DEdC");
+$externalInteractor->setOriginator("The Eugene");
 $externalInteractor->save();
 
 $multiprocess = new Multiprocess($storage, $dfd->getId());
+$multiprocess->setLabel("Some Multiprocess");
+$multiprocess->setLocation(35, 10);
+$multiprocess->setOrganization("DEdC");
+$multiprocess->setOriginator("The Eugene");
 $multiprocess->save();
 
 $dataFlow = new DataFlow($storage, $dfd->getId());
-$dataFlow->setOriginNode($process);
-$dataFlow->setDestinationNode($dataStore);
 $dataFlow->save();
-
+$dataFlow->setOriginNode($process);
+$dataFlow->setDestinationNode($multiprocess);
+$dataFlow->setLabel("Some Dataflow");
+$dataFlow->setLocation(15, 22);
+$dataFlow->setOrganization("DEdC");
+$dataFlow->setOriginator("The Eugene");
+$dataFlow->update();
