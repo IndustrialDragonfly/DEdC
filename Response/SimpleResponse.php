@@ -52,7 +52,7 @@ final class SimpleResponse extends Response implements GETResponsable
     {
         switch($this->rawData['genericType'])
         {
-            case "DataFlowDiagram":
+            case "Diagram":
                 // Parse and setup nodes list
                 $nodeList = array();
                 foreach ($this->rawData['nodeList'] as $node)
