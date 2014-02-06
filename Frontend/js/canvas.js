@@ -21,7 +21,7 @@ Raphael.st.draggable = function (callback, element) {
         tx = dx + ox;
         ty = dy + oy;
         parent.transform('t' + tx + ',' + ty);
-        myElement.updateText();
+        myElement.updateTextPosition();
         myElement.setHasMoved(true);
 
         // Recalculate the Dataflows
@@ -179,7 +179,7 @@ Raphael.st.draggable = function (callback, element) {
             // Load DFD button
             $(load).button().click(function () {
                 // Controller.php is required until the rewrite rules work correctly
-                getDfd("Controller.php/test_dfd");
+                getDfd("Controller.php/0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx_id");
             });
 
             // New tab button
@@ -278,13 +278,13 @@ Raphael.st.draggable = function (callback, element) {
         
         var loadElement = function(canvas, entry) {
             var e;
-            if (entry.type === "process") {
+            if (entry.type === ELETYPE.PROCESS.name) {
                 e = canvas.addProcess(entry.x, entry.y);
-            } else if (entry.type === "multiprocess") {
+            } else if (entry.type === ELETYPE.MULTIPROCESS.name) {
                 e = canvas.addMultiProcess(entry.x, entry.y);
-            } else if (entry.type === "datastore") {
+            } else if (entry.type === ELETYPE.DATASTORE.name) {
                 e = canvas.addDatastore(entry.x, entry.y);
-            } else if (entry.type === "extinteractor") {
+            } else if (entry.type === ELETYPE.EXTINTERACTOR.name) {
                 e = canvas.addExtInteractor(entry.x, entry.y);
             } else {
                 console.log("\"" + entry.type + "\" was not a recognized element type.");
@@ -298,6 +298,7 @@ Raphael.st.draggable = function (callback, element) {
         var loadDataflow = function(canvas, entry) {
             var d = canvas.addDataflowById(entry.origin_id, entry.dest_id);
             d.setId(entry.id);
+            d.setText(entry.label);
         };
         
         // Expose methods to be public
@@ -320,12 +321,12 @@ Raphael.st.draggable = function (callback, element) {
         },
         DATASTORE: {
             value: 1,
-            name: "Datastore",
+            name: "DataStore",
             code: "D"
         },
         EXTINTERACTOR: {
             value: 1,
-            name: "External-Interactor",
+            name: "ExternalInteractor",
             code: "EI"
         }
     };
@@ -567,11 +568,13 @@ Raphael.st.draggable = function (callback, element) {
             e.push(paper.add([
                 {
                     type: "path",
-                    path: "M" + x + " " + y + " L" + (x + 50) + " " + y + " Z"
+                    path: "M" + x + " " + y + " L" + (x + 50) + " " + y + " Z",
+                    "stroke-width": 2
                 },
                 {
                     type: "path",
-                    path: "M" + x + " " + (y + 50) + " L" + (x + 50) + " " + (y + 50) + " Z"
+                    path: "M" + x + " " + (y + 50) + " L" + (x + 50) + " " + (y + 50) + " Z",
+                    "stroke-width": 2
                 },
                 {
                     type: "rect",
@@ -777,7 +780,7 @@ Raphael.st.draggable = function (callback, element) {
         this.applyDefaultStyle = function () {
             set.attr("fill", "#FFF");
             set.attr("stroke", "#000");
-            set.attr("stroke-width", "1px");
+            set.attr("stroke-width", "2px");
         };
 
         /**
@@ -861,6 +864,14 @@ Raphael.st.draggable = function (callback, element) {
                 textBox.attr("text", text);
             }
         };
+        
+        this.getText = function () {
+            if (textBox) {
+                textBox.attr("text");
+            } else {
+                return "";
+            }
+        };
 
         /**
          * Called when any Shape in the set is clicked
@@ -873,7 +884,7 @@ Raphael.st.draggable = function (callback, element) {
         /**
          * Update the position of the text label
          */
-        this.updateText = function () {
+        this.updateTextPosition = function () {
             if (textBox) {
                 var points = this.getAttachPoints();
                 textBox.attr("x", points[3].x);
@@ -909,8 +920,27 @@ Raphael.st.draggable = function (callback, element) {
                 myCanvas = canvas,
                 path,
                 arrow,
-                id;
+                id,
+                textBox,
+                sourcePoint,
+                targetPoint;
 
+        /**
+         * Update the position of the text label
+         */
+        this.updateTextPosition = function () {
+            if (textBox) {
+                var newX = sourcePoint.x + targetPoint.x;
+                var newY = sourcePoint.y + targetPoint.y;
+                
+                newX = newX / 2;
+                newY = newY / 2;
+                
+                textBox.attr("x", newX);
+                textBox.attr("y", newY);
+            }
+        };
+        
        this.getId = function() {
            return id;
        };
@@ -918,6 +948,31 @@ Raphael.st.draggable = function (callback, element) {
        this.setId = function(newId) {
            id = newId;
        };
+       
+       /**
+         * Set the text label for the element
+         * @param {String} text - Text to set label to
+         */
+        this.setText = function (text) {
+            if (!textBox) {
+                var newX = sourcePoint.x + targetPoint.x;
+                var newY = sourcePoint.y + targetPoint.y;
+                
+                newX = newX / 2;
+                newY = newY / 2;
+                textBox = myCanvas.createText(newX, newY, text);
+            } else {
+                textBox.attr("text", text);
+            }
+        };
+        
+        this.getText = function () {
+            if (textBox) {
+                textBox.attr("text");
+            } else {
+                return "";
+            }
+        };
        
         // Make sure this dataflow will get drawn
         myTarget.setHasMoved(true);
@@ -957,18 +1012,18 @@ Raphael.st.draggable = function (callback, element) {
                 return;
             }
 
-            var sourcePoint = mySource.getAttachPoints();
-            var targetPoint = myTarget.getAttachPoints();
+            var sourcePoints = mySource.getAttachPoints();
+            var targetPoints = myTarget.getAttachPoints();
             var sourceIndex = 0; // Shortest point index for source
             var targetIndex = 0; // Shortest point index for source
             var min; // Minimum length
 
             // Loop through all of the attach points for both Elements
-            for (var i = 0; i < sourcePoint.length; i++) {
-                for (var j = 0; j < targetPoint.length; j++) {
+            for (var i = 0; i < sourcePoints.length; i++) {
+                for (var j = 0; j < targetPoints.length; j++) {
                     // Calculate vector's length (sqrt(a^2 + b^2))
-                    var dx = Math.abs(sourcePoint[i].x - targetPoint[j].x);
-                    var dy = Math.abs(sourcePoint[i].y - targetPoint[j].y);
+                    var dx = Math.abs(sourcePoints[i].x - targetPoints[j].x);
+                    var dy = Math.abs(sourcePoints[i].y - targetPoints[j].y);
                     var length = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
                     if (min) {
                         // Check if new vector is minimum
@@ -986,28 +1041,32 @@ Raphael.st.draggable = function (callback, element) {
                 }
             }
             
+            // TODO: Change things below to use this instead of targetPoints and sourcePoints.
+            sourcePoint = sourcePoints[sourceIndex];
+            targetPoint = targetPoints[targetIndex];
+            
             var pathString = "M#{sourceX} #{sourceY} L#{targetX} #{targetY} Z";
-            pathString = pathString.replace(/#\{sourceX\}/g, sourcePoint[sourceIndex].x)
-                    .replace(/#\{sourceY\}/g, sourcePoint[sourceIndex].y)
-                    .replace(/#\{targetX\}/g, targetPoint[targetIndex].x)
-                    .replace(/#\{targetY\}/g, targetPoint[targetIndex].y);
+            pathString = pathString.replace(/#\{sourceX\}/g, sourcePoints[sourceIndex].x)
+                    .replace(/#\{sourceY\}/g, sourcePoints[sourceIndex].y)
+                    .replace(/#\{targetX\}/g, targetPoints[targetIndex].x)
+                    .replace(/#\{targetY\}/g, targetPoints[targetIndex].y);
 
-            var angle = Math.atan2(targetPoint[targetIndex].x - sourcePoint[sourceIndex].x, targetPoint[targetIndex].y - sourcePoint[sourceIndex].y);
+            var angle = Math.atan2(targetPoints[targetIndex].x - sourcePoints[sourceIndex].x, targetPoints[targetIndex].y - sourcePoints[sourceIndex].y);
             angle = (angle / (2 * Math.PI)) * 360;
             var arrowString = "M#{targetX1} #{targetY1} L#{targetX2} #{targetY2} L#{targetX3} #{targetY3} L#{targetX4} #{targetY4}";
-            arrowString = arrowString.replace(/#\{targetX1\}/g, targetPoint[targetIndex].x)
-                    .replace(/#\{targetY1\}/g, targetPoint[targetIndex].y)
-                    .replace(/#\{targetX2\}/g, targetPoint[targetIndex].x - 5)
-                    .replace(/#\{targetY2\}/g, targetPoint[targetIndex].y - 5)
-                    .replace(/#\{targetX3\}/g, targetPoint[targetIndex].x - 5)
-                    .replace(/#\{targetY3\}/g, targetPoint[targetIndex].y + 5)
-                    .replace(/#\{targetX4\}/g, targetPoint[targetIndex].x)
-                    .replace(/#\{targetY4\}/g, targetPoint[targetIndex].y);
+            arrowString = arrowString.replace(/#\{targetX1\}/g, targetPoints[targetIndex].x)
+                    .replace(/#\{targetY1\}/g, targetPoints[targetIndex].y)
+                    .replace(/#\{targetX2\}/g, targetPoints[targetIndex].x - 5)
+                    .replace(/#\{targetY2\}/g, targetPoints[targetIndex].y - 5)
+                    .replace(/#\{targetX3\}/g, targetPoints[targetIndex].x - 5)
+                    .replace(/#\{targetY3\}/g, targetPoints[targetIndex].y + 5)
+                    .replace(/#\{targetX4\}/g, targetPoints[targetIndex].x)
+                    .replace(/#\{targetY4\}/g, targetPoints[targetIndex].y);
 
             var arrowRotationString = "r #{angle},#{targetX},#{targetY}";
             arrowRotationString = arrowRotationString.replace(/#\{angle\}/g, (-90 + angle) * -1)
-                    .replace(/#\{targetX\}/g, targetPoint[targetIndex].x)
-                    .replace(/#\{targetY\}/g, targetPoint[targetIndex].y);
+                    .replace(/#\{targetX\}/g, targetPoints[targetIndex].x)
+                    .replace(/#\{targetY\}/g, targetPoints[targetIndex].y);
 
             if (path && arrow) {
                 // Path existed, update
@@ -1033,6 +1092,10 @@ Raphael.st.draggable = function (callback, element) {
                 arrow = canvas.createPath(arrowString).attr("fill", "black");
                 arrow.transform(arrowRotationString);
             }
+            
+            // Update text position
+            this.updateTextPosition();
+            
         };
 
         // Initially calculate the path
