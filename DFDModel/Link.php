@@ -274,7 +274,7 @@ abstract class Link extends Element
    public function getAssociativeArray()
    {
        // Get Entity and Element array
-       $linkArray = parent::getAssocativeArray();
+       $linkArray = parent::getAssociativeArray();
        
        // Add Link Attributes to array
        $linkArray['originNode'] = $this->originNode;
