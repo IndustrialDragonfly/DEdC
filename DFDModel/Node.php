@@ -1,5 +1,4 @@
 <?php
-require_once 'Element.php';
 /**
  * Node is the abstract class that governs all node objects, like process, datastore
  * etc. For all storage access methods, they could currently go in the Element
@@ -25,7 +24,7 @@ require_once 'Element.php';
     * DB if an entry with a matching id exists
     * @param ReadStorable $datastore
     * @param string $id
-    * @param DataFlowDiagram $parent
+    * @param string $parent (DataFlowDiagram ID)
     */
    public function __construct()
    {
@@ -34,12 +33,12 @@ require_once 'Element.php';
       $this->storage = func_get_arg(0);
 
       // Find if the type of the second argument is DFD, if so, its a new DFD
-      if (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DataFlowDiagram"))
+      if (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Diagram"))
       {
         $this->parent = func_get_arg(1);
       }
       //if the type of the second argument is not a DFD, then load from DB
-      else
+      elseif(is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Node"))
       {
          $this->id = func_get_arg(1);
          

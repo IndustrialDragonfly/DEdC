@@ -131,7 +131,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $node_vars = $load->fetch();
          if($node_vars == FALSE )
          {
-            throw new BadFunctionCallException("no matching id found in entity DB");
+            throw new BadFunctionCallException("No matching id found in entity DB");
          }
          
          // Get links list
@@ -245,7 +245,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     /**
      * Stores a dataflow object into the database
      * 
-     * @param string $resource
+     * @param string $id
      * @param string $label
      * @param string $type
      * @param origin $originator
@@ -254,14 +254,14 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * @param string $origin_resource
      * @param string $dest_resource
      */
-    public function saveLink($resource, $label, $type, $originator, $x, $y, $origin_resource, $dest_resource, $parentId)
+    public function saveLink($id, $label, $type, $originator, $x, $y, $origin_resource, $dest_resource, $parentId)
     {
       //<editor-fold desc="save to Entity table" defaultstate="collapsed">
       // Prepare the statement
       $insert_stmt = $this->dbh->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
 
       // Bind the parameters of the prepared statement
-      $insert_stmt->bindParam(1, $resource);
+      $insert_stmt->bindParam(1, $id);
       $insert_stmt->bindParam(2, $label);
       $insert_stmt->bindParam(3, $type);
       $insert_stmt->bindParam(4, $originator);
@@ -275,7 +275,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       $insert_stmt = $this->dbh->prepare("INSERT INTO element (id, x, y) VALUES(?,?,?)");
 
       // Bind the parameters of the prepared statement
-      $insert_stmt->bindParam(1, $resource);
+      $insert_stmt->bindParam(1, $id);
       $insert_stmt->bindParam(2, $x);
       $insert_stmt->bindParam(3, $y);
 
@@ -289,7 +289,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       {
          $insert_stmt = $this->dbh->prepare("INSERT INTO link (id, origin_id, dest_id) VALUES(?,?,?)");
          // Bind the parameters of the prepared statement
-         $insert_stmt->bindParam(1, $resource);
+         $insert_stmt->bindParam(1, $id);
          $insert_stmt->bindParam(2, $origin_resource);
          $insert_stmt->bindParam(3, $dest_resource);
          // Execute, catch any errors resulting
@@ -299,7 +299,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       {
          $insert_stmt = $this->dbh->prepare("INSERT INTO link (id, dest_id) VALUES(?,?)");
          // Bind the parameters of the prepared statement
-         $insert_stmt->bindParam(1, $resource);
+         $insert_stmt->bindParam(1, $id);
          $insert_stmt->bindParam(2, $dest_resource);
          // Execute, catch any errors resulting
          $insert_stmt->execute();
@@ -308,7 +308,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       {
          $insert_stmt = $this->dbh->prepare("INSERT INTO link (id, origin_id) VALUES(?,?)");
          // Bind the parameters of the prepared statement
-         $insert_stmt->bindParam(1, $resource);
+         $insert_stmt->bindParam(1, $id);
          $insert_stmt->bindParam(2, $origin_resource);
          // Execute, catch any errors resulting
          $insert_stmt->execute();
@@ -317,7 +317,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       {
          $insert_stmt = $this->dbh->prepare("INSERT INTO link (id) VALUES(?)");
          // Bind the parameters of the prepared statement
-         $insert_stmt->bindParam(1, $resource);
+         $insert_stmt->bindParam(1, $id);
          // Execute, catch any errors resulting
          $insert_stmt->execute();
       }
@@ -326,8 +326,8 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       // Save to dfd 
         $insert_stmt = $this->dbh->prepare("INSERT INTO element_list (dfd_id, el_id) VALUES (?,?)");
         $insert_stmt->bindParam(1, $parentId);
-        $insert_stmnt->bindParam(2, $id);
-        $insert_stmnt->execute();
+        $insert_stmt->bindParam(2, $id);
+        $insert_stmt->execute();
     }
     
      /**
@@ -602,34 +602,43 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       // Prepare the statement to store the elements into the elmenet_list table
       $insert_stmt = $this->dbh->prepare("INSERT INTO element_list (dfd_id, el_id) VALUES(?,?)");
       
-      // Save each element in the nodeList to the table
-      foreach ($nodeList as $node)
+      // Save each element in the nodeList to the table if it is an array
+      if (is_array($nodeList))
       {
-         // Bind the parameters of the prepared statement
-         $insert_stmt->bindParam(1, $id);
-         $insert_stmt->bindParam(2, $node);
-         // Execute, catch any errors resulting
-         $insert_stmt->execute();
+        foreach ($nodeList as $node)
+        {
+           // Bind the parameters of the prepared statement
+           $insert_stmt->bindParam(1, $id);
+           $insert_stmt->bindParam(2, $node);
+           // Execute, catch any errors resulting
+           $insert_stmt->execute();
+        }
       }
       
-      // Save each element in the linkList to the table
-      foreach ($linkList as $link)
+      // Save each element in the linkList to the table if it is an array
+      if (is_array($nodeList))
       {
-         // Bind the parameters of the prepared statement
-         $insert_stmt->bindParam(1, $id);
-         $insert_stmt->bindParam(2, $link);
-         // Execute, catch any errors resulting
-         $insert_stmt->execute();
+        foreach ($linkList as $link)
+        {
+           // Bind the parameters of the prepared statement
+           $insert_stmt->bindParam(1, $id);
+           $insert_stmt->bindParam(2, $link);
+           // Execute, catch any errors resulting
+           $insert_stmt->execute();
+        }
       }
       
-      // Save each element in the suDFDNodeList to the table
-      foreach ($subDFDNodeList as $subDFDNode_id)
+      // Save each element in the suDFDNodeList to the table if it isn't null
+      if (is_array($nodeList))
       {
-         // Bind the parameters of the prepared statement
-         $insert_stmt->bindParam(1, $id);
-         $insert_stmt->bindParam(2, $subDFDNode_id);
-         // Execute, catch any errors resulting
-         $insert_stmt->execute();
+        foreach ($subDFDNodeList as $subDFDNode_id)
+        {
+           // Bind the parameters of the prepared statement
+           $insert_stmt->bindParam(1, $id);
+           $insert_stmt->bindParam(2, $subDFDNode_id);
+           // Execute, catch any errors resulting
+           $insert_stmt->execute();
+        }
       }
           // Prepare the statement
       $insert_stmt = $this->dbh->prepare("INSERT INTO subDFDNode (subdfdnode_id, dfd_id) VALUES(?,?)");

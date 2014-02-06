@@ -1,14 +1,14 @@
 <?php
 
-require_once '../Entity.php';
-require_once '../Multiprocess.php';
+require_once 'Entity.php';
+require_once 'Multiprocess.php';
 /**
 * Description of DataFlowDiagram
 *
 * @author Josh Clark
 * @author Eugene Davis
 */
-class DataFlowDiagram extends Entity
+class DataFlowDiagram extends Diagram
 {
    //<editor-fold desc="Attributes" defaultstate="collapsed">
     /**
