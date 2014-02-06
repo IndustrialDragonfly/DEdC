@@ -103,10 +103,12 @@ abstract class Entity
        $entityArray['organization'] = $this->organization;
        $entityArray['type'] = get_class($this);
        
+       $genericType = NULL;
+       
        // Figure out the generic type - i.e. Link, Node, SubDFDNode or DataFlowDiagram
-       if (is_subclass_of($this, "DataFlowDiagram"))
+       if (is_subclass_of($this, "Diagram"))
        {
-           $genericType = "DataFlowDiagram";
+           $genericType = "Diagram";
        }
        elseif (is_subclass_of($this, "Node"))
        {
