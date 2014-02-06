@@ -40,7 +40,7 @@ abstract class Link extends Element
        $this->storage = func_get_arg(0);
 
       // Find if the type of the second argument is DFD, if so, its a new DFD
-      if (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DataFlowDiagram"))
+      if (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Diagram"))
       {
         $this->parent = func_get_arg(1);
       }
@@ -60,8 +60,8 @@ abstract class Link extends Element
          $this->originator = $vars['originator'];
          $this->x = $vars['x'];
          $this->y = $vars['y'];
-         $this->originNode = $vars['origin_id'];
-         $this->destinationNode = $vars['dest_id'];
+         $this->originNode = $vars['originNode'];
+         $this->destinationNode = $vars['destinationNode'];
          $this->parent = $vars['dfd_id'];
       }
    }
@@ -154,7 +154,7 @@ abstract class Link extends Element
    public function setDestinationNode($aNode)
    {
       //make sure a Node object was passed
-      if($aNode instanceof Node)
+      if(is_subclass_of($aNode, "Node"))
       {
          //if destination has not been set yet
          if ($this->destinationNode == NULL)
@@ -240,6 +240,35 @@ abstract class Link extends Element
       $this->clearOriginNode();
       $this->clearDestinationNode();
    }
+   
+   /**
+    * Returns an assocative array representing the link object. This 
+    * assocative array has the following elements and types:
+    * id String
+    * label String
+    * originator String
+    * organization String 
+    * type String
+    * genericType String
+    * x Int
+    * y Int
+    * parent String
+    * originNode String
+    * destinationNode String
+    * 
+    * @return Mixed[]
+    */
+   public function getAssociativeArray()
+   {
+       // Get Entity and Element array
+       $linkArray = parent::getAssociativeArray();
+       
+       // Add Link Attributes to array
+       $linkArray['originNode'] = $this->originNode;
+       $linkArray['destinationNode'] = $this->destinationNode;
+       
+       return $linkArray;
+   }
    //</editor-fold>
    
 //<editor-fold desc="Data Store Actions" defaultstate="collapsed">
@@ -275,7 +304,7 @@ abstract class Link extends Element
    {
        // Temporary cheaty way, should see if a more effictient way is
        // available
-       $this->delete();
+       $this->storage->deleteLink($this->id); // Cannot have removeAllNodes called
        $this->save();
    }
    //</editor-fold>

@@ -66,7 +66,9 @@ abstract class Entity
    {
       $length = 256;
       $numberOfBytes = $length/8;
-      return strtr(base64_encode(openssl_random_pseudo_bytes($numberOfBytes)), "+/=", "x");
+      // Replaces all instances of +, = or / in the Base64 string with x
+      return str_replace(array("+", "=", "/"), array("x","x","x"), 
+              base64_encode(openssl_random_pseudo_bytes($numberOfBytes)));
    }
    //</editor-fold>
    
@@ -150,7 +152,7 @@ abstract class Entity
     * 
     * @param Readable/Writable $newStorage
     */
-   /*
+   /* disabled
    public function setStorage($newStorage)
    {
       $this->storage = $newStorage;
@@ -169,6 +171,56 @@ abstract class Entity
    
    //</editor-fold>
    
+   /**
+    * Returns an assocative array representing the entity object. This 
+    * assocative array has the following elements and types:
+    * id String
+    * label String
+    * originator String
+    * organization String
+    * type String
+    * genericType String
+    *  
+    * @returns Mixed[]
+    */
+   public function getAssociativeArray()
+   {
+       $entityArray = array();
+       
+       $entityArray['id'] = $this->id;
+       $entityArray['label'] = $this->label;
+       $entityArray['originator'] = $this->originator;
+       $entityArray['organization'] = $this->organization;
+       $entityArray['type'] = get_class($this);
+       
+       $genericType = NULL;
+       
+       // Figure out the generic type - i.e. Link, Node, SubDFDNode or DataFlowDiagram
+       if (is_subclass_of($this, "Diagram"))
+       {
+           $genericType = "Diagram";
+       }
+       elseif (is_subclass_of($this, "SubDFDNode"))
+       {
+           $genericType = "SubDFDNode";
+       }
+       elseif (is_subclass_of($this, "Node"))
+       {
+           $genericType = "Node";
+       }
+       elseif (is_subclass_of($this, "Link"))
+       {
+           $genericType = "Link";
+       }
+       else
+       {
+           // Throw relevant exception
+       }
+       
+       $entityArray['genericType'] = $genericType;
+       
+       return $entityArray;
+   }
 }
 
 ?>

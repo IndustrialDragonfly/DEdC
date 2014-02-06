@@ -1,7 +1,7 @@
 <?php
 
-require_once '../Entity.php';
-require_once '../Multiprocess.php';
+require_once 'Entity.php';
+require_once 'Multiprocess.php';
 /**
  * This is an object that represents a dataflow diagram which consists of a 
  * collection of nodes and links between them
@@ -9,7 +9,7 @@ require_once '../Multiprocess.php';
  * @author Josh Clark
  * @author Eugene Davis
  */
-class DataFlowDiagram extends Entity
+class DataFlowDiagram extends Diagram
 {
     //<editor-fold desc="Attributes" defaultstate="collapsed">
     /**
@@ -52,67 +52,67 @@ class DataFlowDiagram extends Entity
     //</editor-fold>
     //<editor-fold desc="Constructor" defaultstate="collapsed">
     /**
-     * Constructor. If no arguments are specified a new object is created with
-     * a random id and having empty lists for elements and external links. If
-     * three arguments are specified, the oject is loaded from the DB if an entry
-     * with a matching id exists. If parent is null it is assumed that there are
-     * no external links
-     * @param Readable/Writable $storage
-     * @param string $id
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->storage = func_get_arg(0);
-        // If there is only one argument (the storage object) then this is a
-        // root DFD
-        // DataFlowDiagram($storage)
-        if (func_num_args() == 1)
-        {
-            $this->elementList = array();
-            $this->parentStack = null;
-            $this->subDFDNode = null;
-        }
-        // If creating a new DFD connected to a SubDFDNode
-        // DataFlowDiagram($storage, $SubDFDNode)
-        else if (func_num_args() == 2 &&
-                is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "SubDFDNode"))
-        {
-            $this->elementList = array();
-            $this->subDFDNode = func_get_arg(1);
-
-            // Initialize the linked SubDFDNode so we can get its parent and link
-            // ourselves into it
-            $type = getTypeFromUUID($this->subDFDNode);
-            $subDFDNode = new $type($this->storage);
-
-            $parentDFD_id = $subDFDNode->getParent();
-
-            // Initialize the parent DFD and get its ancenstry
-            $type = getTypeFromUUID($parentDFD_id);
-            $parentDFD = new $type($parentDFD_id);
-            $this->ancestry = $parentDFD->getAncestry();
-            // Add immediate parent to stack
-            array_push($this->ancestry, $parentDFD->getId());
-        }
-        // If this is an existing DFD to load, get the ID of the DFD
-        // DataFlowDiagram($storage, $DFD)
-        else if (func_num_args() == 2 &&
-                is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DataFlowDiagram"))
-        {
-            $this->elementList = array();
-            $this->id = func_get_arg(1);
-            $vars = $this->storage->loadDFD($this->id);
-
-            // Load up values from the associative array
-            $this->label = $vars['label'];
-            $this->originator = $vars['originator'];
-            $this->nodeList = $vars['nodeList'];
-            $this->linkList = $vars['linkList'];
-            $this->subDFDNodeList = $vars['subDFDNodeList'];
-            $this->ancestry = $vars['ancestry'];
-        }
-    }
+    * Constructor. If no arguments are specified a new object is created with
+    * a random id and having empty lists for elements and external links. If
+    * three arguments are specified, the oject is loaded from the DB if an entry
+    * with a matching id exists. If parent is null it is assumed that there are
+    * no external links
+    * @param Readable/Writable $storage
+    * @param string $id
+    */
+   public function __construct()
+   {
+      parent::__construct();
+      $this->storage = func_get_arg(0);
+      $this->nodeList = array();
+      $this->linkList = array();
+      $this->subDFDNodeList = array();
+      // If there is only one argument (the storage object) then this is a
+      // root DFD
+      // DataFlowDiagram($storage)
+      if (func_num_args() == 1)
+      {
+         $this->parentStack = null;
+         $this->subDFDNode = null;
+      }
+      // If creating a new DFD connected to a SubDFDNode
+      // DataFlowDiagram($storage, $SubDFDNode)
+      else if (func_num_args() == 2 && 
+              is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "SubDFDNode"))
+      {
+           $this->subDFDNode = func_get_arg(1);
+           
+           // Initialize the linked SubDFDNode so we can get its parent and link
+           // ourselves into it
+           $type = getTypeFromUUID($this->subDFDNode);
+           $subDFDNode = new $type($this->storage);
+           
+           $parentDFD_id = $subDFDNode->getParent();
+           
+           // Initialize the parent DFD and get its ancenstry
+           $type = getTypeFromUUID($parentDFD_id);
+           $parentDFD = new $type($parentDFD_id);
+           $this->ancestry = $parentDFD->getAncestry();
+           // Add immediate parent to stack
+           array_push($this->ancestry, $parentDFD->getId());          
+      }
+      // If this is an existing DFD to load, get the ID of the DFD
+      // DataFlowDiagram($storage, $DFD)
+      else if (func_num_args() == 2 && 
+              is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Diagram"))
+      {
+         $this->id = func_get_arg(1);
+         $vars = $this->storage->loadDFD($this->id);
+         
+         // Load up values from the associative array
+         $this->label = $vars['label'];
+         $this->originator = $vars['originator'];
+         $this->nodeList = $vars['nodeList'];
+         $this->linkList = $vars['linkList'];
+         $this->subDFDNodeList = $vars['subDFDNodeList'];
+         $this->ancestry = $vars['ancestry'];
+      }
+   }
 
     //</editor-fold>
     //<editor-fold desc="Accessor functions" defaultstate="collapsed">
@@ -186,7 +186,6 @@ class DataFlowDiagram extends Entity
         $loc = array_search($linkid, $this->linkList);
         if ($loc !== FALSE)
         {
-
             //remove the link from the list
             unset($this->linkList[$loc]);
             //normalize the indexes of the list
@@ -366,10 +365,41 @@ class DataFlowDiagram extends Entity
         else
         {
             throw new BadFunctionCallException("Input parameter not contained in DFD");
-        }
-    }
-
-    //</editor-fold>
+         }
+   }
+   
+   /**
+    * Returns an assocative array representing the DFD object. This assocative
+    * array has the following elements and types:
+    * id String
+    * label String
+    * originator String
+    * organization String 
+    * type String
+    * genericType String
+    * ancestry String[]
+    * nodeList String[]
+    * linkList String[]
+    * subDFDNodeList String[]
+    * subDFDNode String 
+    * 
+    * @returns Mixed[]
+    */
+   public function getAssociativeArray()
+   {
+       // Parent Attributes
+       $dfdArray = parent::getAssociativeArray();
+       
+       // DFD Attributes
+       $dfdArray['ancestry'] = $this->ancestry;
+       $dfdArray['nodeList'] = $this->nodeList;
+       $dfdArray['linkList'] = $this->linkList;
+       $dfdArray['subDFDNodeList'] = $this->subDFDNodeList;
+       $dfdArray['subDFDNode'] = $this->subDFDNode;
+       
+       return $dfdArray;
+   }
+   //</editor-fold>
     //<editor-fold desc="$ancestry Accessors" defaultstate="collapsed">
     /**
      * This function returns the number of ancestors of this DFD

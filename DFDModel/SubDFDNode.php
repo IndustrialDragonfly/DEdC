@@ -36,11 +36,11 @@ class SubDFDNode extends Node
          parent::__construct(func_get_arg(0), func_get_arg(1));
          $this->subDataFlowDiagram = NULL;
       }
-      // If constructor is passed a storage object, parent DFD, and an ID,
+      // If constructor is passed a storage object, and an ID,
       // load from storage
-      else if (func_num_args() == 3)
+      else if (func_num_args() == 2)
       {
-         parent::__construct(func_get_arg(0), func_get_arg(1), func_get_arg(2));
+         parent::__construct(func_get_arg(0), func_get_arg(1));
          
          // Load mapping of subDFDNode to DFD, unlike most load functions
          // this one returns a single value rather than an assocative array
@@ -75,6 +75,31 @@ class SubDFDNode extends Node
          throw new BadFunctionCallException("input parameter was not a DataFlowDiagram");
       }
    }
+   
+   /**
+    * Returns an assocative array representing the entity object. This 
+    * assocative array has the following elements and types:
+    * id String
+    * label String
+    * originator String
+    * organization String 
+    * type String
+    * genericType String
+    * x Int
+    * y Int
+    * parent String
+    * links String[]
+    * subDataFlowDiagram String
+    * 
+    * @return Mixed
+    */
+   public function getAssociativeArray()
+   {
+       $subDFDNodeArray = parent::getAssociativeArray();
+       $subDFDNodeArray['subDataFlowDiagram'] = $this->subDataFlowDiagram;
+       
+       return $subDFDNodeArray;
+   }
 
    //</editor-fold>
    //<editor-fold desc="overriding functions" defaultstate="collapsed">
@@ -85,58 +110,37 @@ class SubDFDNode extends Node
 */
    public function addLink($newLink)
    {
-      if ($newLink instanceof DataFlow)
-      {
-         array_push($this->links, $newLink);
-         $this->subDataFlowDiagram->addExternalLink($newLink);
-      }
-      else
-      {
-         throw new BadFunctionCallException("input parameter was not a DataFlow");
-      }
+       parent::addLink($newLink);
+       // Check if this is equal to null - if it is, this can't happen yet
+       // This function as such must be called when a new DFD is linked up to
+       // this subDFDNode
+       if ($this->subDataFlowDiagram !== NULL)
+       {
+            if (is_subclass_of($newLink, "Link"))
+            {
+                $this->subDataFlowDiagram->addExternalLink($newLink);
+            }
+            else
+            {
+               throw new BadFunctionCallException("Input parameter was not a Link");
+            }
+       }
    }
 
-   /**
-* removes a specified DataFlow from the list of links
+/**
+* Removes a specified DataFlow from the list of links
 * @param type $link the link to be removed
 * @return boolean if the link was in the array
 * @throws BadFunctionCallException if the input was not a DataFlow
 */
    public function removeLink($link)
    {
-      if ($link instanceof DataFlow)
-      {
-         //find if the link is in the list and get its location if it is
-         $loc = array_search($link, $this->links, true);
-         if ($loc !== false)
-         {
-            //remove the link from the list
-            unset($this->links[$loc]);
-            //normalize the indexes of the list
-            $this->links = array_values($this->links);
-            $this->subDataFlowDiagram->removeExternalLink($link);
-            //code to find if this Node is the DataFlows orgin or destination
-            if ($this->isOrigin($link) == true)
-            {
-               //clear the origin of the link
-               $link->clearOriginNode();
-            }
-            else
-            {
-               // clear the destination of the link
-               $link->clearDestinationNode();
-            }
-            return true;
-         }
-         else
-         {
-            return false;
-         }
-      }
-      else
-      {
-         throw new BadFunctionCallException("input parameter was not a DataFlow");
-      }
+       // If removed the link from the Node object and subDFD exists, remove from
+       // the subDFD
+       if (parent::removeLinks() && $this->subDataFlowDiagram != NULL)
+       {
+           $this->subDataFlowDiagram->removeExternalLink($link);
+       }
    }
 
    //</editor-fold>
@@ -149,7 +153,7 @@ class SubDFDNode extends Node
        // Call the Node object save function to do most of the work
        parent::save();
       // Call storage object's saveSubDFDNode
-       $this->storage->saveSubDFDNode($this->parent, $this->id);
+       $this->storage->saveSubDFDNode($this->subDataFlowDiagram, $this->id);
    }
 
    /**
@@ -169,7 +173,9 @@ class SubDFDNode extends Node
     */
    public function update()
    {
-       $this->delete();
+       // Cannot call removeAllLinks in Node delete function
+       $this->storage->deleteSubDFDNode($this->id);
+       $this->storage->deleteNode($this->id);
        $this->save();
    }
    //</editor-fold>
