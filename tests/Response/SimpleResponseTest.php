@@ -43,7 +43,7 @@ class SimpleResponseTest extends PHPUnit_Framework_TestCase
             "originator" => "The Eugene",
             "organization" => "DEdC",
             "type" => "DataFlowDiagram",
-            "genericType" => "DataFlowDiagram",
+            "genericType" => "Diagram",
             "ancestry" => array("AB", "th65"),
             "nodeList" => array(array("id" => "aoeu654", "type" => "Process", "label" => "SomeProcess", "x" => "3", "y" => "4"), 
                 array("id" => "iuoa8", "type" => "DataStore", "label" => "SomeDataStore", "x" => "8", "y" => "22")),
@@ -61,6 +61,7 @@ class SimpleResponseTest extends PHPUnit_Framework_TestCase
     "type": "{$dfdArray['type']}",
     "originator": "{$dfdArray['originator']}",
     "genericType": "{$dfdArray['genericType']}",
+    "subDFDNode": "{$dfdArray['subDFDNode']}",
     "nodes": 
     [
         {

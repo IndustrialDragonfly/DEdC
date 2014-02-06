@@ -121,6 +121,7 @@ EOT;
     "type": "{$this->rawData['type']}",
     "originator": "{$this->rawData['originator']}",
     "genericType": "{$this->rawData['genericType']}",
+    "subDFDNode": "{$this->rawData['subDFDNode']}",
     "nodes": 
     [
 {$nodeList}

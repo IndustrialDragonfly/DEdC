@@ -11,6 +11,7 @@ Definition for a DFD (note there are no nested DFDs in this definition)
     "type": "string",
     "originator": "string",
     "genericType": "string",
+    "subDFDNode": "string",
     "nodes": 
     [
         {
