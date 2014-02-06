@@ -1,14 +1,14 @@
 <?php
 
-require_once '../Entity.php';
-require_once '../Multiprocess.php';
+require_once 'Entity.php';
+require_once 'Multiprocess.php';
 /**
 * Description of DataFlowDiagram
 *
 * @author Josh Clark
 * @author Eugene Davis
 */
-class DataFlowDiagram extends Entity
+class DataFlowDiagram extends Diagram
 {
    //<editor-fold desc="Attributes" defaultstate="collapsed">
     /**
@@ -65,12 +65,14 @@ class DataFlowDiagram extends Entity
    {
       parent::__construct();
       $this->storage = func_get_arg(0);
+      $this->nodeList = array();
+      $this->linkList = array();
+      $this->subDFDNodeList = array();
       // If there is only one argument (the storage object) then this is a
       // root DFD
       // DataFlowDiagram($storage)
       if (func_num_args() == 1)
       {
-         $this->elementList = array();
          $this->parentStack = null;
          $this->subDFDNode = null;
       }
@@ -79,7 +81,6 @@ class DataFlowDiagram extends Entity
       else if (func_num_args() == 2 && 
               is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "SubDFDNode"))
       {
-           $this->elementList = array();
            $this->subDFDNode = func_get_arg(1);
            
            // Initialize the linked SubDFDNode so we can get its parent and link
@@ -101,7 +102,6 @@ class DataFlowDiagram extends Entity
       else if (func_num_args() == 2 && 
               is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DataFlowDiagram"))
       {
-         $this->elementList = array();
          $this->id = func_get_arg(1);
          $vars = $this->storage->loadDFD($this->id);
          
