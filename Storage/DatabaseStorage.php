@@ -444,9 +444,20 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $loadDFD->bindParam(1, $id);
          $loadDFD->execute();
          $vars = $loadDFD->fetch();
+         
+         // Must be a root DFD, try without the subdfdnode table
          if($vars == FALSE )
          {
-            throw new BadFunctionCallException("no matching id found in entity DB");
+             $loadDFD = $this->dbh->prepare("SELECT * 
+                FROM entity id
+                WHERE id=?");
+            $loadDFD->bindParam(1, $id);
+            $loadDFD->execute();
+            $vars = $loadDFD->fetch();
+            if($vars == FALSE )
+            {
+                throw new BadFunctionCallException("no matching id found in entity DB");
+            }
          }
          
          // Get the nodes list from the database
