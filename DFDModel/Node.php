@@ -1,5 +1,7 @@
 <?php
+
 require_once 'Element.php';
+require_once 'BadConstructorCallException.php';
 /**
  * Node is the abstract class that governs all node objects, like process, datastore
  * etc. For all storage access methods, they could currently go in the Element
@@ -10,228 +12,237 @@ require_once 'Element.php';
  * @author Josh Clark
  * @author Eugene Davis
  */
- abstract class Node extends Element
+abstract class Node extends Element
 {
-   //<editor-fold desc="Attributes" defaultstate="collapsed">
-   protected $linkList;
-   //</editor-fold>
-   
-   //<editor-fold desc="Constructor" defaultstate="collapsed">
-   /**
-    * constructor. if no arguments are specified a new object is created with
-    * a random id. if three arguments are specified, the oject is loaded from the
-    * DB if an entry with a matching id exists
-    * @param ReadStorable $datastore
-    * @param string $id
-    * @param string $parent (DataFlowDiagram ID)
-    */
-   public function __construct()
-   {
-      parent::__construct();
-      $this->linkList = array();
-      $this->storage = func_get_arg(0);
+    //<editor-fold desc="Attributes" defaultstate="collapsed">
+    protected $linkList;
 
-      // Find if the type of the second argument is DFD, if so, its a new DFD
-      if (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Diagram"))
-      {
-        $this->parent = func_get_arg(1);
-      }
-      //if the type of the second argument is not a DFD, then load from DB
-      elseif(is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Node"))
-      {
-         $this->id = func_get_arg(1);
-         
-         $vars = $this->storage->loadNode($this->id);
-         
-         // Potentially this section could be rewritten using a foreach loop
-         // on the array and reflection on the current node to determine
-         // what it should store locally
-         $this->label = $vars['label'];
-         $this->originator = $vars['originator'];
-         $this->x = $vars['x'];
-         $this->y = $vars['y'];
-         $this->linkList = $vars['linkList'];
-         $this->parent = $vars['dfd_id'];
-      }
-   }
+    //</editor-fold>
+    //<editor-fold desc="Constructor" defaultstate="collapsed">
+    /**
+     * This is a constructor that takes in 2 parameters.  The first parameter is 
+     * always a valid storage medium.  the second paramenter is either the UUID 
+     * of a Diagram or a UUID of a node decended object to load.  
+     * @param ReadStorable $datastore
+     * @param string $id
+     * @param string $parent (DataFlowDiagram ID)
+     */
+    public function __construct()
+    {
+        if (func_num_args() == 2 )
+        {
+            parent::__construct();
+            $this->linkList = array();
+            $this->storage = func_get_arg(0);
 
-   //</editor-fold>
-   
-   //<editor-fold desc="Accessor functions" defaultstate="collapsed">
-   
-   /**
-    * function that gets the number of links that connect to this node
-    * @return int the number of links 
-    */
-   public function getNumberOfLinks()
-   {
-      return count($this->linkList);
-   }
-   
-   /**
-    * Function that return the links that connect to a node
-    * @return string[] an array of all the uuid of the links to this node
-    */
-   public function getLinks()
-   {
-       return $this->linkList;
-   }
-   
-   /**
-    * Function that adds a new link to the list of links
-    * Should ONLY be called by a object descended from Link, otherwise may
-    * break DFD
-    * 
-    * @param DataFlow $newLink
-    * @throws BadFunctionCallException
-    */
-   public function addLink($newLink)
-   {
-       // Check that it is a link, and that it isn't already in the array
-       // This allows either link or node to add link, without going into
-       // infinite look
-      if(is_subclass_of($newLink, "Link"))
-      {
-          if (!array_search($newLink->getId(), $this->linkList))
-          {
-            array_push($this->linkList, $newLink->getId());
-          }
-      }
-      else
-      {
-         throw new BadFunctionCallException("Input parameter was not a Link");
-      }
-   }
-      
-   /**
-    * Returns a specified link based upon where it is in the list
-    * @param type $index integer
-    * @return type DataFlow
-    * @throws BadFunctionCallException if the value was out of bounds
-    */
-   public function getLinkbyPosition($index)
-   {
-      if ($index <= count($this->linkList) -1 && $index >= 0)
-      {
-         return $this->linkList[$index];
-      }
-      else
-      {
-         throw new BadFunctionCallException("input parameter was out of bounds");
-      }
-   }
-   
-   /**
-    * a function that searches the list of DataFlows and returns one with a matching id
-    * @param type $linkId
-    * @return a DataFlow that has an id matching the specified one, will return null if not specified
-    */
-   public function getLinkbyId($linkId)
-   {
-      for ($i = 0; $i < count($this->linkList); $i++)
-      {
-         if($this->linkList[$i] == $linkId)
-         {
-            return $this->linkList[$i];
-         }
-      }
-      return null;
-   }
-   
-   /**
-    * Returns an assocative array representing the entity object. This 
-    * assocative array has the following elements and types:
-    * id String
-    * label String
-    * originator String
-    * organization String 
-    * type String
-    * genericType String
-    * x Int
-    * y Int
-    * parent String
-    * links String[]
-    * 
-    * @return Mixed[]
-    */
-   public function getAssociativeArray()
-   {
-       $nodeArray = parent::getAssociativeArray();
-       $nodeArray['linkList'] = $this->linkList;
+            // Find if the type of the second argument is DFD, if so, its a new DFD
+            if (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Diagram"))
+            {
+                $this->parent = func_get_arg(1);
+            }
+            //if the type of the second argument is not a DFD, then load from DB
+            elseif (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Node"))
+            {
+                $this->id = func_get_arg(1);
 
-       return $nodeArray;
-   }
-   //</editor-fold>
-    
+                $vars = $this->storage->loadNode($this->id);
+
+                // Potentially this section could be rewritten using a foreach loop
+                // on the array and reflection on the current node to determine
+                // what it should store locally
+                $this->label = $vars['label'];
+                $this->originator = $vars['originator'];
+                $this->x = $vars['x'];
+                $this->y = $vars['y'];
+                $this->linkList = $vars['linkList'];
+                $this->parent = $vars['dfd_id'];
+            }
+            else
+            {
+                throw new BadConstructorCallException("Passed id was neither a valid Diagram or a Node");
+            }
+        }
+        else
+        {
+            throw new BadConstructorCallException("Wrong number of imput parameters were passed to this constructor");
+        }
+    }
+
+    //</editor-fold>
+    //<editor-fold desc="Accessor functions" defaultstate="collapsed">
+
     /**
-    * removes a specified DataFlow from the list of links
-    * Should only be called by Link object
-    * @param type $link the link to be removed
-    * @return boolean if the link was in the array
-    * @throws BadFunctionCallException if the input was not a DataFlow
-    */   
-   public function removeLink($link)
-   {
-      if(is_subclass_of($link, "Link"))
-      {
-         //find if the link is in the list and get its location if it is
-         $loc = array_search($link->getId(), $this->linkList);
-         if ($loc !== FALSE)
-         {
-            
-            //remove the link from the list
-            unset($this->linkList[$loc]);
-            //normalize the indexes of the list
-            $this->linkList = array_values($this->linkList);
-            return true;
-         }
-         else
-         {
-            throw new BadFunctionCallException("Input parameter not contained in Node");
-         }
-      }
-      else
-      {
-         throw new BadFunctionCallException("Input parameter was not descended from Link");
-      }
-   }
-   
+     * function that gets the number of links that connect to this node
+     * @return int the number of links 
+     */
+    public function getNumberOfLinks()
+    {
+        return count($this->linkList);
+    }
+
     /**
-    * function that removes every link to this node, used when deleting a node
-    */
-   public function removeAllLinks()
-   {
-       // Counts down to avoid any ambigutity with unsetting of things in
-       // links
-       for ($i = count($this->linkList); $i > 0; $i--)
-       {
-           $type = $this->storage->getTypeFromUUID($this->linkList[0]);
-           $link = new $type($this->storage, $this->linkList[0]);
-           $link->removeNode($this);
-           $link->update();
-           // The call to link will actually call removeLink in this node
-           // cleaning itself out - because Link descendents objects are the ONLY 
-           // objects that can call removeLink
-       }
-       // Previous code probably needs to get a result from link
-       // before calling this part of code - since this is meant
-       // for in memory usauge only, as the database should already
-       // have been updated to reflected
-       unset($this->linkList);
-       $this->linkList = array();
-   }
-   
-   //<editor-fold desc="Save/Delete/Update" defaultstate="collapsed">
+     * Function that return the links that connect to a node
+     * @return string[] an array of all the uuid of the links to this node
+     */
+    public function getLinks()
+    {
+        return $this->linkList;
+    }
+
     /**
-    * function that will save this object to the data store
+     * Function that adds a new link to the list of links
+     * Should ONLY be called by a object descended from Link, otherwise may
+     * break DFD
+     * 
+     * @param DataFlow $newLink
+     * @throws BadFunctionCallException
+     */
+    public function addLink($newLink)
+    {
+        // Check that it is a link, and that it isn't already in the array
+        // This allows either link or node to add link, without going into
+        // infinite look
+        if (is_subclass_of($newLink, "Link"))
+        {
+            if (!array_search($newLink->getId(), $this->linkList))
+            {
+                array_push($this->linkList, $newLink->getId());
+            }
+        }
+        else
+        {
+            throw new BadFunctionCallException("Input parameter was not a Link");
+        }
+    }
+
+    /**
+     * Returns a specified link based upon where it is in the list
+     * @param type $index integer
+     * @return type DataFlow
+     * @throws BadFunctionCallException if the value was out of bounds
+     */
+    public function getLinkbyPosition($index)
+    {
+        if ($index <= count($this->linkList) - 1 && $index >= 0)
+        {
+            return $this->linkList[$index];
+        }
+        else
+        {
+            throw new BadFunctionCallException("input parameter was out of bounds");
+        }
+    }
+
+    /**
+     * a function that searches the list of DataFlows and returns one with a matching id
+     * @param type $linkId
+     * @return a DataFlow that has an id matching the specified one, will return null if not specified
+     */
+    public function getLinkbyId($linkId)
+    {
+        for ($i = 0; $i < count($this->linkList); $i++)
+        {
+            if ($this->linkList[$i] == $linkId)
+            {
+                return $this->linkList[$i];
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns an assocative array representing the entity object. This 
+     * assocative array has the following elements and types:
+     * id String
+     * label String
+     * originator String
+     * organization String 
+     * type String
+     * genericType String
+     * x Int
+     * y Int
+     * parent String
+     * links String[]
+     * 
+     * @return Mixed[]
+     */
+    public function getAssociativeArray()
+    {
+        $nodeArray = parent::getAssociativeArray();
+        $nodeArray['linkList'] = $this->linkList;
+
+        return $nodeArray;
+    }
+
+    //</editor-fold>
+
+    /**
+     * removes a specified DataFlow from the list of links
+     * Should only be called by Link object
+     * @param type $link the link to be removed
+     * @return boolean if the link was in the array
+     * @throws BadFunctionCallException if the input was not a DataFlow
+     */
+    public function removeLink($link)
+    {
+        if (is_subclass_of($link, "Link"))
+        {
+            //find if the link is in the list and get its location if it is
+            $loc = array_search($link->getId(), $this->linkList);
+            if ($loc !== FALSE)
+            {
+
+                //remove the link from the list
+                unset($this->linkList[$loc]);
+                //normalize the indexes of the list
+                $this->linkList = array_values($this->linkList);
+                return true;
+            }
+            else
+            {
+                throw new BadFunctionCallException("Input parameter not contained in Node");
+            }
+        }
+        else
+        {
+            throw new BadFunctionCallException("Input parameter was not descended from Link");
+        }
+    }
+
+    /**
+     * function that removes every link to this node, used when deleting a node
+     */
+    public function removeAllLinks()
+    {
+        // Counts down to avoid any ambigutity with unsetting of things in
+        // links
+        for ($i = count($this->linkList); $i > 0; $i--)
+        {
+            $type = $this->storage->getTypeFromUUID($this->linkList[0]);
+            $link = new $type($this->storage, $this->linkList[0]);
+            $link->removeNode($this);
+            $link->update();
+            // The call to link will actually call removeLink in this node
+            // cleaning itself out - because Link descendents objects are the ONLY 
+            // objects that can call removeLink
+        }
+        // Previous code probably needs to get a result from link
+        // before calling this part of code - since this is meant
+        // for in memory usauge only, as the database should already
+        // have been updated to reflected
+        unset($this->linkList);
+        $this->linkList = array();
+    }
+
+    //<editor-fold desc="Save/Delete/Update" defaultstate="collapsed">
+    /**
+     * function that will save this object to the data store
      * 
      * @param WriteStorable $dataStore
-    */
+     */
     public function save()
     {
-        $this->storage->saveNode($this->id, $this->label, get_class($this), 
-                $this->originator, $this->x, $this->y, $this->linkList, 
-                $this->getNumberOfLinks(), $this->parent);
+        $this->storage->saveNode($this->id, $this->label, get_class($this), $this->originator, $this->x, $this->y, $this->linkList, $this->getNumberOfLinks(), $this->parent);
     }
 
     /**
@@ -243,11 +254,11 @@ require_once 'Element.php';
     {
         // Remove all links
         $this->removeAllLinks();
-        
+
         // Delete node itself
         $this->storage->deleteNode($this->id);
     }
-    
+
     /**
      * Updates the node with new information. For now, it cheats by just deleting
      * then recreating the node
@@ -259,6 +270,7 @@ require_once 'Element.php';
         $this->storage->deleteNode($this->id);
         $this->save();
     }
+
     //</editor-fold>
 }
 ?>

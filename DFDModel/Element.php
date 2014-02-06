@@ -37,8 +37,8 @@ require_once 'Entity.php';
    
    //<editor-fold desc="Constructor" defaultstate="collapsed">
    /**
-* create a new Element object with a 128 bit random number as an id
-*/
+    * create a new Element object with a 256 bit random number as an id
+    */
    public function __construct()
    {
       parent::__construct();
