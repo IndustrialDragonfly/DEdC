@@ -44,7 +44,7 @@ abstract class Link extends Element
        $this->storage = func_get_arg(0);
 
       // Find if the type of the second argument is DFD, if so, its a new DFD
-      if (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DataFlowDiagram"))
+      if (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Diagram"))
       {
         $this->parent = func_get_arg(1);
       }
@@ -274,7 +274,7 @@ abstract class Link extends Element
    public function getAssociativeArray()
    {
        // Get Entity and Element array
-       $linkArray = parent::getAssocativeArray();
+       $linkArray = parent::getAssociativeArray();
        
        // Add Link Attributes to array
        $linkArray['originNode'] = $this->originNode;

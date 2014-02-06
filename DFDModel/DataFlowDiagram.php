@@ -1,14 +1,14 @@
 <?php
 
-require_once '../Entity.php';
-require_once '../Multiprocess.php';
+require_once 'Entity.php';
+require_once 'Multiprocess.php';
 /**
 * Description of DataFlowDiagram
 *
 * @author Josh Clark
 * @author Eugene Davis
 */
-class DataFlowDiagram extends Entity
+class DataFlowDiagram extends Diagram
 {
    //<editor-fold desc="Attributes" defaultstate="collapsed">
     /**
@@ -65,12 +65,14 @@ class DataFlowDiagram extends Entity
    {
       parent::__construct();
       $this->storage = func_get_arg(0);
+      $this->nodeList = array();
+      $this->linkList = array();
+      $this->subDFDNodeList = array();
       // If there is only one argument (the storage object) then this is a
       // root DFD
       // DataFlowDiagram($storage)
       if (func_num_args() == 1)
       {
-         $this->elementList = array();
          $this->parentStack = null;
          $this->subDFDNode = null;
       }
@@ -79,7 +81,6 @@ class DataFlowDiagram extends Entity
       else if (func_num_args() == 2 && 
               is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "SubDFDNode"))
       {
-           $this->elementList = array();
            $this->subDFDNode = func_get_arg(1);
            
            // Initialize the linked SubDFDNode so we can get its parent and link
@@ -99,9 +100,8 @@ class DataFlowDiagram extends Entity
       // If this is an existing DFD to load, get the ID of the DFD
       // DataFlowDiagram($storage, $DFD)
       else if (func_num_args() == 2 && 
-              is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DataFlowDiagram"))
+              is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Diagram"))
       {
-         $this->elementList = array();
          $this->id = func_get_arg(1);
          $vars = $this->storage->loadDFD($this->id);
          
@@ -217,7 +217,7 @@ class DataFlowDiagram extends Entity
    public function getAssociativeArray()
    {
        // Parent Attributes
-       $dfdArray = parent::getAssocativeArray();
+       $dfdArray = parent::getAssociativeArray();
        
        // DFD Attributes
        $dfdArray['ancestry'] = $this->ancestry;
@@ -225,6 +225,8 @@ class DataFlowDiagram extends Entity
        $dfdArray['linkList'] = $this->linkList;
        $dfdArray['subDFDNodeList'] = $this->subDFDNodeList;
        $dfdArray['subDFDNode'] = $this->subDFDNode;
+       
+       return $dfdArray;
    }
    //</editor-fold>
    //<editor-fold desc="Storage functions" defaultstate="collapsed">
