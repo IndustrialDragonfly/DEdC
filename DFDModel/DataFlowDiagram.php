@@ -1,6 +1,6 @@
 <?php
 
-require_once 'Entity.php';
+require_once 'Diagram.php';
 require_once 'Multiprocess.php';
 /**
  * This is an object that represents a dataflow diagram which consists of a 
