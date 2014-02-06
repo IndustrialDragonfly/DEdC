@@ -174,7 +174,7 @@ class SubDFDNode extends Node
        // Call the Node object save function to do most of the work
        parent::save();
       // Call storage object's saveSubDFDNode
-       $this->storage->saveSubDFDNode($this->parent, $this->id);
+       $this->storage->saveSubDFDNode($this->subDataFlowDiagram, $this->id);
    }
 
    /**
