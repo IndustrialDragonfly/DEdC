@@ -17,7 +17,6 @@ echo <<<EOF
             <script type="text/javascript" src="${web_client_location}js/lib/jquery-layout-resizeTabLayout-1.3.js"></script>
             <script type="text/javascript" src="${web_client_location}js/lib/raphael-2.1.2.js"></script>
             <script type="text/javascript" src="${web_client_location}js/canvas.js"></script>
-            <script type="text/javascript" src="${web_client_location}js/connector.js"></script>
             <script>
                     $(document).ready(function () {
                         DEdC.setupUi(
