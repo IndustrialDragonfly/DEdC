@@ -33,7 +33,9 @@ abstract class Entity
    {
       $length = 256;
       $numberOfBytes = $length/8;
-      return strtr(base64_encode(openssl_random_pseudo_bytes($numberOfBytes)), "+/=", "x");
+      // Replaces all instances of +, = or / in the Base64 string with x
+      return str_replace(array("+", "=", "/"), array("x","x","x"), 
+              base64_encode(openssl_random_pseudo_bytes($numberOfBytes)));
    }
    //</editor-fold>
    
