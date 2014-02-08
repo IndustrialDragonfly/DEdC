@@ -32,10 +32,13 @@ class NodeTest extends PHPUnit_Framework_TestCase
         {
             $this->storage = new DatabaseStorage();
         }
+        
         $this->testDiagram = new DataFlowDiagram($this->storage);
+        $this->testDiagram->save();
         $this->object = new Process($this->storage, $this->testDiagram->getId());
         $this->testDiagram->addNode($this->object);
-        $this->testDiagram->save();
+        $this->object->save();
+        
     }
 
     /**
@@ -44,6 +47,7 @@ class NodeTest extends PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
+        //clear the DB
         $this->testDiagram->delete();
     }
 
@@ -60,7 +64,7 @@ class NodeTest extends PHPUnit_Framework_TestCase
      */
     public function testGetNumberOfLinks_smoke()
     {
-        $aDF = new DataFlow($this->storage);
+        $aDF = new DataFlow($this->storage, $this->object->getParent());
         $this->object->addLink($aDF);
         $this->assertEquals(1, $this->object->getNumberOfLinks());
     }
@@ -70,7 +74,7 @@ class NodeTest extends PHPUnit_Framework_TestCase
      */
     public function testAddLink_smoke()
     {
-        $aDF = new DataFlow($this->storage);
+        $aDF = new DataFlow($this->storage, $this->object->getParent());
         $this->object->addLink($aDF);
         $this->assertEquals(1, $this->object->getNumberOfLinks());
         $annotherDF = $this->object->getLinkbyPosition(0);
@@ -92,7 +96,7 @@ class NodeTest extends PHPUnit_Framework_TestCase
      */
     public function testRemoveLink_smoke()
     {
-        $aDF = new DataFlow($this->storage);
+        $aDF = new DataFlow($this->storage, $this->object->getParent());
         $aDF->setOriginNode($this->object);
         $aDF->save();
         $this->assertEquals(1, $this->object->getNumberOfLinks());
