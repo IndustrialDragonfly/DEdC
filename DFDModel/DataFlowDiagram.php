@@ -58,7 +58,8 @@ class DataFlowDiagram extends Diagram
     * with a matching id exists. If parent is null it is assumed that there are
     * no external links
     * @param Readable/Writable $storage
-    * @param string $id
+    * @param String $id this is the UUID of either the SubDFDNode this is 
+     *                  connected to or the UUID of the DFD to load from storeage 
     */
    public function __construct()
    {
@@ -72,45 +73,54 @@ class DataFlowDiagram extends Diagram
       // DataFlowDiagram($storage)
       if (func_num_args() == 1)
       {
-         $this->parentStack = null;
+         $this->ancestry = null;
          $this->subDFDNode = null;
       }
       // If creating a new DFD connected to a SubDFDNode
       // DataFlowDiagram($storage, $SubDFDNode)
-      else if (func_num_args() == 2 && 
-              is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "SubDFDNode"))
+      else if (func_num_args() == 2 )
       {
-           $this->subDFDNode = func_get_arg(1);
-           
-           // Initialize the linked SubDFDNode so we can get its parent and link
-           // ourselves into it
-           $type = getTypeFromUUID($this->subDFDNode);
-           $subDFDNode = new $type($this->storage);
-           
-           $parentDFD_id = $subDFDNode->getParent();
-           
-           // Initialize the parent DFD and get its ancenstry
-           $type = getTypeFromUUID($parentDFD_id);
-           $parentDFD = new $type($parentDFD_id);
-           $this->ancestry = $parentDFD->getAncestry();
-           // Add immediate parent to stack
-           array_push($this->ancestry, $parentDFD->getId());          
+          if(  is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "SubDFDNode")  ) 
+          {
+            $this->subDFDNode = func_get_arg(1);
+
+             // Initialize the linked SubDFDNode so we can get its parent and link
+             // ourselves into it
+             $type = getTypeFromUUID($this->subDFDNode);
+             $subDFDNode = new $type($this->storage);
+
+             $parentDFD_id = $subDFDNode->getParent();
+
+             // Initialize the parent DFD and get its ancenstry
+             $type = getTypeFromUUID($parentDFD_id);
+             $parentDFD = new $type($parentDFD_id);
+             $this->ancestry = $parentDFD->getAncestry();
+             // Add immediate parent to stack
+             array_push($this->ancestry, $parentDFD->getId());    
+          }
+          // If this is an existing DFD to load, get the ID of the DFD
+          // DataFlowDiagram($storage, $DFD)
+          else if ( is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Diagram") )
+          {
+            $this->id = func_get_arg(1);
+            $vars = $this->storage->loadDFD($this->id);
+
+            // Load up values from the associative array
+            $this->label = $vars['label'];
+            $this->originator = $vars['originator'];
+            $this->nodeList = $vars['nodeList'];
+            $this->linkList = $vars['linkList'];
+            $this->subDFDNodeList = $vars['subDFDNodeList'];
+            $this->ancestry = $vars['ancestry'];
+          }
+          else
+          {
+              throw new BadConstructorCallException('UUID that was passed did not belong to a DFD or subDFDNode');
+          }
       }
-      // If this is an existing DFD to load, get the ID of the DFD
-      // DataFlowDiagram($storage, $DFD)
-      else if (func_num_args() == 2 && 
-              is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Diagram"))
+      else
       {
-         $this->id = func_get_arg(1);
-         $vars = $this->storage->loadDFD($this->id);
-         
-         // Load up values from the associative array
-         $this->label = $vars['label'];
-         $this->originator = $vars['originator'];
-         $this->nodeList = $vars['nodeList'];
-         $this->linkList = $vars['linkList'];
-         $this->subDFDNodeList = $vars['subDFDNodeList'];
-         $this->ancestry = $vars['ancestry'];
+          throw  new BadConstructorCallException('incorect number of parameters was passed to the constructor');
       }
    }
 

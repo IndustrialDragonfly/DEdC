@@ -15,6 +15,11 @@ require_once 'BadConstructorCallException.php';
 abstract class Node extends Element
 {
     //<editor-fold desc="Attributes" defaultstate="collapsed">
+    /**
+     * This is a container which holds the UUIDs of eevry link coming out from 
+     * this node
+     * @var String[]
+     */
     protected $linkList;
 
     //</editor-fold>
@@ -24,8 +29,8 @@ abstract class Node extends Element
      * always a valid storage medium.  the second paramenter is either the UUID 
      * of a Diagram or a UUID of a node decended object to load.  
      * @param ReadStorable $datastore
-     * @param string $id
-     * @param string $parent (DataFlowDiagram ID)
+     * @param string $id    the UUID of either the parent Diagram or the id of the 
+     *                      Node to be loaded
      */
     public function __construct()
     {
@@ -59,7 +64,7 @@ abstract class Node extends Element
             }
             else
             {
-                throw new BadConstructorCallException("Passed id was neither a valid Diagram or a Node");
+                throw new BadConstructorCallException("Passed id was neither a valid Diagram nor a Node");
             }
         }
         else
