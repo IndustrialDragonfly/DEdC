@@ -109,7 +109,7 @@ abstract class Node extends Element
         // infinite look
         if (is_subclass_of($newLink, "Link"))
         {
-            if (!array_search($newLink->getId(), $this->linkList))
+            //if (!array_search($newLink->getId(), $this->linkList))
             {
                 array_push($this->linkList, $newLink->getId());
             }
@@ -190,11 +190,16 @@ abstract class Node extends Element
      */
     public function removeLink($link)
     {
+        
         if (is_subclass_of($link, "Link"))
         {
+            var_dump($this->linkList);
+            var_dump($link->getId());
             //find if the link is in the list and get its location if it is
-            $loc = array_search($link->getId(), $this->linkList);
+            $loc = array_search($link->getId(), $this->linkList, True);
+            var_dump($loc);
             if ($loc !== FALSE)
+            if (FALSE !== array_search($link->getId(), $this->linkList, False))
             {
 
                 //remove the link from the list

@@ -96,11 +96,15 @@ class NodeTest extends PHPUnit_Framework_TestCase
      */
     public function testRemoveLink_smoke()
     {
+        $someDF = new DataFlow($this->storage, $this->object->getParent());
+        $this->object->addLink($someDF);
         $aDF = new DataFlow($this->storage, $this->object->getParent());
         $aDF->setOriginNode($this->object);
         $aDF->save();
-        $this->assertEquals(1, $this->object->getNumberOfLinks());
+        $this->assertEquals(2, $this->object->getNumberOfLinks());
         // Only Links can break a linkage
+        var_dump($this->object->getLinks());
+        var_dump($aDF->getId());
         $aDF->removeNode($this->object);
         $this->assertEquals(0, $this->object->getNumberOfLinks());
         $this->assertNull($aDF->getOriginNode());
