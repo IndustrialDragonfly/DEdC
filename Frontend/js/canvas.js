@@ -263,6 +263,16 @@ Raphael.st.draggable = function (callback, element) {
             // If GET is successful, load SimpleMediaType DFD
             var onSuccess = function (response) {
                 var canvas = createNewTab(response.getData().label);
+                
+                // Set the DFD view's datamodel
+                canvas.setData({
+                    "id": response.getData().id,
+                    "label": response.getData().label,
+                    "type": response.getData().type,
+                    "originator": response.getData().originator,
+                    "genericType": response.getData().genericType,
+                    "subDFDNode": response.getData().subDFDNode
+                });
 
                 response.getData().nodes.forEach(function (entry) {
                     loadElement(canvas, entry);
@@ -310,7 +320,13 @@ Raphael.st.draggable = function (callback, element) {
 
             // Set the text label and id for the element
             e.setText(entry.label);
-            e.setId(entry.id);
+            e.setData({
+                "id": entry.id,
+                "type": entry.type
+                //"label": entry.label, // These will be pulled from the graphical representation
+                //"x": entry.x,
+                //"y": entry.y
+            });
         };
         
         /**
@@ -323,7 +339,15 @@ Raphael.st.draggable = function (callback, element) {
             var d = canvas.addDataflowById(entry.origin_id, entry.dest_id);
             
             // Set the Dataflow's id and text label
-            d.setId(entry.id);
+            d.setData({
+                "id": entry.id,
+                "type": entry.type
+                //"label": entry.label, // These will be pulled from the graphical representation
+                //"x": entry.x,
+                //"y": entry.y
+                //"origin_id": entry.origin_id,
+                //"dest_id": entry.dest_id
+            });            
             d.setText(entry.label);
         };
         
@@ -390,7 +414,10 @@ Raphael.st.draggable = function (callback, element) {
     function Canvas(container, width, height) {
         // Create canvas with Raphael with given arguments
         var paper = Raphael(container, width, height);
-
+        
+        // Datamodel
+        var myData;
+        
         // Element and Dataflow arrays
         var elements = [];
         var dataflows = [];
@@ -413,6 +440,22 @@ Raphael.st.draggable = function (callback, element) {
                 ctrlState = KEYSTATE.UP;
             }
         });
+        
+        /**
+         * Set a data object
+         * @param {Object} data object
+         */
+        this.setData = function (data) {
+            myData = data;
+        };
+        
+        /**
+         * Get the set data object
+         * @returns {Object}
+         */
+        this.getData = function () {
+            return data;
+        };
 
         /**
          * Event called when an Element on the canvas is clicked
@@ -668,9 +711,9 @@ Raphael.st.draggable = function (callback, element) {
                 target;
         
             elements.forEach(function (entry) {
-                if (entry.getId() === sourceId) {
+                if (entry.getData().id === sourceId) {
                     source = entry;
-                } else if (entry.getId() === targetId) {
+                } else if (entry.getData().id === targetId) {
                     target = entry;
                 }
             });
@@ -780,23 +823,23 @@ Raphael.st.draggable = function (callback, element) {
             set = canvas.createSet(), // Raphael.Set for shapes
             textBox,
             hasMoved = false,
-            id;
+            myData;
     
-       /**
-        * Get the Element's id String
-        * @returns {String} id
-        */
-       this.getId = function() {
-           return id;
-       };
-       
-       /**
-        * Set the Element's id String
-        * @param {String} newId Id to set
-        */
-       this.setId = function(newId) {
-           id = newId;
-       };
+        /**
+         * Set a data object
+         * @param {Object} data object
+         */
+        this.setData = function (data) {
+            myData = data;
+        };
+        
+        /**
+         * Get the set data object
+         * @returns {Object}
+         */
+        this.getData = function () {
+            return myData;
+        };
 
         /**
          * Add a shape to the Element
@@ -975,7 +1018,7 @@ Raphael.st.draggable = function (callback, element) {
                 myCanvas = canvas,
                 path,
                 arrow,
-                id,
+                myData,
                 textBox,
                 sourcePoint,
                 targetPoint;
@@ -996,21 +1039,21 @@ Raphael.st.draggable = function (callback, element) {
             }
         };
         
-       /**
-        * Get the Dataflow's id String
-        * @returns {String} id
-        */
-       this.getId = function() {
-           return id;
-       };
-       
-       /**
-        * Set the Dataflows's id String
-        * @param {String} newId Id to set
-        */
-       this.setId = function(newId) {
-           id = newId;
-       };
+        /**
+         * Set a data object
+         * @param {Object} data object
+         */
+        this.setData = function (data) {
+            myData = data;
+        };
+        
+        /**
+         * Get the set data object
+         * @returns {Object}
+         */
+        this.getData = function () {
+            return myData;
+        };
        
        /**
          * Set the text label for the element
