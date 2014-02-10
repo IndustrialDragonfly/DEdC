@@ -52,11 +52,11 @@ CREATE TABLE IF NOT EXISTS `element` (
 --
 
 INSERT INTO `element` (`id`, `x`, `y`) VALUES
-('cabumEiAZdExZKbHDaumNT9KEoN0lwUJZwgyISIDre4x', 20, 50),
-('hClaOolenANwol8HZhcIK7ulTfDiEwFtRM2CMo9Ppxgx', 15, 22),
-('mmWyh0gmygRejKr2meuRGSfLAl9oceUAhrG7foCquFox', 30, 50),
-('nDnIae2poYlZu6x87lYuoSg7XYZ8jmxpx6xthnrp3qcx', 35, 10),
-('TgRGVyTIh0srk2zw7OndjUx9AcyNx4AymEWiOMnDMPwx', 10, 50);
+('cabumEiAZdExZKbHDaumNT9KEoN0lwUJZwgyISIDre4x', 100, 100),
+('hClaOolenANwol8HZhcIK7ulTfDiEwFtRM2CMo9Ppxgx', 100, 200),
+('mmWyh0gmygRejKr2meuRGSfLAl9oceUAhrG7foCquFox', 200, 100),
+('nDnIae2poYlZu6x87lYuoSg7XYZ8jmxpx6xthnrp3qcx', 500, 200),
+('TgRGVyTIh0srk2zw7OndjUx9AcyNx4AymEWiOMnDMPwx', 500, 100);
 
 -- --------------------------------------------------------
 
