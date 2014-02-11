@@ -190,7 +190,7 @@ Raphael.st.draggable = function (callback, element) {
 
         /**
          * Create a new DFD view tab
-         * @param {string} Name of the tab (optional)
+         * @param {string} name of the tab (optional)
          * @returns {canvas} Canvas that was created in the tab
          */
         var createNewTab = function (name) {
@@ -263,28 +263,7 @@ Raphael.st.draggable = function (callback, element) {
             // If GET is successful, load SimpleMediaType DFD
             var onSuccess = function (response) {
                 var canvas = createNewTab(response.getData().label);
-                
-                // Set the DFD view's datamodel
-                canvas.setData({
-                    "id": response.getData().id,
-                    "label": response.getData().label,
-                    "type": response.getData().type,
-                    "originator": response.getData().originator,
-                    "genericType": response.getData().genericType,
-                    "subDFDNode": response.getData().subDFDNode
-                });
-
-                response.getData().nodes.forEach(function (entry) {
-                    loadElement(canvas, entry);
-                });
-                
-                response.getData().subDFDNodes.forEach(function (entry) {
-                    loadElement(canvas, entry);
-                });
-                
-                response.getData().links.forEach(function (entry) {
-                    loadDataflow(canvas, entry);
-                });
+                ElementFactory.loadDfd(canvas, response);
             };
 
             // If GET is not successful
@@ -295,60 +274,6 @@ Raphael.st.draggable = function (callback, element) {
 
             // Execute the GET request
             Connector.get(url, onSuccess, onFail);
-        };
-        
-        /**
-         * Load an Element from the data model object
-         * @param {Canvas} canvas The DFD view to add the element to
-         * @param {Object} entry Datamodel representation of element
-         */
-        var loadElement = function(canvas, entry) {
-            var e;
-            // Add an element at the x,y position
-            if (entry.type === ELETYPE.PROCESS.name) {
-                e = canvas.addProcess(entry.x, entry.y);
-            } else if (entry.type === ELETYPE.MULTIPROCESS.name) {
-                e = canvas.addMultiProcess(entry.x, entry.y);
-            } else if (entry.type === ELETYPE.DATASTORE.name) {
-                e = canvas.addDatastore(entry.x, entry.y);
-            } else if (entry.type === ELETYPE.EXTINTERACTOR.name) {
-                e = canvas.addExtInteractor(entry.x, entry.y);
-            } else {
-                console.log("\"" + entry.type + "\" was not a recognized element type.");
-                return;
-            }
-
-            // Set the text label and id for the element
-            e.setText(entry.label);
-            e.setData({
-                "id": entry.id,
-                "type": entry.type
-                //"label": entry.label, // These will be pulled from the graphical representation
-                //"x": entry.x,
-                //"y": entry.y
-            });
-        };
-        
-        /**
-         * Load a Dataflow into the given canvas
-         * @param {Canvas} canvas The DFD view to add the Dataflow to
-         * @param {Object} entry Datamodel representation of element
-         */
-        var loadDataflow = function(canvas, entry) {
-            // Connect Dataflow by the Elements' ids
-            var d = canvas.addDataflowById(entry.origin_id, entry.dest_id);
-            
-            // Set the Dataflow's id and text label
-            d.setData({
-                "id": entry.id,
-                "type": entry.type
-                //"label": entry.label, // These will be pulled from the graphical representation
-                //"x": entry.x,
-                //"y": entry.y
-                //"origin_id": entry.origin_id,
-                //"dest_id": entry.dest_id
-            });            
-            d.setText(entry.label);
         };
         
         // Expose methods to be public
@@ -1216,7 +1141,7 @@ Raphael.st.draggable = function (callback, element) {
      * Base Response for requests
      * @constructor
      */
-    var Response = function () {
+    function Response() {
         var me = this;
         var myStatus = null;
         var myData = null;
@@ -1276,6 +1201,106 @@ Raphael.st.draggable = function (callback, element) {
             return me;
         };
     };
+    
+    /**
+     * This will handle the dirty work of translating the datamodel JSON objects into their visual counterparts
+     */
+    var ElementFactory = (function() {
+        /**
+         * Load a DFD from the given Response object
+         * @param {Canvas} canvas object to load Dfd into
+         * @param {Response} response Response from the GET Dfd request
+         */
+        var publicLoadDfd = function (canvas, response) {
+            // TODO: Check type to make sure it's a dataflow
+            
+            // Set the DFD view's datamodel
+            canvas.setData({
+                "id": response.getData().id,
+                "label": response.getData().label,
+                "type": response.getData().type,
+                "originator": response.getData().originator,
+                "genericType": response.getData().genericType,
+                "subDFDNode": response.getData().subDFDNode
+            });
+
+            response.getData().nodes.forEach(function (entry) {
+                publicLoadElement(canvas, entry);
+            });
+
+            response.getData().subDFDNodes.forEach(function (entry) {
+                // TODO: Handle subDFDNodes
+                publicLoadElement(canvas, entry);
+            });
+
+            response.getData().links.forEach(function (entry) {
+                publicLoadDataflow(canvas, entry);
+            });
+        };
+                
+        /**
+         * Load an Element from the data model object
+         * @param {Canvas} canvas The DFD view to add the element to
+         * @param {Object} entry Datamodel representation of element
+         */
+        var publicLoadElement = function(canvas, entry) {
+            // TODO: Check type to make sure it's an element
+            var e;
+            // Add an element at the x,y position
+            if (entry.type === ELETYPE.PROCESS.name) {
+                e = canvas.addProcess(entry.x, entry.y);
+            } else if (entry.type === ELETYPE.MULTIPROCESS.name) {
+                e = canvas.addMultiProcess(entry.x, entry.y);
+            } else if (entry.type === ELETYPE.DATASTORE.name) {
+                e = canvas.addDatastore(entry.x, entry.y);
+            } else if (entry.type === ELETYPE.EXTINTERACTOR.name) {
+                e = canvas.addExtInteractor(entry.x, entry.y);
+            } else {
+                console.log("\"" + entry.type + "\" was not a recognized element type.");
+                return;
+            }
+
+            // Set the text label and id for the element
+            e.setText(entry.label);
+            e.setData({
+                "id": entry.id,
+                "type": entry.type
+                //"label": entry.label, // These will be pulled from the graphical representation
+                //"x": entry.x,
+                //"y": entry.y
+            });
+        };
+        
+        /**
+         * Load a Dataflow into the given canvas
+         * @param {Canvas} canvas The DFD view to add the Dataflow to
+         * @param {Object} entry Datamodel representation of element
+         */
+        var publicLoadDataflow = function(canvas, entry) {
+            // Connect Dataflow by the Elements' ids
+            var d = canvas.addDataflowById(entry.origin_id, entry.dest_id);
+            
+            // Set the Dataflow's id and text label
+            d.setData({
+                "id": entry.id,
+                "type": entry.type
+                //"label": entry.label, // These will be pulled from the graphical representation
+                //"x": entry.x,
+                //"y": entry.y
+                //"origin_id": entry.origin_id,
+                //"dest_id": entry.dest_id
+            });
+            
+            // Set the text label
+            d.setText(entry.label);
+        };
+         
+        return {
+            loadElement: publicLoadElement,
+            loadDataflow: publicLoadDataflow,
+            loadDfd: publicLoadDfd
+        };
+    })();
 
     /**
      * Connector will handel all Ajax code
@@ -1292,7 +1317,6 @@ Raphael.st.draggable = function (callback, element) {
             $.ajax({
                 accepts: "application/json",
                 url: url,
-                // If async is true, response will be returned before query executes
                 dataType: "json" // Do not let jQuery automatically parse the JSON response
             }).done(function (data, textStatus) {
                 // Request was successful
