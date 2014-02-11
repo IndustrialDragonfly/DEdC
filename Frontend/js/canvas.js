@@ -170,7 +170,15 @@ Raphael.st.draggable = function (callback, element) {
             $(deleteButton).button().click(function () {
                 var c = getCurrentCanvas();
                 if (c) {
-                    c.removeElementFromSelection();
+                    var onSuccess = function(response) {
+                        c.removeElementFromSelection();
+                    };
+                    
+                    var onFail = function(response) {
+                        console.log("Removing element failed. " + response.getError());
+                    };
+                    
+                    Connector.delete("Controller.php/delete/0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx_id", onSuccess, onFail);
                 } else {
                     console.log("No tab currently selected.");
                 }
@@ -1332,6 +1340,26 @@ Raphael.st.draggable = function (callback, element) {
                 failCallback(response);
             });
         };
+        
+        var publicDelete = function (url, successCallback, failCallback) {
+            $.ajax({
+                type: "DELETE",
+                accepts: "application/json",
+                url: url,
+                dataType: "json"
+            }).done(function (data, textStatus) {
+                successCallback(parseJson(data));
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                // Request failed for some reason
+                var response = new Response();
+
+                response.setStatus(textStatus);
+                response.setError("DELETE " + url + " " + jqXHR.status + " (" + jqXHR.statusText + ")");
+
+                failCallback(response);
+
+            });
+        };
 
         /**
          * Parse a JSON object
@@ -1348,7 +1376,8 @@ Raphael.st.draggable = function (callback, element) {
         };
 
         return {
-            get: publicGet
+            get: publicGet,
+            delete: publicDelete
         };
     })();
 
