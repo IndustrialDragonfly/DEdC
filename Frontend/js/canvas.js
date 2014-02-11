@@ -170,7 +170,7 @@ Raphael.st.draggable = function (callback, element) {
             $(deleteButton).button().click(function () {
                 var c = getCurrentCanvas();
                 if (c) {
-                    getCurrentCanvas().removeElementFromSelection();
+                    c.removeElementFromSelection();
                 } else {
                     console.log("No tab currently selected.");
                 }
@@ -235,17 +235,15 @@ Raphael.st.draggable = function (callback, element) {
                     var posx = event.pageX - $(tabContainer).offset().left,
                         posy = event.pageY - $(tabContainer).offset().top;
 
-                    var c = getCurrentCanvas();
-
                     // Check the type of the dropped element and an element to the canvas
                     if ($(ui.draggable).data("type") === ELETYPE.PROCESS) { 
-                        c.addProcess(posx, posy); 
+                        ElementFactory.createElement(getCurrentCanvas(), ELETYPE.PROCESS.name, posx, posy); 
                     } else if ($(ui.draggable).data("type") === ELETYPE.MULTIPROCESS) {
-                        c.addMultiProcess(posx, posy);
+                        ElementFactory.createElement(getCurrentCanvas(), ELETYPE.MULTIPROCESS.name, posx, posy); 
                     } else if ($(ui.draggable).data("type") === ELETYPE.DATASTORE) {
-                        c.addDatastore(posx, posy);
+                        ElementFactory.createElement(getCurrentCanvas(), ELETYPE.DATASTORE.name, posx, posy); 
                     } else if ($(ui.draggable).data("type") === ELETYPE.EXTINTERACTOR) {
-                        c.addExtInteractor(posx, posy);
+                        ElementFactory.createElement(getCurrentCanvas(), ELETYPE.EXTINTERACTOR.name, posx, posy); 
                     } else {
                         console.log("Draggable Element was malformed.");
                     }
@@ -492,131 +490,6 @@ Raphael.st.draggable = function (callback, element) {
         };
 
         /**
-         * Add a process element to the canvas at the given location
-         * @param {number} x - Coordinate in pixels
-         * @param {number} y - Coordinate in pixels
-         * @return {Process} Element on canvas
-         */
-        this.addProcess = function (x, y) {
-            var e = new Element(this, x, y);
-            e.push(paper.add([
-                {
-                    type: "circle",
-                    cx: x,
-                    cy: y,
-                    r: 25
-                }
-            ]));
-            
-            e.applyDefaultStyle();
-            e.draggable();
-
-            elements.push(e);
-
-            return e;
-        };
-
-        /**
-         * Add a multi-process element to the canvas at the given location
-         * @param {number} x - Coordinate in pixels
-         * @param {number} y - Coordinate in pixels
-         * @return {MultiProcess} Element on canvas
-         */
-        this.addMultiProcess = function (x, y) {
-            var e = new Element(this, x, y);
-            e.push(paper.add([
-                {
-                    type: "circle",
-                    cx: x,
-                    cy: y,
-                    r: 25
-                },
-                {
-                    type: "circle",
-                    cx: x,
-                    cy: y,
-                    r: 18
-                }
-            ]));
-            
-            e.applyDefaultStyle();
-            e.draggable();
-
-            elements.push(e);
-
-            return e;
-        };
-
-        /**
-         * Add a datastore element to the canvas at the given location
-         * @param {number} x - Coordinate in pixels
-         * @param {number} y - Coordinate in pixels
-         * @return {Datastore} Element on canvas
-         */
-        this.addDatastore = function (x, y) {
-            var e = new Element(this, x, y);
-            
-            x = x - 25;
-            y = y - 25;
-            
-            e.push(paper.add([
-                {
-                    type: "path",
-                    path: "M" + x + " " + y + " L" + (x + 50) + " " + y + " Z",
-                    "stroke-width": 2
-                },
-                {
-                    type: "path",
-                    path: "M" + x + " " + (y + 50) + " L" + (x + 50) + " " + (y + 50) + " Z",
-                    "stroke-width": 2
-                },
-                {
-                    type: "rect",
-                    x: x,
-                    y: y +1,
-                    width: 50,
-                    height: 48,
-                    "stroke-width": 0,
-                    fill: "#FFF"
-                }
-
-            ]));
-
-            //e.applyDefaultStyle();
-            e.draggable();
-
-            elements.push(e);
-
-            return e;
-        };
-
-        /**
-         * Add a external interactor element to the canvas at the given location
-         * @param {number} x - Coordinate in pixels
-         * @param {number} y - Coordinate in pixels
-         * @return {ExtInteractor} Element on canvas
-         */
-        this.addExtInteractor = function (x, y) {
-            var e = new Element(this, x, y);
-            e.push(paper.add([
-                {
-                    type: "rect",
-                    x: x - 25,
-                    y: y - 25,
-                    width: 50,
-                    height: 50
-                }
-            ]));
-            
-            e.applyDefaultStyle();
-            e.draggable();
-
-            elements.push(e);
-
-            return e;
-        };
-
-        /**
          * Add a dataflow to the cavas between the two elements
          * @param {Element} source - Source of the Dataflow
          * @param {Element} target - Target of the Dataflow
@@ -705,6 +578,24 @@ Raphael.st.draggable = function (callback, element) {
             for (var i = 0; i < dataflows.length; i++) {
                 dataflows[i].calcPath();
             }
+        };
+        
+        /**
+         * Create a new element with the visual representation defined by a JSON array
+         * @param {Object} json JSON array as defined at http://raphaeljs.com/reference.html#Paper.add
+         * @returns {Raphael.Set} Resulting set of elements
+         */
+        this.createFromJsonArray = function (json)
+        {
+            return paper.add(json);
+        };
+        
+        /**
+         * Push a new element onto the DFD view
+         * @param {Element} element Element to add
+         */
+        this.pushElement = function (element) {
+            elements.push(element);
         };
         
         /**
@@ -952,13 +843,16 @@ Raphael.st.draggable = function (callback, element) {
          * Update the position of the text label
          */
         this.updateTextPosition = function () {
+            // If the dataflow actually has text
             if (textBox) {
+                // Calculate mid point
                 var newX = sourcePoint.x + targetPoint.x;
                 var newY = sourcePoint.y + targetPoint.y;
                 
                 newX = newX / 2;
                 newY = newY / 2;
                 
+                // Move textbox to point
                 textBox.attr("x", newX);
                 textBox.attr("y", newY);
             }
@@ -986,6 +880,7 @@ Raphael.st.draggable = function (callback, element) {
          */
         this.setText = function (text) {
             if (!textBox) {
+                // Create the textbox if it doesn't exist
                 var newX = sourcePoint.x + targetPoint.x;
                 var newY = sourcePoint.y + targetPoint.y;
                 
@@ -993,6 +888,7 @@ Raphael.st.draggable = function (callback, element) {
                 newY = newY / 2;
                 textBox = myCanvas.createText(newX, newY, text);
             } else {
+                // Update the text in the box
                 textBox.attr("text", text);
             }
         };
@@ -1203,7 +1099,7 @@ Raphael.st.draggable = function (callback, element) {
     };
     
     /**
-     * This will handle the dirty work of translating the datamodel JSON objects into their visual counterparts
+     * This model handles the dirty part of connecting the datamodel to the visual representation
      */
     var ElementFactory = (function() {
         /**
@@ -1212,7 +1108,7 @@ Raphael.st.draggable = function (callback, element) {
          * @param {Response} response Response from the GET Dfd request
          */
         var publicLoadDfd = function (canvas, response) {
-            // TODO: Check type to make sure it's a dataflow
+            // TODO: Check type to make sure it's a Dfd
             
             // Set the DFD view's datamodel
             canvas.setData({
@@ -1237,6 +1133,121 @@ Raphael.st.draggable = function (callback, element) {
                 publicLoadDataflow(canvas, entry);
             });
         };
+        
+        /**
+         * Create a new Element on canvas
+         * @param {Canvas} canvas Canvas to add element to
+         * @param {String} type The type of the element as a String, ELETYPE.name
+         * @param {type} x
+         * @param {type} y
+         * @returns {Element} Created element
+         */
+        var publicCreateElement = function(canvas, type, x, y) {
+            var e;
+            if (type === ELETYPE.PROCESS.name) {
+                // Create process
+                e = new Element(canvas);
+                e.push(canvas.createFromJsonArray([
+                    {
+                        type: "circle",
+                        cx: x,
+                        cy: y,
+                        r: 25,
+                        fill: "#FFF",
+                        stroke: "#000",
+                        "stroke-width": "2px"
+                    }
+                ]));
+                e.draggable();
+                canvas.pushElement(e);
+            } else if (type === ELETYPE.MULTIPROCESS.name) {
+                // Create multiprocess
+                e = new Element(canvas);
+                e.push(canvas.createFromJsonArray([
+                    {
+                        type: "circle",
+                        cx: x,
+                        cy: y,
+                        r: 25,
+                        fill: "#FFF",
+                        stroke: "#000",
+                        "stroke-width": "2px"
+
+                    },
+                    {
+                        type: "circle",
+                        cx: x,
+                        cy: y,
+                        r: 18,
+                        fill: "#FFF",
+                        stroke: "#000",
+                        "stroke-width": "2px"
+                    }
+                ]));
+                
+                e.draggable();
+                canvas.pushElement(e);            
+            } else if (type === ELETYPE.DATASTORE.name) {
+                // Create datastore
+                e = new Element(canvas);
+
+                // Top left instead of center for boxes
+                var shiftedX = x - 25;
+                var shiftedY = y - 25;
+
+                e.push(canvas.createFromJsonArray([
+                    {
+                        type: "path",
+                        path: "M" + shiftedX + " " + shiftedY + " L" + (shiftedX + 50) + " " + shiftedY + " Z",
+                        stroke: "#000",
+                        "stroke-width": 2
+                    },
+                    {
+                        type: "path",
+                        path: "M" + shiftedX + " " + (shiftedY + 50) + " L" + (shiftedX + 50) + " " + (shiftedY + 50) + " Z",
+                        stroke: "#000",
+                        "stroke-width": 2
+                    },
+                    {
+                        type: "rect",
+                        x: shiftedX,
+                        y: shiftedY + 1,
+                        width: 50,
+                        height: 48,
+                        stroke: "#000",
+                        "stroke-width": 0,
+                        fill: "#FFF"
+                    }
+                ]));
+                e.draggable();
+                canvas.pushElement(e);
+            } else if (type === ELETYPE.EXTINTERACTOR.name) {
+                // Create external interactor
+                e = new Element(canvas);
+                
+                e.push(canvas.createFromJsonArray([
+                    {
+                        type: "rect",
+                        x: x - 25,
+                        y: y - 25,
+                        width: 50,
+                        height: 50,
+                        fill: "#FFF",
+                        stroke: "#000",
+                        "stroke-width": "2px"
+                    }
+                ]));
+                e.draggable();
+                canvas.pushElement(e);
+            } else {
+                // The type was not recognized
+                console.log("\"" + type + "\" was not a recognized element type.");
+                return;
+            }
+            
+            // Return the element
+            return e;
+        };
                 
         /**
          * Load an Element from the data model object
@@ -1245,20 +1256,7 @@ Raphael.st.draggable = function (callback, element) {
          */
         var publicLoadElement = function(canvas, entry) {
             // TODO: Check type to make sure it's an element
-            var e;
-            // Add an element at the x,y position
-            if (entry.type === ELETYPE.PROCESS.name) {
-                e = canvas.addProcess(entry.x, entry.y);
-            } else if (entry.type === ELETYPE.MULTIPROCESS.name) {
-                e = canvas.addMultiProcess(entry.x, entry.y);
-            } else if (entry.type === ELETYPE.DATASTORE.name) {
-                e = canvas.addDatastore(entry.x, entry.y);
-            } else if (entry.type === ELETYPE.EXTINTERACTOR.name) {
-                e = canvas.addExtInteractor(entry.x, entry.y);
-            } else {
-                console.log("\"" + entry.type + "\" was not a recognized element type.");
-                return;
-            }
+            var e = publicCreateElement(canvas, entry.type, entry.x, entry.y);    
 
             // Set the text label and id for the element
             e.setText(entry.label);
@@ -1269,6 +1267,8 @@ Raphael.st.draggable = function (callback, element) {
                 //"x": entry.x,
                 //"y": entry.y
             });
+            
+            return e;
         };
         
         /**
@@ -1298,7 +1298,8 @@ Raphael.st.draggable = function (callback, element) {
         return {
             loadElement: publicLoadElement,
             loadDataflow: publicLoadDataflow,
-            loadDfd: publicLoadDfd
+            loadDfd: publicLoadDfd,
+            createElement: publicCreateElement
         };
     })();
 
