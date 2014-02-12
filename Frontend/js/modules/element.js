@@ -37,9 +37,11 @@ define(function () {
         this.setGraphicByJson = function (json) {
             if (set) {
                 set.remove();
+                set = myCanvas.createFromJsonArray(json);
             } else {
                 set = myCanvas.createFromJsonArray(json);
             }
+            set.mouseup(onMouseClick);
         };
 
         /**
