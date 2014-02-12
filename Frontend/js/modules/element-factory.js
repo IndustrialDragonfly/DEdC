@@ -47,7 +47,7 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
             if (type === globals.ELETYPE.PROCESS.name) {
                 // Create process
                 e = new Element(canvas);
-                e.push(canvas.createFromJsonArray([{
+                e.setGraphicByJson([{
                     type: "circle",
                     cx: x,
                     cy: y,
@@ -55,13 +55,13 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
                     fill: "#FFF",
                     stroke: "#000",
                     "stroke-width": "2px"
-                }]));
+                }]);
                 e.draggable();
                 canvas.pushElement(e);
             } else if (type === globals.ELETYPE.MULTIPROCESS.name) {
                 // Create multiprocess
                 e = new Element(canvas);
-                e.push(canvas.createFromJsonArray([{
+                e.setGraphicByJson([{
                     type: "circle",
                     cx: x,
                     cy: y,
@@ -78,7 +78,7 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
                     fill: "#FFF",
                     stroke: "#000",
                     "stroke-width": "2px"
-                }]));
+                }]);
 
                 e.draggable();
                 canvas.pushElement(e);
@@ -90,7 +90,7 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
                 var shiftedX = x - 25;
                 var shiftedY = y - 25;
 
-                e.push(canvas.createFromJsonArray([{
+                e.setGraphicByJson([{
                     type: "path",
                     path: "M" + shiftedX + " " + shiftedY + " L" + (shiftedX + 50) + " " + shiftedY + " Z",
                     stroke: "#000",
@@ -109,14 +109,14 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
                     stroke: "#000",
                     "stroke-width": 0,
                     fill: "#FFF"
-                }]));
+                }]);
                 e.draggable();
                 canvas.pushElement(e);
             } else if (type === globals.ELETYPE.EXTINTERACTOR.name) {
                 // Create external interactor
                 e = new Element(canvas);
 
-                e.push(canvas.createFromJsonArray([{
+                e.setGraphicByJson([{
                     type: "rect",
                     x: x - 25,
                     y: y - 25,
@@ -125,7 +125,7 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
                     fill: "#FFF",
                     stroke: "#000",
                     "stroke-width": "2px"
-                }]));
+                }]);
                 e.draggable();
                 canvas.pushElement(e);
             } else {
