@@ -1341,6 +1341,12 @@ Raphael.st.draggable = function (callback, element) {
             });
         };
         
+        /**
+         * Ajax DELETE method
+         * @param {type} url Url of resource
+         * @param {type} successCallback Callback to execute on success
+         * @param {type} failCallback Callback to execute on failure
+         */
         var publicDelete = function (url, successCallback, failCallback) {
             $.ajax({
                 type: "DELETE",
@@ -1357,9 +1363,36 @@ Raphael.st.draggable = function (callback, element) {
                 response.setError("DELETE " + url + " " + jqXHR.status + " (" + jqXHR.statusText + ")");
 
                 failCallback(response);
-
             });
         };
+        
+        /**
+         * Ajax PUT method
+         * @param {type} url Url of resource
+         * @param {type} data String or plain object that will be sent
+         * @param {type} successCallback Callback to execute on success
+         * @param {type} failCallback Callback to execute on failure
+         */
+        var publicPut = function(url, data,successCallback, failCallback) {
+            $.ajax({
+                type: "PUT",
+                url: url,
+                data: data,
+                dataType: "json"
+            }).done(function (data, textStatus) {
+                successCallback(parseJson(data));
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                // Request failed for some reason
+                var response = new Response();
+
+                response.setStatus(textStatus);
+                response.setError("DELETE " + url + " " + jqXHR.status + " (" + jqXHR.statusText + ")");
+
+                failCallback(response);
+
+            });
+
+        }
 
         /**
          * Parse a JSON object
@@ -1377,7 +1410,8 @@ Raphael.st.draggable = function (callback, element) {
 
         return {
             get: publicGet,
-            delete: publicDelete
+            delete: publicDelete,
+            put: publicPut
         };
     })();
 
