@@ -6,7 +6,7 @@ require_once "Request.php";
  *
  * @author eugene
  */
-class SimpleRequest extends Request
+class SimpleRequest extends Request implements GETRequestable, DELETERequestable
 {
     public function __construct($accept, $method, $uri)
     {

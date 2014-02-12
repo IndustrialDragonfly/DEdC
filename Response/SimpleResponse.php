@@ -27,10 +27,15 @@ final class SimpleResponse extends Response implements GETResponsable
      * data model
      * @param Mixed[] $data
      */
-    public function __construct($data)
+    public function __construct()
     {
-        $this->setRawData($data);
-        $this->createRepresentation();
+        // Constructor when passed data i.e. GET
+        if (func_get_args() == 1 && is_array(func_get_arg(0)))
+        {
+            $this->setRawData($data);
+            $this->createRepresentation();
+        }
+        // If there is no data, don't do anything, header is set separately
     }
     
     /**
