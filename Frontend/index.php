@@ -10,32 +10,7 @@ echo <<<EOF
             <link rel="stylesheet" type="text/css" href="${web_client_location}css/smoothness/jquery-ui-1.10.3.css"/>
             <link rel="stylesheet" type="text/css" href="${web_client_location}css/jquery-layout-1.3.0-rc30.79.css"/>
             <link rel="stylesheet" type="text/css" href="${web_client_location}css/styles.css"/>
-            <script type="text/javascript" src="${web_client_location}js/lib/jquery-1.10.2.js"></script>
-            <script type="text/javascript" src="${web_client_location}js/lib/jquery-ui-1.10.3.js"></script>
-            <script type="text/javascript" src="${web_client_location}js/lib/jquery-layout-1.3.0-rc30.79.js"></script>
-            <script type="text/javascript" src="${web_client_location}js/lib/jquery-layout-resizeAccordionCallback-1.2.js"></script>
-            <script type="text/javascript" src="${web_client_location}js/lib/jquery-layout-resizeTabLayout-1.3.js"></script>
-            <script type="text/javascript" src="${web_client_location}js/lib/raphael-2.1.2.js"></script>
-            <script type="text/javascript" src="${web_client_location}js/canvas.js"></script>
-            <script>
-                    $(document).ready(function () {
-                        DEdC.setupUi(
-                            "#content", 
-                            "#sidebar1", 
-                            "#users",
-                            "#tabsContainer", 
-                            "#process", 
-                            "#multiprocess", 
-                            "#datastore", 
-                            "#extinteractor", 
-                            "#connect", 
-                            "#delete", 
-                            "#load",
-                            "#newTab"
-                        ); 
-                    });
-            </script>
-
+            <script data-main="${web_client_location}js/app" src="${web_client_location}js/require.js"></script>
     </head>
     <body>
             <div id="header" class="ui-layout-north"><a href="#"><img src="${web_client_location}images/logo.png" width="144" height="57"/></a></div>
