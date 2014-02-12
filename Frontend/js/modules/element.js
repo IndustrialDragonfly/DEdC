@@ -30,6 +30,10 @@ define(function () {
             return myData;
         };
 
+       /**
+        * Create a new element with the visual representation defined by a JSON array
+        * @param {Object} json JSON array as defined at http://raphaeljs.com/reference.html#Paper.add
+        */
         this.setGraphicByJson = function (json) {
             if (set) {
                 set.remove();
