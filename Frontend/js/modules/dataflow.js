@@ -79,7 +79,7 @@ define(function() {
          */
         this.getText = function () {
             if (textBox) {
-                textBox.attr("text");
+                return textBox.attr("text");
             } else {
                 return "";
             }
