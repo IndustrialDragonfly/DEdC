@@ -19,7 +19,7 @@ requirejs.config({
         'jquery-layout-resizeTabLayout': ['jquery-layout'],
         'QUnit': {
             exports: 'QUnit',
-            init: function() {
+            init: function () {
                 QUnit.config.autoload = false;
                 QUnit.config.autostart = false;
             }
@@ -28,11 +28,12 @@ requirejs.config({
 });
 
 // Start the main app logic.
-requirejs(['QUnit', 'modules/tests/responseTest', 'modules/tests/elementTest', 'modules/tests/dataflowTest'], function (QUnit, responseTest, elementTest, dataflowTest) {
+requirejs(['QUnit', 'modules/tests/responseTest', 'modules/tests/elementTest', 'modules/tests/dataflowTest', 'modules/tests/elementFactoryTest'], function (QUnit, responseTest, elementTest, dataflowTest, elementFactoryTest) {
     responseTest.run();
     elementTest.run();
     dataflowTest.run();
-    
+    elementFactoryTest.run();
+
     QUnit.load();
     QUnit.start();
 });
