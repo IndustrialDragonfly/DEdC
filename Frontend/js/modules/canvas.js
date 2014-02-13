@@ -14,7 +14,7 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
     */
    Raphael.st.draggable = function (callback, element) {
        // Cache Set so elements can use it
-       var parent = this;
+       var parent = element.getSet();
        var myElement = element;
 
        // Transform location
@@ -47,9 +47,7 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
            oy = ty;
        };
 
-       this.drag(onMove, onStart, onEnd);
-
-       return this;
+       parent.drag(onMove, onStart, onEnd);
    };
 
     return function Canvas(container, width, height) {

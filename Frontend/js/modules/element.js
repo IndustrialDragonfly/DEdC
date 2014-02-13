@@ -29,6 +29,10 @@ define(function () {
         this.getData = function () {
             return myData;
         };
+        
+        this.getSet = function() {
+            return set;
+        };
 
        /**
         * Create a new element with the visual representation defined by a JSON array
