@@ -28,8 +28,9 @@ requirejs.config({
 });
 
 // Start the main app logic.
-requirejs(['QUnit', 'modules/tests/responseTest'], function (QUnit, responseTest) {
+requirejs(['QUnit', 'modules/tests/responseTest', 'modules/tests/elementTest'], function (QUnit, responseTest, elementTest) {
     responseTest.run();
+    elementTest.run();
     
     QUnit.load();
     QUnit.start();
