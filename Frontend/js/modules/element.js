@@ -8,11 +8,10 @@ define(function () {
     return function Element(canvas) {
         var me = this,
             myCanvas = canvas,
-            // Internal reference to canvas
-            set,
-            // Raphael.Set for shapes
-            textBox, hasMoved = false,
-            myData;
+            set = null,
+            textBox, 
+            hasMoved = false,
+            myData = null;
 
         /**
          * Set a data object
@@ -30,6 +29,10 @@ define(function () {
             return myData;
         };
         
+        /**
+         * Get the internal Raphael.Set
+         * @returns {Raphael.Set}
+         */
         this.getSet = function() {
             return set;
         };
@@ -54,15 +57,6 @@ define(function () {
          */
         this.draggable = function () {
             set.draggable(myCanvas.calcDataflows, me);
-        };
-
-        /**
-         * Style all of the Shapes with the default styling
-         */
-        this.applyDefaultStyle = function () {
-            set.attr("fill", "#FFF");
-            set.attr("stroke", "#000");
-            set.attr("stroke-width", "2px");
         };
 
         /**
@@ -153,7 +147,7 @@ define(function () {
          */
         this.getText = function () {
             if (textBox) {
-                textBox.attr("text");
+                return textBox.attr("text");
             } else {
                 return "";
             }
@@ -184,10 +178,12 @@ define(function () {
         this.remove = function () {
             if (textBox) {
                 textBox.remove();
+                textBox = null;
             }
 
             if (set) {
                 set.remove();
+                set = null;
             }
         };
 
