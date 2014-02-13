@@ -40,7 +40,7 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
      * @param {String} type The type of the element as a String, ELETYPE.name
      * @param {type} x
      * @param {type} y
-     * @returns {Element} Created element
+     * @returns {Element} Created element, or false if the type was not recongnized
      */
     var publicCreateElement = function (canvas, type, x, y) {
             var e;
@@ -131,7 +131,7 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
             } else {
                 // The type was not recognized
                 console.log("\"" + type + "\" was not a recognized element type.");
-                return;
+                return false;
             }
 
             // Return the element
