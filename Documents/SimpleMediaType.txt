@@ -12,7 +12,7 @@ Definition for a DFD (note there are no nested DFDs in this definition)
     "originator": "string",
     "genericType": "string",
     "subDFDNode": "string",
-    "nodes": 
+    "nodeList": 
     [
         {
             "id": "string",
@@ -22,7 +22,7 @@ Definition for a DFD (note there are no nested DFDs in this definition)
             "y": "value"
         }
     ],
-    "links": 
+    "linkList": 
         [
             {
                 "id": "string",
@@ -34,7 +34,7 @@ Definition for a DFD (note there are no nested DFDs in this definition)
                 "y": "value"
             }
         ],
-    "subDFDNodes": 
+    "subDFDNodeList": 
     [
         {
             "id": "string",
@@ -55,7 +55,7 @@ Definition for a single node
     "x": "value",
     "y": "value",
     "originator": "string",
-    "links": 
+    "linkList": 
     [ 
         { 
             "id": "string",
@@ -74,7 +74,7 @@ Definition for a single subDFDNode
     "y": "value",
     "originator": "string",
     "subDFD": "string",
-    "links": 
+    "linkList": 
     [ 
         { 
             "id": "string",

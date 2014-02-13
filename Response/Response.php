@@ -15,6 +15,7 @@ abstract class Response implements Responsable
      * @var String
      */
     protected $header;
+    protected $uuidTag = "_id"; // Tag that identifies a UUID
     
     
     //</editor-fold>
