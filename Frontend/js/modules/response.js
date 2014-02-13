@@ -6,9 +6,9 @@ define(function() {
 
     return function Response() {
        var me = this;
-       var myStatus = null;
+       var myStatus = "";
        var myData = null;
-       var myError = null;
+       var myError = "";
 
        /**
         * Get the status of the Response
