@@ -28,13 +28,13 @@ function addTags($rawData, $tag)
             foreach ($rawData['linkList'] as &$link)
             {
                 $link['id'] = $link['id'] . "_id";
-                $link['origin_id'] = $link['origin_id'] . "_id";
-                $link['dest_id'] = $link['dest_id'] . "_id";
+                $link['originNode'] = $link['originNode'] . "_id";
+                $link['destinationNode'] = $link['destinationNode'] . "_id";
             }
 
-            foreach ($rawData['subDFDNodeList'] as &$subDFDNode)
+            foreach ($rawData['DiaNodeList'] as &$diaNode)
             {
-                $subDFDNode['id'] = $subDFDNode['id'] . "_id";
+                $diaNode['id'] = $diaNode['id'] . "_id";
             }
 
             for ($i = 0; $i < count($rawData['ancestry']); $i++)
@@ -42,19 +42,19 @@ function addTags($rawData, $tag)
                 $rawData['ancestry'][$i] = $rawData['ancestry'][$i] . "_id";
             }
 
-            $rawData['subDFDNode'] = $rawData['subDFDNode'] . "_id";
+            $rawData['diaNode'] = $rawData['diaNode'] . "_id";
             break;
            
-        case "SubDFDNode":
-            $rawData['dfd_id'] = $rawData['dfd_id'] . "_id";
+        case "diaNode":
+            $rawData['diagramId'] = $rawData['diagramId'] . "_id";
             // Intentionally let it fall through to Node so that we only
             // have to write linkList code here once
         case "Node":
             foreach ($rawData['linkList'] as &$link)
             {
                 $link['id'] = $link['id'] . "_id";
-                $link['origin_id'] = $link['origin_id'] . "_id";
-                $link['dest_id'] = $link['dest_id'] . "_id";
+                $link['originNode'] = $link['originNode'] . "_id";
+                $link['destinationNode'] = $link['destinationNode'] . "_id";
             }
             break;
         

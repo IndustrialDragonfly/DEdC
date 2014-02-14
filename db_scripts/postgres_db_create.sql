@@ -51,8 +51,8 @@ ON UPDATE CASCADE
 CREATE TABLE link 
 ( 
 id CHAR(44) NOT NULL, 
-origin_id CHAR(44), 
-dest_id CHAR(44), 
+originNode CHAR(44), 
+destinationNode CHAR(44), 
 PRIMARY KEY (id), 
 FOREIGN KEY (id) 
 REFERENCES entity(id) 
@@ -76,9 +76,9 @@ ON UPDATE CASCADE
 
 CREATE TABLE external_links
 (
-dfd_id CHAR(44) NOT NULL,
+diagramId CHAR(44) NOT NULL,
 df_id CHAR(44) NOT NULL,
-FOREIGN KEY (dfd_id)
+FOREIGN KEY (diagramId)
 REFERENCES entity(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE,
@@ -90,13 +90,13 @@ ON UPDATE CASCADE
 
 CREATE TABLE element_list
 (
-dfd_id CHAR(44) NOT NULL,
-el_id CHAR(44) NOT NULL,
-FOREIGN KEY (dfd_id)
+diagramId CHAR(44) NOT NULL,
+elementId CHAR(44) NOT NULL,
+FOREIGN KEY (diagramId)
 REFERENCES entity(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE,
-FOREIGN KEY (el_id)
+FOREIGN KEY (elementId)
 REFERENCES entity(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE
@@ -104,9 +104,9 @@ ON UPDATE CASCADE
 
 CREATE TABLE multiprocess
 (
-dfd_id CHAR(44) NOT NULL,
+diagramId CHAR(44) NOT NULL,
 mp_id CHAR(44) NOT NULL,
-FOREIGN KEY (dfd_id)
+FOREIGN KEY (diagramId)
 REFERENCES entity(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE,

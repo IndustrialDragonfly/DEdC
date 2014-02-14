@@ -31,18 +31,18 @@ interface WriteStorable
     public function deleteNode($id);
     
     /**
-     * Stores the mapping between a subDFDNode and its DFD into the data store
+     * Stores the mapping between a diaNode and its DFD into the data store
      * 
      * @param String $dfd_resource
      * @param String $mp_resource
      */
-    public function saveSubDFDNode($dfd_resource, $subDFD_resource);
+    public function saveDiaNode($dfd_resource, $subDFD_resource);
     
      /**
-     * Deletes the given subDFDNode from the subDFDNode to DFD mapping
+     * Deletes the given diaNode from the diaNode to DFD mapping
      * @param String $id
      */
-    public function deleteSubDFDNode($id);
+    public function deleteDiaNode($id);
     
     /**
      * Stores a dataflow object into the data store
@@ -68,12 +68,12 @@ interface WriteStorable
     /**
      * Saves the DFD to the database
      */
-   public function saveDFD($id, $type, $label, $originator, $ancestry, 
-            $nodeList, $linkList, $subDFDNodeList, $subDFDNode);   
+   public function saveDiagram($id, $type, $label, $originator, $ancestry, 
+            $nodeList, $linkList, $DiaNodeList, $diaNode);   
     /**
      * Deletes the DFD from the database
      */
-    public function deleteDFD($id);
+    public function deleteDiagram($id);
 }
 
 ?>

@@ -96,7 +96,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         //</editor-fold>
         //<editor-fold desc="save to Node table" defaultstate="collapsed">
         // Prepare the statement
-        $insert_stmt = $this->dbh->prepare("INSERT INTO node (id, link_id) VALUES(?,?)");
+        $insert_stmt = $this->dbh->prepare("INSERT INTO node (id, linkId) VALUES(?,?)");
         for ($i = 0; $i < $numLinks; $i++)
         {
             // Bind the parameters of the prepared statement
@@ -108,7 +108,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         //</editor-fold>
         
         // Save into the DFD (element_list table)
-        $insert_stmt = $this->dbh->prepare("INSERT INTO element_list (dfd_id, el_id) VALUES (?,?)");
+        $insert_stmt = $this->dbh->prepare("INSERT INTO element_list (diagramId, elementId) VALUES (?,?)");
         $insert_stmt->bindParam(1, $parentId);
         $insert_stmt->bindParam(2, $id);
         $insert_stmt->execute();
@@ -138,7 +138,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $load = $this->dbh->prepare("
              SELECT id, label
              FROM entity
-             WHERE id in (SELECT link_id FROM node WHERE id=?)");
+             WHERE id in (SELECT linkId FROM node WHERE id=?)");
          $load->bindParam(1, $id);
          $load->execute();
          
@@ -149,18 +149,18 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $node_vars['linkList'] = $linkList;
          
          // Setup select statement to grab parent DFD id
-        $select_stmt = $this->dbh->prepare('SELECT * FROM element_list WHERE el_id = ?');
+        $select_stmt = $this->dbh->prepare('SELECT * FROM element_list WHERE elementId = ?');
         $select_stmt->bindParam(1, $id);
         $select_stmt->execute();
         $parent =  $select_stmt->fetch();
         
         if ($parent === FALSE)
         {
-            $node_vars['dfd_id'] = NULL;
+            $node_vars['diagramId'] = NULL;
         }
         else
         {
-            $node_vars['dfd_id'] = $parent['dfd_id'];
+            $node_vars['diagramId'] = $parent['diagramId'];
         }
         
          return $node_vars;
@@ -192,20 +192,20 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     //</editor-fold>
    
     /**
-     * Stores the mapping between a subDFDNode and its DFD into the database
+     * Stores the mapping between a diaNode and its DFD into the database
      * 
      * @param String $dfd_resource
      * @param String $mp_resource
      */
-    public function saveSubDFDNode($dfd_id, $subDFDNode_id)
+    public function saveDiaNode($diagramId, $diaNodeId)
     {
         //<editor-fold desc="save to multiprocess table" defaultstate="collapsed">
       // Prepare the statement
-      $insert_stmt = $this->dbh->prepare("INSERT INTO subdfdnode (dfd_id, subdfdnode_id) VALUES(?,?)");
+      $insert_stmt = $this->dbh->prepare("INSERT INTO dianode (diagramId, diaNodeId) VALUES(?,?)");
 
       // Bind the parameters of the prepared statement
-      $insert_stmt->bindParam(1, $dfd_id);
-      $insert_stmt->bindParam(2, $subDFDNode_id);
+      $insert_stmt->bindParam(1, $diagramId);
+      $insert_stmt->bindParam(2, $diaNodeId);
 
       // Execute, catch any errors resulting
       $insert_stmt->execute();
@@ -213,28 +213,28 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     }
     
     /**
-     * For a given id that is of type subDFDNode, return what dfd it maps to
+     * For a given id that is of type diaNode, return what dfd it maps to
      * @param String $id
      * @return String
      */
-    public function loadSubDFDNode($id)
+    public function loadDiaNode($id)
     {
-         $select_statement = $this->dbh->prepare("SELECT dfd_id FROM subdfdnode WHERE subdfdnode_id=?");
+         $select_statement = $this->dbh->prepare("SELECT diagramId FROM dianode WHERE diaNodeId=?");
          $select_statement->bindParam(1, $id);
          $select_statement->execute();
-         $dfd_id = $select_statement->fetch();
+         $diagramId = $select_statement->fetch();
          
          // Return the id from the associative array
-         return $dfd_id['dfd_id'];
+         return $diagramId['diagramId'];
     }
     
     /**
-     * Deletes the given subDFDNode from the subDFDNode to DFD mapping
+     * Deletes the given diaNode from the diaNode to DFD mapping
      * @param String $id
      */
-    public function deleteSubDFDNode($id)
+    public function deleteDiaNode($id)
     {
-        $delete_statement = $this->dbh->prepare("DELETE FROM subdfdnode WHERE subdfdnode_id=?");
+        $delete_statement = $this->dbh->prepare("DELETE FROM dianode WHERE diaNodeId=?");
         $delete_statement->bindParam(1, $id);
         $delete_statement->execute();
     }
@@ -284,7 +284,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       // Prepare the statement
       if($origin_resource != NULL && $dest_resource != NULL)
       {
-         $insert_stmt = $this->dbh->prepare("INSERT INTO link (id, origin_id, dest_id) VALUES(?,?,?)");
+         $insert_stmt = $this->dbh->prepare("INSERT INTO link (id, originNode, destinationNode) VALUES(?,?,?)");
          // Bind the parameters of the prepared statement
          $insert_stmt->bindParam(1, $id);
          $insert_stmt->bindParam(2, $origin_resource);
@@ -294,7 +294,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       }
       else if($origin_resource == NULL && $dest_resource != NULL)
       {
-         $insert_stmt = $this->dbh->prepare("INSERT INTO link (id, dest_id) VALUES(?,?)");
+         $insert_stmt = $this->dbh->prepare("INSERT INTO link (id, destinationNode) VALUES(?,?)");
          // Bind the parameters of the prepared statement
          $insert_stmt->bindParam(1, $id);
          $insert_stmt->bindParam(2, $dest_resource);
@@ -303,7 +303,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       }
       else if($origin_resource != NULL && $dest_resource == NULL)
       {
-         $insert_stmt = $this->dbh->prepare("INSERT INTO link (id, origin_id) VALUES(?,?)");
+         $insert_stmt = $this->dbh->prepare("INSERT INTO link (id, originNode) VALUES(?,?)");
          // Bind the parameters of the prepared statement
          $insert_stmt->bindParam(1, $id);
          $insert_stmt->bindParam(2, $origin_resource);
@@ -321,7 +321,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       //</editor-fold>
       
       // Save to dfd 
-        $insert_stmt = $this->dbh->prepare("INSERT INTO element_list (dfd_id, el_id) VALUES (?,?)");
+        $insert_stmt = $this->dbh->prepare("INSERT INTO element_list (diagramId, elementId) VALUES (?,?)");
         $insert_stmt->bindParam(1, $parentId);
         $insert_stmt->bindParam(2, $id);
         $insert_stmt->execute();
@@ -348,7 +348,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          }
          
         // Setup select statement to grab parent DFD id
-        $select_stmt = $this->dbh->prepare('SELECT * FROM element_list WHERE el_id = ?');
+        $select_stmt = $this->dbh->prepare('SELECT * FROM element_list WHERE elementId = ?');
         $select_stmt->bindParam(1, $id);
         $select_stmt->execute();
         $parent =  $select_stmt->fetch();
@@ -359,13 +359,13 @@ class DatabaseStorage implements ReadStorable, WriteStorable
             throw new BadFunctionCallException("No matching id found in elementList");
          }
         
-        $results['dfd_id'] = $parent['dfd_id'];
+        $results['diagramId'] = $parent['diagramId'];
         
         // Setup select statement to grab origin node info
         $select_stmt = $this->dbh->prepare('
             SELECT id, label
             FROM entity
-            WHERE id IN (SELECT origin_id FROM link WHERE id=?)
+            WHERE id IN (SELECT originNode FROM link WHERE id=?)
             ');
         $select_stmt->bindParam(1, $id);
         $select_stmt->execute();
@@ -383,7 +383,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $select_stmt = $this->dbh->prepare('
             SELECT id, label
             FROM entity
-            WHERE id IN (SELECT dest_id FROM link WHERE id=?)
+            WHERE id IN (SELECT destinationNode FROM link WHERE id=?)
             ');
         $select_stmt->bindParam(1, $id);
         $select_stmt->execute();
@@ -433,9 +433,9 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     {
         // This should produce a stack of the ancestry, with the root at top
         // and the immediate parent the last entry
-        $loadAncestry = $this->dbh->prepare("SELECT ancestor_id
+        $loadAncestry = $this->dbh->prepare("SELECT ancestorId
             FROM dfd_ancestry 
-            WHERE descendant_id=?
+            WHERE descendantId=?
             ORDER BY depth DESC");
         $loadAncestry->bindParam(1, $id);
         
@@ -444,7 +444,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $newId = $loadAncestry->fetch();
         while ($newId != FALSE)
          {
-            array_push($ancestryStack,$newId['ancestor_id']);
+            array_push($ancestryStack,$newId['ancestorId']);
             $newId = $loadAncestry->fetch();
          }
          
@@ -464,27 +464,27 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * @return Mixed[]
      * @throws BadFunctionCallException
      */
-    public function loadDFD($id)
+    public function loadDiagram($id)
     {
-        // Get the id, label, originator, and curtesy of subdfdnode, the 
-        // subDFDNode the DFD is linked to
-         $loadDFD = $this->dbh->prepare("SELECT * 
+        // Get the id, label, originator, and curtesy of diaNode, the 
+        // diaNode the DFD is linked to
+         $loadDiagram = $this->dbh->prepare("SELECT * 
              FROM entity id
-                JOIN subdfdnode dfd_id ON id=dfd_id
+                JOIN dianode diagramId ON id=diagramId
              WHERE id=?");
-         $loadDFD->bindParam(1, $id);
-         $loadDFD->execute();
-         $vars = $loadDFD->fetch();
+         $loadDiagram->bindParam(1, $id);
+         $loadDiagram->execute();
+         $vars = $loadDiagram->fetch();
          
-         // Must be a root DFD, try without the subdfdnode table
+         // Must be a root DFD, try without the diaNode table
          if($vars == FALSE )
          {
-             $loadDFD = $this->dbh->prepare("SELECT * 
+             $loadDiagram = $this->dbh->prepare("SELECT * 
                 FROM entity id
                 WHERE id=?");
-            $loadDFD->bindParam(1, $id);
-            $loadDFD->execute();
-            $vars = $loadDFD->fetch();
+            $loadDiagram->bindParam(1, $id);
+            $loadDiagram->execute();
+            $vars = $loadDiagram->fetch();
             if($vars == FALSE )
             {
                 throw new BadFunctionCallException("no matching id found in entity DB");
@@ -493,20 +493,20 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          
          // Get the nodes list from the database
          // This is performed by joining element list, entity and element, then 
-         // filtering out all subdfdnodes and links from the list with a
+         // filtering out all diaNodes and links from the list with a
          // a subquery
-         $loadDFD = $this->dbh->prepare("
+         $loadDiagram = $this->dbh->prepare("
              SELECT * 
             FROM entity id
-                    JOIN element_list el_id ON el_id=id
+                    JOIN element_list elementId ON elementId=id
                     NATURAL JOIN element
-            WHERE id NOT IN (SELECT subdfdnode_id FROM subdfdnode UNION SELECT id FROM link) AND dfd_id=?;
+            WHERE id NOT IN (SELECT diaNodeId FROM dianode UNION SELECT id FROM link) AND diagramId=?;
                 ");
-         $loadDFD->bindParam(1, $id);
-         $loadDFD->execute();
+         $loadDiagram->bindParam(1, $id);
+         $loadDiagram->execute();
          
          // Extract all the data of the nodes
-         $nodeList = $loadDFD->fetchAll();
+         $nodeList = $loadDiagram->fetchAll();
 
          // Add the data of the nodes to the $vars array that is
          // to be returned
@@ -515,58 +515,58 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          
          // Get the links list from the database
          // This is performed by joining the relevant tables
-         $loadDFD = $this->dbh->prepare("
+         $loadDiagram = $this->dbh->prepare("
              SELECT * 
                 FROM link id 
-                        JOIN element_list el_id ON id=el_id
+                        JOIN element_list elementId ON id=elementId
                         NATURAL JOIN entity
                         NATURAL JOIN element
                         NATURAL JOIN link
-                WHERE dfd_id=?;
+                WHERE diagramId=?;
                 ");
-         $loadDFD->bindParam(1, $id);
-         $loadDFD->execute();
+         $loadDiagram->bindParam(1, $id);
+         $loadDiagram->execute();
          
          // Extract all the data of the nodes
-         $linkList = $loadDFD->fetchAll();
+         $linkList = $loadDiagram->fetchAll();
          
          // Add the data of the links to the $vars array that is
          // to be returned
          $vars['linkList'] = $linkList;
          
          
-         // Get the subdfdnode list from the database
+         // Get the diaNode list from the database
          // This is performed by joining the relevant tables
          // This first approach should work, but MySQL seems to have a bug
          // relating to this approach (something about a JOIN and having
          // to specify the column name as table.column makes MySQL assume that
          // the WHERE clause is impossible - supposedly fixed in new versions.)
-         /*$loadDFD = $this->dbh->prepare("
+         /*$loadDiagram = $this->dbh->prepare("
              SELECT *
                 FROM node id
-                        JOIN element_list el_id ON el_id=id
+                        JOIN element_list elementId ON elementId=id
                         NATURAL JOIN element
                         NATURAL JOIN entity
-                        JOIN subdfdnode subdfdnode_id ON subdfdnode_id=id
-                WHERE \"element_list.dfd_id\"=?;
+                        JOIN dianode diaNodeId ON diaNodeId=id
+                WHERE \"element_list.diagramId\"=?;
                 ");*/
          // Scarier looking work around version
-         $loadDFD = $this->dbh->prepare("
+         $loadDiagram = $this->dbh->prepare("
              SELECT *
                 FROM entity id
                         NATURAL JOIN element
-                        JOIN subdfdnode subdfdnode_id ON subdfdnode_id=id
-                WHERE id IN (SELECT el_id FROM element_list WHERE dfd_id=?);
+                        JOIN dianode diaNodeId ON diaNodeId=id
+                WHERE id IN (SELECT elementId FROM element_list WHERE diagramId=?);
                 ");
-         $loadDFD->bindParam(1, $id);
-         $loadDFD->execute();
+         $loadDiagram->bindParam(1, $id);
+         $loadDiagram->execute();
          
          // Extract all the data of the nodes
-         $subDFDNodeList = $loadDFD->fetchAll();
+         $DiaNodeList = $loadDiagram->fetchAll();
          
-         // Add the data from subdfdnodes to the $vars array that is
+         // Add the data from diaNodes to the $vars array that is
          // to be returned
-         $vars['subDFDNodeList'] = $subDFDNodeList;         
+         $vars['DiaNodeList'] = $DiaNodeList;         
          
          // Get the stack of the DFDs ancestry from the database
          $vars['ancestry'] = $this->getAncestry($id);
@@ -582,7 +582,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      */
     private function saveAncestry($id, $ancestry)
     {
-      $insert_stmt = $this->dbh->prepare("INSERT INTO dfd_ancestry (ancestor_id, descendant_id, depth) VALUES(?,?,?)");
+      $insert_stmt = $this->dbh->prepare("INSERT INTO dfd_ancestry (ancestorId, descendantId, depth) VALUES(?,?,?)");
       
       for ($i = 0; $i < count($ancestry); $i++)
       {
@@ -604,11 +604,11 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * @param string[] $ancestry
      * @param string[] $nodeList
      * @param string[] $linkList
-     * @param string[] $subDFDNodeList
-     * @param string $subDFDNode
+     * @param string[] $DiaNodeList
+     * @param string $diaNode
      */
-    public function saveDFD($id, $type, $label, $originator, $ancestry, 
-            $nodeList, $linkList, $subDFDNodeList, $subDFDNode)
+    public function saveDiagram($id, $type, $label, $originator, $ancestry, 
+            $nodeList, $linkList, $DiaNodeList, $diaNode)
     {
       // Prepare the statement
       $insert_stmt = $this->dbh->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
@@ -623,7 +623,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       $insert_stmt->execute();
       
       // Prepare the statement to store the elements into the elmenet_list table
-      $insert_stmt = $this->dbh->prepare("INSERT INTO element_list (dfd_id, el_id) VALUES(?,?)");
+      $insert_stmt = $this->dbh->prepare("INSERT INTO element_list (diagramId, elementId) VALUES(?,?)");
       
       // Save each element in the nodeList to the table if it is an array
       if (is_array($nodeList))
@@ -654,20 +654,20 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       // Save each element in the suDFDNodeList to the table if it isn't null
       if (is_array($nodeList))
       {
-        foreach ($subDFDNodeList as $subDFDNode_id)
+        foreach ($DiaNodeList as $diaNodeId)
         {
            // Bind the parameters of the prepared statement
            $insert_stmt->bindParam(1, $id);
-           $insert_stmt->bindParam(2, $subDFDNode_id);
+           $insert_stmt->bindParam(2, $diaNodeId);
            // Execute, catch any errors resulting
            $insert_stmt->execute();
         }
       }
           // Prepare the statement
-      $insert_stmt = $this->dbh->prepare("INSERT INTO subDFDNode (subdfdnode_id, dfd_id) VALUES(?,?)");
+      $insert_stmt = $this->dbh->prepare("INSERT INTO dianode (diaNodeId, diagramId) VALUES(?,?)");
 
       // Bind the parameters of the prepared statement
-      $insert_stmt->bindParam(1, $subDFDNode);
+      $insert_stmt->bindParam(1, $diaNode);
       $insert_stmt->bindParam(2, $id);
       
       $this->saveAncestry($id, $ancestry);
@@ -681,10 +681,10 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * 
      * @param String $id
      */
-    public function deleteDFD($id)
+    public function deleteDiagram($id)
     {
         // Start by isolating the child from its parents
-        $delete = $this->dbh->prepare("DELETE FROM dfd_ancestry WHERE descendant_id = ?");
+        $delete = $this->dbh->prepare("DELETE FROM dfd_ancestry WHERE descendantId = ?");
         $delete->bindParam(1, $id);
         $delete->execute();
         

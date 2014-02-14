@@ -32,11 +32,11 @@ class DataFlowDiagram extends Diagram
     */
    protected $linkList;
    /**
-    * List of all the the subDFDNodes contained with this DFD and basic data
+    * List of all the the DiaNodes contained with this DFD and basic data
     * for the frontend to use them. Stored in an associative array.
     * @var Mixed[]
     */
-   protected $subDFDNodeList;
+   protected $diaNodeList;
    /**
     * Storage object, should be readable and/or writable (depending on whether
     * this is a normal data store, import data source, or export data format)
@@ -44,11 +44,11 @@ class DataFlowDiagram extends Diagram
     */
    protected $storage;
    /**
-    * The SubDFDNode UUID that this DFD is linked to 
+    * The diaNode UUID that this DFD is linked to 
     * Can be null if root
     * @var String 
     */
-   protected $subDFDNode;
+   protected $diaNode;
 
    //</editor-fold>
    //<editor-fold desc="Constructor" defaultstate="collapsed">
@@ -67,32 +67,32 @@ class DataFlowDiagram extends Diagram
       $this->storage = func_get_arg(0);
       $this->nodeList = array();
       $this->linkList = array();
-      $this->subDFDNodeList = array();
+      $this->diaNodeList = array();
       // If there is only one argument (the storage object) then this is a
       // root DFD
       // DataFlowDiagram($storage)
       if (func_num_args() == 1)
       {
          $this->parentStack = null;
-         $this->subDFDNode = null;
+         $this->diaNode = null;
       }
-      // If creating a new DFD connected to a SubDFDNode
-      // DataFlowDiagram($storage, $SubDFDNode)
+      // If creating a new DFD connected to a diaNode
+      // DataFlowDiagram($storage, $diaNode)
       else if (func_num_args() == 2 && 
-              is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "SubDFDNode"))
+              is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DiaNode"))
       {
-           $this->subDFDNode = func_get_arg(1);
+           $this->diaNode = func_get_arg(1);
            
-           // Initialize the linked SubDFDNode so we can get its parent and link
+           // Initialize the linked diaNode so we can get its parent and link
            // ourselves into it
-           $type = getTypeFromUUID($this->subDFDNode);
-           $subDFDNode = new $type($this->storage);
+           $type = getTypeFromUUID($this->diaNode);
+           $diaNode = new $type($this->storage);
            
-           $parentDFD_id = $subDFDNode->getParent();
+           $parentdiagramId = $diaNode->getParent();
            
            // Initialize the parent DFD and get its ancenstry
-           $type = getTypeFromUUID($parentDFD_id);
-           $parentDFD = new $type($parentDFD_id);
+           $type = getTypeFromUUID($parentdiagramId);
+           $parentDFD = new $type($parentdiagramId);
            $this->ancestry = $parentDFD->getAncestry();
            // Add immediate parent to stack
            array_push($this->ancestry, $parentDFD->getId());          
@@ -103,14 +103,14 @@ class DataFlowDiagram extends Diagram
               is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Diagram"))
       {
          $this->id = func_get_arg(1);
-         $vars = $this->storage->loadDFD($this->id);
+         $vars = $this->storage->loadDiagram($this->id);
          
          // Load up values from the associative array
          $this->label = $vars['label'];
          $this->originator = $vars['originator'];
          $this->nodeList = $vars['nodeList'];
          $this->linkList = $vars['linkList'];
-         $this->subDFDNodeList = $vars['subDFDNodeList'];
+         $this->diaNodeList = $vars['DiaNodeList'];
          $this->ancestry = $vars['ancestry'];
       }
    }
@@ -171,24 +171,24 @@ class DataFlowDiagram extends Diagram
    }
    
     /**
-    * Finds and deletes the subDFDNode at the given UUID from the subDFDNode
-    * @param String $subdfdnodeid
+    * Finds and deletes the diaNode at the given UUID from the diaNode
+    * @param String $DiaNodeId
     * @return boolean
     * @throws BadFunctionCallException
     */
-   public function removesubDFDNode($subdfdnodeid)
+   public function removediaNode($DiaNodeId)
    {
-       $type = $this->storage->getTypeFromUUID($subdfdnodeid);
-       $subDFDNode = new $type($this->storage, $subdfdnodeid);
-       $subDFDNode->delete();
-       $loc = array_search($subdfdnodeid, $this->subDFDNodeList);
+       $type = $this->storage->getTypeFromUUID($DiaNodeId);
+       $diaNode = new $type($this->storage, $DiaNodeId);
+       $diaNode->delete();
+       $loc = array_search($DiaNodeId, $this->diaNodeList);
          if ($loc !== FALSE)
          {
             
             //remove the link from the list
-            unset($this->subDFDNodeList[$loc]);
+            unset($this->diaNodeList[$loc]);
             //normalize the indexes of the list
-            $this->subDFDNodeList = array_values($this->subDFDNodeList);
+            $this->diaNodeList = array_values($this->diaNodeList);
             return true;
          }
          else
@@ -209,8 +209,8 @@ class DataFlowDiagram extends Diagram
     * ancestry String[]
     * nodeList String[]
     * linkList String[]
-    * subDFDNodeList String[]
-    * subDFDNode String 
+    * DiaNodeList String[]
+    * diaNode String 
     * 
     * @returns Mixed[]
     */
@@ -223,8 +223,8 @@ class DataFlowDiagram extends Diagram
        $dfdArray['ancestry'] = $this->ancestry;
        $dfdArray['nodeList'] = $this->nodeList;
        $dfdArray['linkList'] = $this->linkList;
-       $dfdArray['subDFDNodeList'] = $this->subDFDNodeList;
-       $dfdArray['subDFDNode'] = $this->subDFDNode;
+       $dfdArray['DiaNodeList'] = $this->diaNodeList;
+       $dfdArray['diaNode'] = $this->diaNode;
        
        return $dfdArray;
    }
@@ -236,8 +236,8 @@ class DataFlowDiagram extends Diagram
 */
    public function save()
    {
-      $this->storage->saveDFD($this->id, get_class($this), $this->label, $this->originator, $this->ancestry, 
-            $this->nodeList, $this->linkList, $this->subDFDNodeList, $this->subDFDNode);
+      $this->storage->saveDiagram($this->id, get_class($this), $this->label, $this->originator, $this->ancestry, 
+            $this->nodeList, $this->linkList, $this->diaNodeList, $this->diaNode);
    }
 
    /**
@@ -264,16 +264,16 @@ class DataFlowDiagram extends Diagram
         {
             $this->removeNode($node);
         }
-        // Remove its subDFDNodes
-        foreach ($this->subDFDNodeList as $subDFDNode)
+        // Remove its diaNodes
+        foreach ($this->diaNodeList as $diaNode)
         {
-            $this->removesubDFDNode($subDFDNode);
+            $this->removediaNode($diaNode);
         }
         
         // Remove the remaining portions of the DFD from the database.
         // Note that this will NOT delete the children DFDs but leave them
         // orphaned instead
-       $this->storage->deleteDFD($this->id);
+       $this->storage->deleteDiagram($this->id);
    }
    //</editor-fold>
 }

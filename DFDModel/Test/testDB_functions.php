@@ -52,7 +52,7 @@ class testDB_functions
             $pdo->query('TRUNCATE TABLE link;');
             $pdo->query('TRUNCATE TABLE node;');
             $pdo->query('TRUNCATE TABLE element_list;');
-            $pdo->query('TRUNCATE TABLE subdfdnode;');
+            $pdo->query('TRUNCATE TABLE dianode;');
             $pdo->query('TRUNCATE TABLE dfd_ancestry;');
 
             // Truncate the foreign key restricted entity table in mysql

@@ -48,10 +48,10 @@ class SimpleResponseTest extends PHPUnit_Framework_TestCase
             "ancestry" => array("AB", "th65"),
             "nodeList" => array(array("id" => "aoeu654", "type" => "Process", "label" => "SomeProcess", "x" => "3", "y" => "4"), 
                 array("id" => "iuoa8", "type" => "DataStore", "label" => "SomeDataStore", "x" => "8", "y" => "22")),
-            "linkList" => array(array("id" => "87oeuao", "type" => "DataFlow", "label" => "SomeDF", "origin_id" => "aoeu654", "dest_id" => "iuoa8", "x" => "88", "y" => "22")),
-            "subDFDNodeList" => array(array("id" => "sthsrch", "type" => "Multiprocess", "label" => "SomeMP1", "x" => "55", "y" => "44"), 
+            "linkList" => array(array("id" => "87oeuao", "type" => "DataFlow", "label" => "SomeDF", "originNode" => "aoeu654", "destinationNode" => "iuoa8", "x" => "88", "y" => "22")),
+            "DiaNodeList" => array(array("id" => "sthsrch", "type" => "Multiprocess", "label" => "SomeMP1", "x" => "55", "y" => "44"), 
                 array("id" => "6548", "type" => "Multiprocess", "label" => "SomeMP2", "x" => "88", "y" => "66")),
-            "subDFDNode" => "crgoeu"
+            "diaNode" => "crgoeu"
         );
         
         $dfdArrayTag = addTags($dfdArray, "_id");

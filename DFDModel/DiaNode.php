@@ -4,15 +4,15 @@ require_once 'Node.php';
 require_once 'DataFlowDiagram.php';
 
 /**
- * Description of SubDFDNode
+ * Description of DiaNode
  *
  * @author Josh Clark
  */
-class SubDFDNode extends Node
+class DiaNode extends Node
 {
 
    //<editor-fold desc="Attributes" defaultstate="collapsed">
-   protected $subDataFlowDiagram;
+   protected $subDiagram;
 
    //</editor-fold>
    //<editor-fold desc="Constructor" defaultstate="collapsed">
@@ -34,7 +34,7 @@ class SubDFDNode extends Node
          // Since we don't require linking up to a DFD on construction,
          // the construction is almost identical to a node object'
          parent::__construct(func_get_arg(0), func_get_arg(1));
-         $this->subDataFlowDiagram = NULL;
+         $this->subDiagram = NULL;
       }
       // If constructor is passed a storage object, and an ID,
       // load from storage
@@ -42,9 +42,9 @@ class SubDFDNode extends Node
       {
          parent::__construct(func_get_arg(0), func_get_arg(1));
          
-         // Load mapping of subDFDNode to DFD, unlike most load functions
+         // Load mapping of diaNode to DFD, unlike most load functions
          // this one returns a single value rather than an assocative array
-         $this->subDataFlowDiagram = $this->storage->loadSubDFDNode($this->id);         
+         $this->subDiagram = $this->storage->loadDiaNode($this->id);         
       }
    }
 
@@ -56,7 +56,7 @@ class SubDFDNode extends Node
 */
    public function getSubDFD()
    {
-      return $this->subDataFlowDiagram;
+      return $this->subDiagram;
    }
 
    /**
@@ -68,7 +68,7 @@ class SubDFDNode extends Node
    {
       if ($aDiagram instanceof DataFlowDiagram)
       {
-         $this->subDataFlowDiagram = $aDiagram;
+         $this->subDiagram = $aDiagram;
       }
       else
       {
@@ -95,10 +95,10 @@ class SubDFDNode extends Node
     */
    public function getAssociativeArray()
    {
-       $subDFDNodeArray = parent::getAssociativeArray();
-       $subDFDNodeArray['subDataFlowDiagram'] = $this->subDataFlowDiagram;
+       $diaNodeArray = parent::getAssociativeArray();
+       $diaNodeArray['subDataFlowDiagram'] = $this->subDiagram;
        
-       return $subDFDNodeArray;
+       return $diaNodeArray;
    }
 
    //</editor-fold>
@@ -113,12 +113,12 @@ class SubDFDNode extends Node
        parent::addLink($newLink);
        // Check if this is equal to null - if it is, this can't happen yet
        // This function as such must be called when a new DFD is linked up to
-       // this subDFDNode
-       if ($this->subDataFlowDiagram !== NULL)
+       // this diaNode
+       if ($this->subDiagram !== NULL)
        {
             if (is_subclass_of($newLink, "Link"))
             {
-                $this->subDataFlowDiagram->addExternalLink($newLink);
+                $this->subDiagram->addExternalLink($newLink);
             }
             else
             {
@@ -137,9 +137,9 @@ class SubDFDNode extends Node
    {
        // If removed the link from the Node object and subDFD exists, remove from
        // the subDFD
-       if (parent::removeLinks() && $this->subDataFlowDiagram != NULL)
+       if (parent::removeLinks() && $this->subDiagram != NULL)
        {
-           $this->subDataFlowDiagram->removeExternalLink($link);
+           $this->subDiagram->removeExternalLink($link);
        }
    }
 
@@ -152,8 +152,8 @@ class SubDFDNode extends Node
    {
        // Call the Node object save function to do most of the work
        parent::save();
-      // Call storage object's saveSubDFDNode
-       $this->storage->saveSubDFDNode($this->subDataFlowDiagram, $this->id);
+      // Call storage object's saveDiaNode
+       $this->storage->saveDiaNode($this->subDiagram, $this->id);
    }
 
    /**
@@ -162,7 +162,7 @@ class SubDFDNode extends Node
    public function delete()
    {
        // Call the parent delete function AFTER child delete function
-       $this->storage->deleteSubDFDNode($this->id);
+       $this->storage->deleteDiaNode($this->id);
        
        parent::delete();
    }
@@ -174,7 +174,7 @@ class SubDFDNode extends Node
    public function update()
    {
        // Cannot call removeAllLinks in Node delete function
-       $this->storage->deleteSubDFDNode($this->id);
+       $this->storage->deleteDiaNode($this->id);
        $this->storage->deleteNode($this->id);
        $this->save();
    }

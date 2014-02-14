@@ -52,7 +52,7 @@
          $this->x = $vars['x'];
          $this->y = $vars['y'];
          $this->linkList = $vars['linkList'];
-         $this->parent = $vars['dfd_id'];
+         $this->parent = $vars['diagramId'];
       }
    }
 
