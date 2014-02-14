@@ -90,7 +90,9 @@ define(["modules/response", "jquery"], function (Response, $) {
        var response = new Response();
 
        response.setData(jsonObject);
-       response.setStatus(textStatus);
+       if (textStatus) {
+            response.setStatus(textStatus);
+       }
 
        return response;
    };
