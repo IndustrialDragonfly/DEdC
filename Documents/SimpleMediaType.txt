@@ -1,0 +1,104 @@
+For purposes of early development purposes, a simple media type has
+been defined for testing integration between client and controller code.
+This media type is JSON based, and is not to be used in any production code.
+This media type does not fully support all data that can be within a given DFD,
+only providing one level.
+
+Definition for a DFD (note there are no nested DFDs in this definition)
+{
+    "id": "string",
+    "label": "string",
+    "type": "string",
+    "originator": "string",
+    "genericType": "string",
+    "diaNode": "string",
+    "nodeList": 
+    [
+        {
+            "id": "string",
+            "type": "string",
+            "label": "string",
+            "x": "value",
+            "y": "value"
+        }
+    ],
+    "linkList": 
+        [
+            {
+                "id": "string",
+                "type": "string",
+                "label": "string",
+                "originNode": "string",
+                "destinationNode": "string",
+                "x": "value",
+                "y": "value"
+            }
+        ],
+    "DiaNodeList": 
+    [
+        {
+            "id": "string",
+            "type": "string",
+            "label": "string",
+            "x": "value",
+            "y": "value"
+        }
+    ]
+}
+
+Definition for a single node
+{
+    "id": "string",
+    "type": "string",
+    "genericType": "string",
+    "label": "string",
+    "x": "value",
+    "y": "value",
+    "originator": "string",
+    "linkList": 
+    [ 
+        { 
+            "id": "string",
+            "label": "string"
+        }
+    ]
+}
+
+Definition for a single diaNode
+{
+    "id": "string",
+    "type": "string",
+    "genericType": "string",
+    "label": "string",
+    "x": "value",
+    "y": "value",
+    "originator": "string",
+    "subDFD": "string",
+    "linkList": 
+    [ 
+        { 
+            "id": "string",
+            "label": "string"
+        }
+    ]
+}
+
+Definition for a single link
+{
+    "id": "string",
+    "type": "string",
+    "genericType": "string",
+    "originNode": 
+        {
+            "id": "string",
+            "label": "string"
+        },
+    "destinationNode": 
+        {
+            "id": "string",
+            "label": "string"
+        },
+    "originator": "string",
+    "x": "value",
+    "y": "value"
+}

@@ -60,7 +60,7 @@ abstract class Node extends Element
                 $this->x = $vars['x'];
                 $this->y = $vars['y'];
                 $this->linkList = $vars['linkList'];
-                $this->parent = $vars['dfd_id'];
+                $this->parent = $vars['diagramId'];
             }
             else
             {
@@ -77,7 +77,7 @@ abstract class Node extends Element
     //<editor-fold desc="Accessor functions" defaultstate="collapsed">
 
     /**
-     * function that gets the number of links that connect to this node
+     * This is a function that gets the number of links that connect to this node
      * @return int the number of links 
      */
     public function getNumberOfLinks()
@@ -86,7 +86,7 @@ abstract class Node extends Element
     }
 
     /**
-     * Function that return the links that connect to a node
+     * Function that returns the links that connect to this node
      * @return string[] an array of all the uuid of the links to this node
      */
     public function getLinks()
@@ -139,9 +139,11 @@ abstract class Node extends Element
     }
 
     /**
-     * a function that searches the list of DataFlows and returns one with a matching id
+     * This is a function that searches the list of DataFlows and returns one 
+     * with a matching id
      * @param type $linkId
-     * @return a DataFlow that has an id matching the specified one, will return null if not specified
+     * @return a UUID of a DataFlow that has an id matching the specified one, will return 
+     *          null if not specified
      */
     public function getLinkbyId($linkId)
     {

@@ -24,8 +24,8 @@ if (FALSE !== stripos($_SERVER['HTTP_ACCEPT'], $browser_accept))
 
 /**
  * Autoload function which loads a file based on class name from any of the 
- * relevant folders - those of the data models and those of Request and Response
- * folders.
+ * relevant folders - those of the data models, those of Request and Response
+ * folders, and those in the Storage folder
  * @param String $classname
  */
 function __autoload($classname)
@@ -46,6 +46,10 @@ function __autoload($classname)
     {
         require_once "DFDModel/" . $classname . ".php";
     }
+    elseif (file_exists("Storage/" . $classname . ".php"))
+    {
+        require_once "Storage/" . $classname . ".php";
+    }
     else
     {
         // Make throw an exception later
@@ -57,8 +61,6 @@ function __autoload($classname)
 require_once "MethodsEnum.php";
 require_once "Authentication.php";
 require_once "AuthorizeUser.php";
-require_once 'Storage/DatabaseStorage.php';
-
 
     // Decode URL if needed
     
@@ -89,25 +91,18 @@ require_once 'Storage/DatabaseStorage.php';
     // Retrieve information about request and put it in a request object
     $request = new SimpleRequest($_SERVER['HTTP_ACCEPT'], $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
     
-    // Demonstrate ability to retrieve the type of an existing element
-    // from the DB. Not really controller code, just a convient place to
-    // demo, absolutely should be deleted soon
-    $storage_access = new DatabaseStorage();
-    $test_element = new Process();
-    $test_element->save($storage_access);
-    $id = $test_element->getId();
-    $test_type = $storage_access->getTypeFromUUID($id);
-    echo $test_type;
-    
-    
+    // Construct object that has been requested
+    $storage = new DatabaseStorage(); 
+    $elementType = $storage->getTypeFromUUID($request->getId());
+    $element = new $elementType($storage, $request->getId());
     
     switch ($request->getMethod())
     {
         case MethodsEnum::GET:
-            $response = new SimpleResponse();
+            $response = new SimpleResponse($element->getAssociativeArray());
             $response->setHeader(200);
             header($response->getHeader());
-            echo $response->getBody();
+            echo $response->getRepresentation();
             break;
         case MethodsEnum::POST:
             sendHeader(successful);
@@ -119,12 +114,16 @@ require_once 'Storage/DatabaseStorage.php';
             // Should be no need to send data since it is idemnipotentent
             break;
         case MethodsEnum::DELETE:
-            sendHeader(sucessful);
-            // should be no need to send data since it is idemnipotentent
+            // Delete needs to send no data other than a header
+            $element->delete();
+            $response = new SimpleResponse();
+            $response->setHeader(200);
+            header($response->getHeader());
+            break;
             break;
         case MethodsEnum::UPDATE:
             sendHeader(sucessful);
-            // Should need to send no data since it is idemnipotentent
+            // should be no need to send data since it is idemnipotentent
             break;
         default:
             echo "ERROR  - Bad method";

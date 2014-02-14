@@ -1,38 +1,72 @@
 <?php
-require_once "Response.php";
+require_once 'Response.php';
+require_once 'GETResponsable.php';
+require_once 'DELETEResponsable.php';
 /**
  * Simple class to allow for testing of the abstract Request object.
  *
  * @author eugene
  */
 
-class SimpleResponse extends Response
+final class SimpleResponse extends Response implements GETResponsable, DELETEResponsable
 {
-    public function __construct($element)
+    /**
+     * Contains the raw (associative array) data for the body.
+     * @var String
+     */
+    private $rawData;
+    
+    /**
+     * Contains the SimpleMediaType representation of the object being sent
+     * @var String
+     */
+    private $representation;
+    
+    /**
+     * Constructs a SimpleMediaType response, with the input consisting of
+     * an associative array that contains the information for an entity of the
+     * data model
+     * @param Mixed[] $data
+     */
+    public function __construct()
     {
-        parent::__construct($element);
-        // Set the very hard coded DFD up
-        $body =<<<EOT
-                {
-                    "name": "DFD",
-                    "elements": [
-                            {
-                                    "id": "1234",
-                                    "type": "process",
-                                    "label": "Example Process 1",
-                                    "x": "50",
-                                    "y": "50"
-                            },
-                            {
-                                    "id": "1235",
-                                    "type": "process",
-                                    "label": "Example Process 2",
-                                    "x": "100",
-                                    "y": "50"
-                            }
-                    ]
-                }
-EOT;
-        $this->setBody($body);
+        // Constructor when passed data i.e. GET
+        if (func_num_args() == 1 && is_array(func_get_arg(0)))
+        {
+            $this->setRawData(func_get_arg(0));
+            $this->createRepresentation();
+        }
+        // If there is no data, don't do anything, header is set separately
+    }
+    
+    /**
+     * Sets the raw (associative array) data from the data model
+     * 
+     * @param Mixed[] $data
+     */
+    public function setRawData($data)
+    {
+        $this->rawData = $data;
+    }
+    
+    /**
+     * Converts the raw data into the SimpleMediaType representation.
+     * Just switches between templates for different objects, hopefully
+     * more sophisticated media types can be created in a cleaner way.
+     */
+    private function createRepresentation()
+    {
+        $this->representation = json_encode(addTags($this->rawData, $this->uuidTag));
+    }
+    
+    /**
+     * Returns the SimpleMediaType representation of the data to send to the 
+     * client.
+     * 
+     * @return String
+     */
+    public function getRepresentation()
+    {
+        return $this->representation;
     }
 }

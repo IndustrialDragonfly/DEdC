@@ -1,7 +1,6 @@
 <?php
 
 require_once 'Diagram.php';
-require_once 'Multiprocess.php';
 /**
  * This is an object that represents a dataflow diagram which consists of a 
  * collection of nodes and links between them
@@ -11,6 +10,6 @@ require_once 'Multiprocess.php';
  */
 class DataFlowDiagram extends Diagram
 {
-    
+
 }
 ?>

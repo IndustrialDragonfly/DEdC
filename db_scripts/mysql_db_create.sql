@@ -42,8 +42,8 @@ ON UPDATE CASCADE
 CREATE TABLE link 
 ( 
 id CHAR(44) NOT NULL, 
-origin_id CHAR(44), 
-dest_id CHAR(44), 
+originNode CHAR(44), 
+destinationNode CHAR(44), 
 PRIMARY KEY (id), 
 FOREIGN KEY (id) 
 REFERENCES entity(id) 
@@ -54,7 +54,7 @@ ON UPDATE CASCADE
 CREATE TABLE node
 (
 id CHAR(44) NOT NULL,
-link_id CHAR(44) NOT NULL,
+linkId CHAR(44) NOT NULL,
 FOREIGN KEY (id)
 REFERENCES entity(id)
 ON DELETE CASCADE
@@ -63,14 +63,14 @@ ON UPDATE CASCADE
 
 CREATE TABLE dfd_ancestry
 (
-ancestor_id CHAR(44) NOT NULL,
-descendant_id CHAR(44) NOT NULL,
+ancestorId CHAR(44) NOT NULL,
+descendantId CHAR(44) NOT NULL,
 depth INT NOT NULL,
-FOREIGN KEY (ancestor_id)
+FOREIGN KEY (ancestorId)
 REFERENCES entity(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE,
-FOREIGN KEY (descendant_id)
+FOREIGN KEY (descendantId)
 REFERENCES entity(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE
@@ -78,19 +78,19 @@ ON UPDATE CASCADE
 
 CREATE TABLE element_list
 (
-dfd_id CHAR(44) NOT NULL,
-el_id CHAR(44) NOT NULL,
-FOREIGN KEY (el_id)
+diagramId CHAR(44) NOT NULL,
+elementId CHAR(44) NOT NULL,
+FOREIGN KEY (elementId)
 REFERENCES entity(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE
 ) Engine InnoDB;
 
-CREATE TABLE subdfdnode
+CREATE TABLE dianode
 (
-dfd_id CHAR(44),
-subdfdnode_id CHAR(44) NOT NULL,
-FOREIGN KEY (subdfdnode_id)
+diagramId CHAR(44),
+diaNodeId CHAR(44) NOT NULL,
+FOREIGN KEY (diaNodeId)
 REFERENCES entity(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE
@@ -101,7 +101,7 @@ CREATE USER 'dedc_user'@'localhost' IDENTIFIED BY 'dedc';
 GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.entity TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.element TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.link TO 'dedc_user'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.subdfdnode TO 'dedc_user'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.dianode TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.dfd_ancestry TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.element_list TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.node TO 'dedc_user'@'localhost';
