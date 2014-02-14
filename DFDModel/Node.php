@@ -200,6 +200,16 @@ abstract class Node extends Element
             //find if the link is in the list and get its location if it is
             $loc = array_search($link->getId(), $this->linkList, True);
             var_dump($loc);
+            $loc = FALSE;
+            for ($i = 0; $i < count($this->linkList); $i++)
+            {
+                $current = $this->linkList[$i];
+                if( $current['id'] == $link->getId())
+                {
+                    $loc = $i;
+                }
+            }
+            
             if ($loc !== FALSE)
             if (FALSE !== array_search($link->getId(), $this->linkList, False))
             {

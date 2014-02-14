@@ -20,28 +20,28 @@ abstract class Diagram extends Entity
     protected $ancestry;
 
     /**
-     * List of all nodes contained within this DFD and basic data to use them.
+     * List of all nodes contained within this Diagram and basic data to use them.
      * Stored in an associative array. Eldest anchestor will be first in the array
      * @var String[]
      */
     protected $nodeList;
 
     /**
-     * List of all links contained within this DFD and basic data to used them.
+     * List of all links contained within this Diagram and basic data to used them.
      * Stored in an associative array.
      * @var String[]
      */
     protected $linkList;
 
     /**
-     * List of all the the subDFDNodes contained with this DFD and basic data
+     * List of all the the DiaNodes contained with this Diagram and basic data
      * for the frontend to use them. Stored in an associative array.
      * @var Mixed[]
      */
     protected $diaNodeList;
 
     /**
-     * The SubDFDNode UUID that this DFD is linked to 
+     * The "parent" DiaNode connected to this Diagram
      * Can be null if root
      * @var String 
      */
@@ -76,15 +76,15 @@ abstract class Diagram extends Entity
          $this->ancestry = null;
          $this->diaNode = null;
       }
-      // If creating a new DFD connected to a SubDFDNode
-      // DataFlowDiagram($storage, $SubDFDNode)
+      // If creating a new DFD connected to a DiaNode
+      // DataFlowDiagram($storage, $DiaNode)
       else if (func_num_args() == 2 )
       {
-          if(  is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "SubDFDNode")  ) 
+          if(  is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DiaNode")  ) 
           {
             $this->diaNode = func_get_arg(1);
 
-             // Initialize the linked SubDFDNode so we can get its parent and link
+             // Initialize the linked DiaNode so we can get its parent and link
              // ourselves into it
              $type = getTypeFromUUID($this->diaNode);
              $subDFDNode = new $type($this->storage);
@@ -110,12 +110,12 @@ abstract class Diagram extends Entity
             $this->originator = $vars['originator'];
             $this->nodeList = $vars['nodeList'];
             $this->linkList = $vars['linkList'];
-            $this->diaNodeList = $vars['subDFDNodeList'];
+            $this->diaNodeList = $vars['DiaNodeList'];
             $this->ancestry = $vars['ancestry'];
           }
           else
           {
-              throw new BadConstructorCallException('UUID that was passed did not belong to a DFD or subDFDNode');
+              throw new BadConstructorCallException('UUID that was passed did not belong to a Diagram or  DiaNode');
           }
       }
       else
@@ -340,14 +340,14 @@ abstract class Diagram extends Entity
     public function addDiaNode($node)
     {
         //ensure that a valid Node child was passed
-        if (is_subclass_of($node, 'subDFDNode')  )
+        if (is_subclass_of($node, 'DiaNode')  )
         {
             //add it to the list
             array_push($this->diaNodeList, $node->getId());
         }
         else
         {
-            throw new BadFunctionCallException("Input parameter not a vaild Node");
+            throw new BadFunctionCallException("Input parameter not a vaild DiaNode");
         }
     }
     
@@ -478,7 +478,7 @@ abstract class Diagram extends Entity
      */
     public function save()
     {
-        $this->storage->saveDFD($this->id, get_class($this), $this->label, 
+        $this->storage->saveDiagram($this->id, get_class($this), $this->label, 
                 $this->originator, $this->ancestry, $this->nodeList, 
                 $this->linkList, $this->diaNodeList, $this->diaNode);
     }
@@ -507,16 +507,16 @@ abstract class Diagram extends Entity
         {
             $this->removeNode($node);
         }
-        // Remove its subDFDNodes
-        foreach ($this->diaNodeList as $subDFDNode)
+        // Remove its diaNodes
+        foreach ($this->diaNodeList as $diaNode)
         {
-            $this->removesubDFDNode($subDFDNode);
+            $this->deleteDiaNode(diaNode);
         }
 
         // Remove the remaining portions of the DFD from the database.
         // Note that this will NOT delete the children DFDs but leave them
         // orphaned instead
-        $this->storage->deleteDFD($this->id);
+        $this->storage->deleteDiagram($this->id);
     }
 
     //</editor-fold>
