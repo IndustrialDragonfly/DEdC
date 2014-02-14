@@ -80,8 +80,8 @@ define(['modules/connector'], function(Connector) {
                 ok(true, "Request should fail");
                 notEqual(response, null, "Response should not be null");
                 
-                equal(response.getStatus(), "error", "Status");
-                equal(response.getError(), "GET Controller.php/some_id_thats_not_an_id 500 (Internal Server Error)", "Error");
+                equal(response.getStatus(), "error", "Test status text on failure");
+                equal(response.getError(), "GET Controller.php/some_id_thats_not_an_id 500 (Internal Server Error)", "Test error message on failure");
                 start();
             };
             
