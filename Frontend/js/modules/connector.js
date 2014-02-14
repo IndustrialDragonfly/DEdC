@@ -60,12 +60,15 @@ define(["modules/response", "jquery"], function (Response, $) {
     * @param {type} successCallback Callback to execute on success
     * @param {type} failCallback Callback to execute on failure
     */
-   var publicPut = function(url, data,successCallback, failCallback) {
+   var publicPut = function(url, data, successCallback, failCallback) {
+       var dataString = JSON.stringify(data);
        $.ajax({
            type: "PUT",
            url: url,
-           data: data,
-           dataType: "json"
+           data: dataString,
+           dataType: "json",
+           processData: false,
+           contentType: "application/json"
        }).done(function (data, textStatus) {
            successCallback(parseJson(data));
        }).fail(function (jqXHR, textStatus, errorThrown) {
