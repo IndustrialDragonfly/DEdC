@@ -1,6 +1,6 @@
 requirejs.config({
     // Load modules from Frontend/js/lib by default
-    baseUrl: 'js',
+    baseUrl: 'Frontend/js',
 
     // Map shorthand names to file paths relative to baseUrl
     paths: {
@@ -28,11 +28,12 @@ requirejs.config({
 });
 
 // Start the main app logic.
-requirejs(['QUnit', 'modules/tests/responseTest', 'modules/tests/elementTest', 'modules/tests/dataflowTest', 'modules/tests/elementFactoryTest'], function (QUnit, responseTest, elementTest, dataflowTest, elementFactoryTest) {
+requirejs(['QUnit', 'modules/tests/responseTest', 'modules/tests/elementTest', 'modules/tests/dataflowTest', 'modules/tests/elementFactoryTest', 'modules/tests/connectorTest'], function (QUnit, responseTest, elementTest, dataflowTest, elementFactoryTest, connectorTest) {
     responseTest.run();
     elementTest.run();
     dataflowTest.run();
     elementFactoryTest.run();
+    connectorTest.run();
 
     QUnit.load();
     QUnit.start();
