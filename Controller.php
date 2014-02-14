@@ -114,12 +114,16 @@ require_once "AuthorizeUser.php";
             // Should be no need to send data since it is idemnipotentent
             break;
         case MethodsEnum::DELETE:
-            sendHeader(sucessful);
-            // should be no need to send data since it is idemnipotentent
+            // Delete needs to send no data other than a header
+            $element->delete();
+            $response = new SimpleResponse();
+            $response->setHeader(200);
+            header($response->getHeader());
+            break;
             break;
         case MethodsEnum::UPDATE:
             sendHeader(sucessful);
-            // Should need to send no data since it is idemnipotentent
+            // should be no need to send data since it is idemnipotentent
             break;
         default:
             echo "ERROR  - Bad method";

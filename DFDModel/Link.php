@@ -66,7 +66,7 @@ abstract class Link extends Element
          $this->y = $vars['y'];
          $this->originNode = $vars['originNode'];
          $this->destinationNode = $vars['destinationNode'];
-         $this->parent = $vars['dfd_id'];
+         $this->parent = $vars['diagramId'];
       }
    }
 //</editor-fold>

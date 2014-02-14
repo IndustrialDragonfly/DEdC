@@ -162,9 +162,9 @@ class MultiprocessTest extends PHPUnit_Framework_TestCase
         }
 
         $row = $this->pdo->query("SELECT * FROM multiprocess WHERE mp_id = '" . $this->object->getId() . "'")->fetch();
-        $this->assertEquals($this->object->getSubDFD()->getId(), $row['dfd_id']);
+        $this->assertEquals($this->object->getSubDFD()->getId(), $row['diagramId']);
 
-        $rows = $this->pdo->query("SELECT * FROM external_links WHERE dfd_id = '" . $this->object->getSubDFD()->getId() . "'");
+        $rows = $this->pdo->query("SELECT * FROM external_links WHERE diagramId = '" . $this->object->getSubDFD()->getId() . "'");
         for ($i = 0; $i < $this->object->getSubDFD()->getNumberOfExternalLinks(); $i++)
         {
             $row = $rows->fetch();

@@ -36,18 +36,18 @@ interface ReadStorable
     public function loadLink($id);
     
     /**
-     * loadDFD takes an input of a UUID and returns an associative array of all
+     * loadDiagram takes an input of a UUID and returns an associative array of all
      * the information related to that ID from the database.
      * @param String $id
      */
-    public function loadDFD($id);
+    public function loadDiagram($id);
     
     /**
-     * For a given id that is of type subDFDNode, return what dfd it maps to
+     * For a given id that is of type diaNode, return what dfd it maps to
      * @param String $id
      * @return String
      */
-    public function loadSubDFDNode($id);
+    public function loadDiaNode($id);
 }
 
 ?>

@@ -5,7 +5,7 @@
  * 
  * @author eugene
  */
-interface GetRequestable extends Requestable
+interface GETRequestable extends Requestable
 {
     // Thus far empty, GET Requestable uses only default functionality that
     // any Requestable object should have. Kept here to be consistent with other

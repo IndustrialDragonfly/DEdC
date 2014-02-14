@@ -1,13 +1,14 @@
 <?php
 require_once 'Response.php';
 require_once 'GETResponsable.php';
+require_once 'DELETEResponsable.php';
 /**
  * Simple class to allow for testing of the abstract Request object.
  *
  * @author eugene
  */
 
-final class SimpleResponse extends Response implements GETResponsable
+final class SimpleResponse extends Response implements GETResponsable, DELETEResponsable
 {
     /**
      * Contains the raw (associative array) data for the body.
@@ -27,10 +28,15 @@ final class SimpleResponse extends Response implements GETResponsable
      * data model
      * @param Mixed[] $data
      */
-    public function __construct($data)
+    public function __construct()
     {
-        $this->setRawData($data);
-        $this->createRepresentation();
+        // Constructor when passed data i.e. GET
+        if (func_num_args() == 1 && is_array(func_get_arg(0)))
+        {
+            $this->setRawData(func_get_arg(0));
+            $this->createRepresentation();
+        }
+        // If there is no data, don't do anything, header is set separately
     }
     
     /**
@@ -50,177 +56,7 @@ final class SimpleResponse extends Response implements GETResponsable
      */
     private function createRepresentation()
     {
-        switch($this->rawData['genericType'])
-        {
-            case "Diagram":
-                // Parse and setup nodes list
-                $nodeList = array();
-                foreach ($this->rawData['nodeList'] as $node)
-                {
-                    // Using a heredoc - ugly but easy to understand
-                    $nodeJson =<<<EOT
-        {
-            "id": "{$node['id']}_id",
-            "type": "{$node['type']}",
-            "label": "{$node['label']}",
-            "x": "{$node['x']}",
-            "y": "{$node['y']}"
-        }
-EOT;
-                    
-                    array_push($nodeList, $nodeJson);
-                }
-                // Convert nodes into a comma delimited string
-                $nodeList = implode(",\n", $nodeList);
-                
-                $linkList = array();
-                foreach ($this->rawData['linkList'] as $link)
-                {
-                    // Using a heredoc - ugly but easy to understand
-                    $linkJson =<<<EOT
-            {
-                "id": "{$link['id']}_id",
-                "type": "{$link['type']}",
-                "label": "{$link['label']}",
-                "origin_id": "{$link['origin_id']}_id",
-                "dest_id": "{$link['dest_id']}_id",
-                "x": "{$link['x']}",
-                "y": "{$link['y']}"
-            }
-EOT;
-                    
-                    array_push($linkList, $linkJson);
-                }
-                // Convert nodes into a comma delimited string
-                $linkList = implode(",\n", $linkList);
-                
-                
-                // Parse and setup subDFDNodes list
-                $subDFDNodeList = array();
-                foreach ($this->rawData['subDFDNodeList'] as $subDFDnode)
-                {
-                    // Using a heredoc - ugly but easy to understand
-                    $subDFDNodeJson =<<<EOT
-        {
-            "id": "{$subDFDnode['id']}_id",
-            "type": "{$subDFDnode['type']}",
-            "label": "{$subDFDnode['label']}",
-            "x": "{$subDFDnode['x']}",
-            "y": "{$subDFDnode['y']}"
-        }
-EOT;
-                    
-                    array_push($subDFDNodeList, $subDFDNodeJson);
-                }
-                $subDFDNodeList = implode(",\n", $subDFDNodeList);
-                    
-                $this->representation =<<<EOT
-{
-    "id": "{$this->rawData['id']}_id",
-    "label": "{$this->rawData['label']}",
-    "type": "{$this->rawData['type']}",
-    "originator": "{$this->rawData['originator']}",
-    "genericType": "{$this->rawData['genericType']}",
-    "subDFDNode": "{$this->rawData['subDFDNode']}",
-    "nodes": 
-    [
-{$nodeList}
-    ],
-    "links": 
-        [
-$linkList
-        ],
-    "subDFDNodes": 
-    [
-{$subDFDNodeList}
-    ]
-}
-EOT;
-                 break;
-            case "Node":
-                // Convert the linkList array into a string
-                $linkList = array();
-                foreach ($this->rawData['linkList'] as $link)
-                {
-                    // Using a heredoc - ugly but easy to understand
-                    $linkJson =<<<EOT
-            {
-                "id": "{$link['id']}_id",
-                "label": "{$link['label']}"
-            }
-EOT;
-                    
-                    array_push($linkList, $linkJson);
-                }
-                // Convert nodes into a comma delimited string
-                $linkList = implode(",\n", $linkList);
- 
-                $this->representation = <<<EOT
-                    {
-                        "id": "{$this->rawData['id']}_id",
-                        "type": "{$this->rawData['type']}",
-                        "genericType": "{$this->rawData['genericType']}",
-                        "label": "{$this->rawData['label']}",
-                        "x": "{$this->rawData['x']}",
-                        "y": "{$this->rawData['y']}",
-                        "originator": "{$this->rawData['originator']}",
-                        "links": [$linkList]
-                    }
-EOT;
-                break;
-            case "SubDFDNode":
-                // Convert the linkList array into a string
-                $linkList = array();
-                foreach ($this->rawData['linkList'] as $link)
-                {
-                    // Using a heredoc - ugly but easy to understand
-                    $linkJson =<<<EOT
-            {
-                "id": "{$link['id']}_id",
-                "label": "{$link['label']}"
-            }
-EOT;
-                    
-                    array_push($linkList, $linkJson);
-                }
-                // Convert nodes into a comma delimited string
-                $linkList = implode(",\n", $linkList);
-                
-                $this->representation = <<<EOT
-                    {
-                        "id": "{$this->rawData['id']}_id",
-                        "type": "{$this->rawData['type']}",
-                        "genericType": "{$this->rawData['genericType']}",
-                        "label": "{$this->rawData['label']}",
-                        "x": "{$this->rawData['x']}",
-                        "y": "{$this->rawData['y']}",
-                        "originator": "{$this->rawData['originator']}",
-                        "links": [$linkList]
-                    }
-EOT;
-                break;
-            case "Link":
-                $this->representation = <<<EOT
-                    {
-                        "id": "{$this->rawData['id']}_id",
-                        "type": "{$this->rawData['type']}",
-                        "genericType": "{$this->rawData['genericType']}",
-                        "origin_id": 
-                            {
-                                "id": "{$this->rawData['originNode']['id']}_id",
-                                "label": "{$this->rawData['originNode']['label']}"
-                            },
-                        "dest_id": 
-                            {
-                                "id": "{$this->rawData['destinationNode']['id']}_id",
-                                "label": "{$this->rawData['destinationNode']['label']}"
-                            },
-                        "originator": "{$this->rawData['originator']}",
-                        "x": "{$this->rawData['x']}",
-                        "y": "{$this->rawData['y']}"
-                    }
-EOT;
-        }
+        $this->representation = json_encode(addTags($this->rawData, $this->uuidTag));
     }
     
     /**

@@ -433,11 +433,11 @@ class DataFlowDiagramTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->object->getOriginator(), $row['originator']);
         $this->assertEquals(Types::DataFlowDiagram, $row['type']);
 
-        $rows = $this->pdo->query("SELECT * FROM element_list WHERE dfd_id = '" . $this->object->getId() . "'");
+        $rows = $this->pdo->query("SELECT * FROM element_list WHERE diagramId = '" . $this->object->getId() . "'");
         for ($i = 0; $i < $this->object->getNumberOfElements(); $i++)
         {
             $row = $rows->fetch();
-            $this->assertEquals($this->object->getElementByPosition($i)->getId(), $row['el_id']);
+            $this->assertEquals($this->object->getElementByPosition($i)->getId(), $row['elementId']);
         }
     }
 

@@ -105,14 +105,14 @@ abstract class Entity
        
        $genericType = NULL;
        
-       // Figure out the generic type - i.e. Link, Node, SubDFDNode or DataFlowDiagram
+       // Figure out the generic type - i.e. Link, Node, diaNode or DataFlowDiagram
        if (is_subclass_of($this, "Diagram"))
        {
            $genericType = "Diagram";
        }
-       elseif (is_subclass_of($this, "SubDFDNode"))
+       elseif (is_subclass_of($this, "DiaNode"))
        {
-           $genericType = "SubDFDNode";
+           $genericType = "diaNode";
        }
        elseif (is_subclass_of($this, "Node"))
        {
