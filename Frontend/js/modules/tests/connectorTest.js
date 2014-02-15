@@ -154,6 +154,21 @@ define(['modules/connector'], function(Connector) {
              
             Connector.put("Controller.php/0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx_id", JSON.stringify(data), onSuccess, onFail);
         });
+        
+        asyncTest("Connector: Valid DELETE", function() {
+            var onSuccess = function(response) {
+                ok(true, "Request should be successful");
+                start();
+            };
+            
+            var onFail = function(response) {
+                console.log(response.getError());
+                ok(false, "Request should not fail");
+                start();
+            };
+             
+            Connector.delete("Controller.php/0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx_id", onSuccess, onFail);
+        });
     };
     
     return {
