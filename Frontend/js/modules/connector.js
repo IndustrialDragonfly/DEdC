@@ -2,7 +2,7 @@
 * Connector will handel all Ajax code
 */
 define(["modules/response", "jquery"], function (Response, $) {
-
+    
    /**
     * Ajax GET method
     * @param {String} url Url of resource
@@ -12,15 +12,15 @@ define(["modules/response", "jquery"], function (Response, $) {
    var publicGet = function (url, successCallback, failCallback) {
        $.ajax({
            accepts: "application/json",
-           url: url,
-           dataType: "json" // Do not let jQuery automatically parse the JSON response
+           url: url
        }).done(function (data, textStatus) {
            // Request was successful
            successCallback(parseJson(data));
        }).fail(function (jqXHR, textStatus, errorThrown) {
            // Request failed for some reason
            var response = new Response();
-
+           
+           response.setData(errorThrown);
            response.setStatus(textStatus);
            response.setError("GET " + url + " " + jqXHR.status + " (" + jqXHR.statusText + ")");
 
@@ -38,8 +38,7 @@ define(["modules/response", "jquery"], function (Response, $) {
        $.ajax({
            type: "DELETE",
            accepts: "application/json",
-           url: url,
-           dataType: "json"
+           url: url
        }).done(function (data, textStatus) {
            successCallback(parseJson(data));
        }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -66,7 +65,6 @@ define(["modules/response", "jquery"], function (Response, $) {
            type: "PUT",
            url: url,
            data: dataString,
-           dataType: "json",
            processData: false,
            contentType: "application/json"
        }).done(function (data, textStatus) {
@@ -82,7 +80,7 @@ define(["modules/response", "jquery"], function (Response, $) {
 
        });
 
-   }
+   };
 
    /**
     * Parse a JSON object
