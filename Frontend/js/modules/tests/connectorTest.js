@@ -1,60 +1,63 @@
 define(['modules/connector'], function(Connector) {
+    var expectedData = {
+    id:"0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx_id", 
+    label:"New_DFD!", 
+    type:"DataFlowDiagram", 
+    originator:"The Eugene", 
+    genericType:"Diagram", 
+    subDFDNode:"", 
+    nodes:[
+        {
+            id:"cabumEiAZdExZKbHDaumNT9KEoN0lwUJZwgyISIDre4x_id", 
+            type:"ExternalInteractor", 
+            label:"Some Interactor", 
+            x:"100", 
+            y:"100"
+        }, 
+        {
+            id:"mmWyh0gmygRejKr2meuRGSfLAl9oceUAhrG7foCquFox_id",
+            type:"DataStore", 
+            label:"Some Store", 
+            x:"200", 
+            y:"100"
+        }, 
+        {
+            id:"TgRGVyTIh0srk2zw7OndjUx9AcyNx4AymEWiOMnDMPwx_id",
+            type:"Process", 
+            label:"Some Proc", 
+            x:"100", 
+            y:"200"
+        }
+    ], 
+    links:[
+        {
+            id:"hClaOolenANwol8HZhcIK7ulTfDiEwFtRM2CMo9Ppxgx_id", 
+            type:"DataFlow", 
+            label:"Some Dataflow", 
+            origin_id:"TgRGVyTIh0srk2zw7OndjUx9AcyNx4AymEWiOMnDMPwx_id", 
+            dest_id:"nDnIae2poYlZu6x87lYuoSg7XYZ8jmxpx6xthnrp3qcx_id", 
+            x:"100", 
+            y:"200"
+        }
+    ], 
+    subDFDNodes:[
+        {
+            id:"nDnIae2poYlZu6x87lYuoSg7XYZ8jmxpx6xthnrp3qcx_id",
+            type:"Multiprocess",
+            label:"Some Multiprocess", 
+            x:"200", 
+            y:"200"
+        }
+    ]
+};
+    var validUrl = "Controller.php/0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx_id";
+    var invalidUrl = "Controller.php/some_id_that_doesnt_exist";
+
     
     var publicRun = function() {
         asyncTest("Connector: Valid GET", function() {
             var onSuccess = function(response) {
                 notEqual(response, null, "Test response not null");
-                var expectedData = {
-                    id:"0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx_id", 
-                    label:"New_DFD!", 
-                    type:"DataFlowDiagram", 
-                    originator:"The Eugene", 
-                    genericType:"Diagram", 
-                    subDFDNode:"", 
-                    nodes:[
-                        {
-                            id:"cabumEiAZdExZKbHDaumNT9KEoN0lwUJZwgyISIDre4x_id", 
-                            type:"ExternalInteractor", 
-                            label:"Some Interactor", 
-                            x:"100", 
-                            y:"100"
-                        }, 
-                        {
-                            id:"mmWyh0gmygRejKr2meuRGSfLAl9oceUAhrG7foCquFox_id",
-                            type:"DataStore", 
-                            label:"Some Store", 
-                            x:"200", 
-                            y:"100"
-                        }, 
-                        {
-                            id:"TgRGVyTIh0srk2zw7OndjUx9AcyNx4AymEWiOMnDMPwx_id",
-                            type:"Process", 
-                            label:"Some Proc", 
-                            x:"100", 
-                            y:"200"
-                        }
-                    ], 
-                    links:[
-                        {
-                            id:"hClaOolenANwol8HZhcIK7ulTfDiEwFtRM2CMo9Ppxgx_id", 
-                            type:"DataFlow", 
-                            label:"Some Dataflow", 
-                            origin_id:"TgRGVyTIh0srk2zw7OndjUx9AcyNx4AymEWiOMnDMPwx_id", 
-                            dest_id:"nDnIae2poYlZu6x87lYuoSg7XYZ8jmxpx6xthnrp3qcx_id", 
-                            x:"100", 
-                            y:"200"
-                        }
-                    ], 
-                    subDFDNodes:[
-                        {
-                            id:"nDnIae2poYlZu6x87lYuoSg7XYZ8jmxpx6xthnrp3qcx_id",
-                            type:"Multiprocess",
-                            label:"Some Multiprocess", 
-                            x:"200", 
-                            y:"200"
-                        }
-                    ]
-                };
                 
                 ok(JSON.stringify(expectedData) === JSON.stringify(response.getData()), "Test if data was as expected");
                 equal(response.getStatus(), "", "Response Status should be as expected.");
@@ -67,7 +70,7 @@ define(['modules/connector'], function(Connector) {
                 start();
             };
             
-            Connector.get("Controller.php/0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx_id", onSuccess, onFail);
+            Connector.get(validUrl, onSuccess, onFail);
         });
         
         asyncTest("Connector: Invalid GET", function() {
@@ -81,11 +84,11 @@ define(['modules/connector'], function(Connector) {
                 notEqual(response, null, "Response should not be null");
                 
                 equal(response.getStatus(), "error", "Test status text on failure");
-                equal(response.getError(), "GET Controller.php/some_id_thats_not_an_id 500 (Internal Server Error)", "Test error message on failure");
+                equal(response.getError(), "GET " + invalidUrl + " 404 (Not Found)", "Test error message on failure");
                 start();
             };
             
-            Connector.get("Controller.php/some_id_thats_not_an_id", onSuccess, onFail);
+            Connector.get(invalidUrl, onSuccess, onFail);
         });
         
         asyncTest("Connector: Valid PUT", function() {
@@ -152,7 +155,7 @@ define(['modules/connector'], function(Connector) {
                 ]
              };
              
-            Connector.put("Controller.php/0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx_id", JSON.stringify(data), onSuccess, onFail);
+            Connector.put(validUrl, JSON.stringify(data), onSuccess, onFail);
         });
         
         asyncTest("Connector: Valid DELETE", function() {
@@ -167,7 +170,7 @@ define(['modules/connector'], function(Connector) {
                 start();
             };
              
-            Connector.delete("Controller.php/0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx_id", onSuccess, onFail);
+            Connector.delete(validUrl, onSuccess, onFail);
         });
     };
     
