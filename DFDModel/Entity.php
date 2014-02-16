@@ -214,12 +214,25 @@ abstract class Entity
        }
        else
        {
-           // Throw relevant exception
+           // TODO - Throw relevant exception
        }
        
        $entityArray['genericType'] = $genericType;
        
        return $entityArray;
+   }
+   
+       /**
+     * Takes an assocative array representing an object and loads it into this
+     * object.
+     * @param Mixed[] $assocativeArray
+     */
+   protected function loadAssociativeArray($associativeArray)
+   {
+       // TODO - error handling for missing elements/invalid elements
+        $this->label = $associativeArray['label'];
+        $this->originator = $associativeArray['originator'];
+        $this->organization = $associativeArray['organization'];
    }
 }
 

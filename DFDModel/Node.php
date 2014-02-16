@@ -28,9 +28,11 @@ abstract class Node extends Element
      * This is a constructor that takes in 2 parameters.  The first parameter is 
      * always a valid storage medium.  the second paramenter is either the UUID 
      * of a Diagram or a UUID of a node decended object to load.  
-     * @param ReadStorable $datastore
+     * @param {ReadStorable,WriteStorable} $datastore
      * @param string $id    the UUID of either the parent Diagram or the id of the 
-     *                      Node to be loaded
+     *                      Node to be loaded (can be replaced by an assocative array
+     *                      to load
+     * @param Mixed[] $assocativeArray
      */
     public function __construct()
     {
@@ -39,37 +41,58 @@ abstract class Node extends Element
             parent::__construct();
             $this->linkList = array();
             $this->storage = func_get_arg(0);
-
-            // Find if the type of the second argument is DFD, if so, its a new DFD
-            if (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Diagram"))
+            // Check that the first parameter implements both Readable and Writable
+            if (!is_subclass_of($this->storage, "ReadStorable"))
             {
-                $this->parent = func_get_arg(1);
+                throw new BadConstructorCallException("Passed storage object does not implement ReadStorable.");
             }
-            //if the type of the second argument is not a DFD, then load from DB
-            elseif (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Node"))
+            if (!is_subclass_of($this->storage, "WriteStorable"))
             {
-                $this->id = func_get_arg(1);
+                throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
+            }
+                        
+            // Find out if handed an ID or an assocative array for the second arg
+            if (is_string(func_get_arg(1)))
+            {
+                $id = func_get_arg(1);
+                // TODO - add exception handling to getTypeFromUUID call such that it at a minimum gives 
+                // information specific to this class in addition to passing the original error
+                $type = $this->storage->getTypeFromUUID($id);
+                // Find if the type of the second argument is Diagram, if so, its a new node
+                if (is_subclass_of($type, "Diagram"))
+                {
+                    $this->parent = $id;
+                }
+                //if the type of the second argument is not a Diagram, then load from storage
+                elseif (is_subclass_of($type, "Node"))
+                {
+                    $this->id = $id;
 
-                $vars = $this->storage->loadNode($this->id);
+                    $assocativeArray = $this->storage->loadNode($this->id);
 
-                // Potentially this section could be rewritten using a foreach loop
-                // on the array and reflection on the current node to determine
-                // what it should store locally
-                $this->label = $vars['label'];
-                $this->originator = $vars['originator'];
-                $this->x = $vars['x'];
-                $this->y = $vars['y'];
-                $this->linkList = $vars['linkList'];
-                $this->parent = $vars['diagramId'];
+                    $this->loadAssociativeArray($assocativeArray);
+
+                }
+                else
+                {
+                    throw new BadConstructorCallException("Passed ID was for neither a Node nor a Diagram.");
+                }
+            }
+            // Otherwise if it is an array, load it
+            elseif (is_array(func_get_arg(1)))
+            {
+                $assocativeArray = func_get_arg(1);
+                
+                $this->loadAssociativeArray($assocativeArray);
             }
             else
             {
-                throw new BadConstructorCallException("Passed id was neither a valid Diagram nor a Node");
+                throw new BadConstructorCallException("Invalid second parameter, can be neither an ID or an assocative array");
             }
         }
         else
         {
-            throw new BadConstructorCallException("Wrong number of imput parameters were passed to this constructor");
+            throw new BadConstructorCallException("Invalid number of input parameters were passed to this constructor");
         }
     }
 
@@ -179,6 +202,21 @@ abstract class Node extends Element
         $nodeArray['linkList'] = $this->linkList;
 
         return $nodeArray;
+    }
+    
+    /**
+     * Takes an assocative array representing an object and loads it into this
+     * object.
+     * @param Mixed[] $assocativeArray
+     */
+    protected function loadAssociativeArray($associativeArray)
+    {
+        // TODO - error handling for missing elements/invalid elements
+        // Potentially this section could be rewritten using a foreach loop
+        // on the array and reflection on the current node to determine
+        // what it should store locally
+        parent::loadAssociativeArray($associativeArray);
+        $this->linkList = $associativeArray['linkList'];
     }
 
     //</editor-fold>

@@ -152,6 +152,21 @@ require_once 'Entity.php';
        
        return $elementArray;
    }
+   
+     /**
+     * Takes an assocative array representing an object and loads it into this
+     * object.
+     * @param Mixed[] $assocativeArray
+     */
+    protected function loadAssociativeArray($associativeArray)
+    {
+        // TODO - error handling for missing elements/invalid elements
+        parent::loadAssociativeArray($associativeArray);
+        $this->x = $associativeArray['x'];
+        $this->y = $associativeArray['y'];
+        $this->parent = $associativeArray['diagramId'];
+    }
+    
    //</editor-fold>
    //</editor-fold>
 }
