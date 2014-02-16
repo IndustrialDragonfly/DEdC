@@ -31,10 +31,10 @@ class DiaNode extends Node
    {     
       if (func_num_args() == 2 )
         {   
-            parent::__construct(func_get_arg(0), func_get_arg(1));
             // Find out if handed an ID or an assocative array for the second arg
             if (is_string(func_get_arg(1)))
             {
+                parent::__construct(func_get_arg(0), func_get_arg(1));
                 $id = func_get_arg(1);
                 // TODO - add exception handling to getTypeFromUUID call such that it at a minimum gives 
                 // information specific to this class in addition to passing the original error
@@ -63,9 +63,12 @@ class DiaNode extends Node
             // everything is loaded by Node
             elseif (is_array(func_get_arg(1)))
             {
-                $assocativeArray = func_get_arg(1);
-                // TODO - make sure this diagram is either Null or exists
-                $this->subDiagram = $assocativeArray['diagramId'];
+                // Very deliberately NOT calling the parent constructor, as
+                // loadAssociativeArray is doing all the loading with calls
+                // to its parent versions
+                $associativeArray = func_get_arg(1);
+                $this->loadAssociativeArray($associativeArray);
+                
             }
             else
             {
@@ -131,6 +134,19 @@ class DiaNode extends Node
        
        return $diaNodeArray;
    }
+   
+       /**
+     * Takes an assocative array representing an object and loads it into this
+     * object.
+     * @param Mixed[] $assocativeArray
+     */
+    protected function loadAssociativeArray($associativeArray)
+    {
+        parent::loadAssociativeArray($associativeArray);
+        
+        // TODO - error handling for missing elements/invalid elements
+        $this->subDiagram = $associativeArray['diagramId'];
+    }
 
    //</editor-fold>
    //<editor-fold desc="overriding functions" defaultstate="collapsed">

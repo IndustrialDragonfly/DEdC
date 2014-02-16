@@ -230,6 +230,7 @@ abstract class Entity
    protected function loadAssociativeArray($associativeArray)
    {
        // TODO - error handling for missing elements/invalid elements
+        $this->id = $associativeArray['id'];
         $this->label = $associativeArray['label'];
         $this->originator = $associativeArray['originator'];
         $this->organization = $associativeArray['organization'];
