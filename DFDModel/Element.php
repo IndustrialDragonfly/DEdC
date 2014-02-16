@@ -41,6 +41,7 @@ require_once 'Entity.php';
     */
    public function __construct()
    {
+       // TODO - this constructor should know when it should set things to be null and when it is being loaded other ways
       parent::__construct();
       $this->x = 0;
       $this->y = 0;

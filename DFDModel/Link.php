@@ -30,52 +30,70 @@ abstract class Link extends Element
      * constructor. if no arguments are specified a new object is created with
      * a random id. if three arguments are specified, the oject is loaded from the
      * DB if an entry with a matching id exists
-     * @param ReadStorable $storage
-     * @param string $id
-     * @param DataFlowDiagram $parent
+     * @param {Read,Write}Storable $storage
+     * @param string $id (Optional if associative array is in its place)
+     * @param Mixed[] $associativeArray (Optional if a Link or Diagram ID is in its place)
      */
     public function __construct()
-    {
-        
-        if (func_num_args() == 2)
+    {  
+        if (func_num_args() == 2 )
         {
-            parent::__construct();
+             parent::__construct(func_get_arg(0), func_get_arg(1));
+            // TODO - Get storage setting moved up the stack so it isn't repeated all over the place
             $this->storage = func_get_arg(0);
-            
-            // Find if the type of the second argument is DFD, if so, its a new DFD
-            if (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Diagram"))
+            // Check that the first parameter implements both Readable and Writable
+            if (!is_subclass_of($this->storage, "ReadStorable"))
             {
-                $this->parent = func_get_arg(1);
-                $this->originNode = NULL;
-                $this->destinationNode = NULL;
+                throw new BadConstructorCallException("Passed storage object does not implement ReadStorable.");
             }
-            //if the type of the second argument is not a DFD, then load from DB
-            else if (is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Link"))
+            if (!is_subclass_of($this->storage, "WriteStorable"))
             {
-                $this->storage = func_get_arg(0);
-                $this->id = func_get_arg(1);
+                throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
+            }
+                        
+            // Find out if handed an ID or an assocative array for the second arg
+            if (is_string(func_get_arg(1)))
+            {
+                $id = func_get_arg(1);
+                // TODO - add exception handling to getTypeFromUUID call such that it at a minimum gives 
+                // information specific to this class in addition to passing the original error
+                $type = $this->storage->getTypeFromUUID($id);
+                // Find if the type of the second argument is Diagram, if so, its a new node
+                if (is_subclass_of($type, "Diagram"))
+                {
+                    $this->parent = $id;
+                    $this->originNode = NULL;
+                    $this->destinationNode = NULL;
+                }
+                //if the type of the second argument is not a Diagram, then load from storage
+                elseif (is_subclass_of($type, "Link"))
+                {                    
+                    $associativeArray = $this->storage->loadLink($this->id);
 
-                $vars = $this->storage->loadLink($this->id);
+                    $this->loadAssociativeArray($associativeArray);
 
-                // As in other classes, this could probably be turned into a for
-                // each loop in the future for greater flexibility
-                // Perform mapping
-                $this->label = $vars['label'];
-                $this->originator = $vars['originator'];
-                $this->x = $vars['x'];
-                $this->y = $vars['y'];
-                $this->originNode = $vars['originNode'];
-                $this->destinationNode = $vars['destinationNode'];
-                $this->parent = $vars['diagramId'];
+                }
+                else
+                {
+                    throw new BadConstructorCallException("Passed ID was for neither a Link nor a Diagram.");
+                }
+            }
+            // Otherwise if it is an array, load it
+            // TODO - figure out if this can be called at a higher level (e.g. entity) while still using the entire chain of load functions
+            elseif (is_array(func_get_arg(1)))
+            {
+                $assocativeArray = func_get_arg(1);
+                
+                $this->loadAssociativeArray($assocativeArray);
             }
             else
             {
-                throw new BadConstructorCallException('input id did not match any existing DFD or Link object');
+                throw new BadConstructorCallException("Invalid second parameter, can be neither an ID or an assocative array");
             }
         }
         else
         {
-            throw new BadConstructorCallException('incorrect number of paramenters passed to this constructor');
+            throw new BadConstructorCallException("Invalid number of input parameters were passed to this constructor");
         }
     }
 
@@ -283,6 +301,20 @@ abstract class Link extends Element
         $linkArray['destinationNode'] = $this->destinationNode;
 
         return $linkArray;
+    }
+    
+    /**
+     * Takes an assocative array representing an object and loads it into this
+     * object.
+     * @param Mixed[] $assocativeArray
+     */
+    protected function loadAssociativeArray($associativeArray)
+    {
+        parent::loadAssociativeArray($associativeArray);
+        // TODO - error handling for missing elements/invalid elements
+        $this->originNode = $associativeArray['originNode'];
+        $this->destinationNode = $associativeArray['destinationNode'];
+        
     }
 
     //</editor-fold>

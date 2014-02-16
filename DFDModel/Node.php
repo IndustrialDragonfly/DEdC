@@ -38,7 +38,7 @@ abstract class Node extends Element
     {
         if (func_num_args() == 2 )
         {
-            parent::__construct();
+            parent::__construct(func_get_arg(0), func_get_arg(1));
             $this->linkList = array();
             $this->storage = func_get_arg(0);
             // Check that the first parameter implements both Readable and Writable
@@ -66,8 +66,6 @@ abstract class Node extends Element
                 //if the type of the second argument is not a Diagram, then load from storage
                 elseif (is_subclass_of($type, "Node"))
                 {
-                    $this->id = $id;
-
                     $assocativeArray = $this->storage->loadNode($this->id);
 
                     $this->loadAssociativeArray($assocativeArray);
@@ -79,6 +77,7 @@ abstract class Node extends Element
                 }
             }
             // Otherwise if it is an array, load it
+            // TODO - figure out if this can be called at a higher level (e.g. entity) while still using the entire chain of load functions
             elseif (is_array(func_get_arg(1)))
             {
                 $assocativeArray = func_get_arg(1);

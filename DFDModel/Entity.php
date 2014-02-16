@@ -52,6 +52,8 @@ abstract class Entity
     */
    public function __construct()
    {
+       // TODO - handle setting storage, and armor this constructor against issues
+       // TODO - this constructor should know when it should set things to be null and when it is being loaded other ways
       $this->id = $this->generateId();
       $this->label = '';
       $this->originator = '';
