@@ -45,6 +45,7 @@ define(["modules/response", "jquery"], function (Response, $) {
            // Request failed for some reason
            var response = new Response();
 
+           response.setData(errorThrown);
            response.setStatus(textStatus);
            response.setError("DELETE " + url + " " + jqXHR.status + " (" + jqXHR.statusText + ")");
 
@@ -73,6 +74,7 @@ define(["modules/response", "jquery"], function (Response, $) {
            // Request failed for some reason
            var response = new Response();
 
+           response.setData(errorThrown);
            response.setStatus(textStatus);
            response.setError("DELETE " + url + " " + jqXHR.status + " (" + jqXHR.statusText + ")");
 
