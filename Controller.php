@@ -1,7 +1,7 @@
 <?php
 /*
  * @author Eugene
- * @Description Central piece of controller code which handles figuring out
+ * Central piece of controller code which handles figuring out
  * how to handle all incoming requests from clients and addresses the data model
  * to deal with them.
  */
@@ -78,24 +78,15 @@ require_once "AuthorizeUser.php";
     // Pass authentication information from client
     if (!authenticateUser())
     {
-        // Return authentication error to client
-        sendHeader(failedAuthentication);
+        // TODO - handle authentication
         exit;
     }
     
-    // Determine if a valid request and media type
-    // apache_request_headers();
-    /*if (!checkFormat())
-    {
-        // Return error indicating problem with format to client
-        sendHeader(invalidFormat);
-        exit;
-    }*/
     // Determine if user has correct permissions to perform the action
     if (!authorizeUser())
     {
         // Return authorization error to client
-        sendHeader(notAuthorized);
+        // TODO - handle authorization
         exit;
     }
     
@@ -112,15 +103,20 @@ require_once "AuthorizeUser.php";
         case MethodsEnum::GET:
             $element = existingElementFactory($request->getId(), $storage);
             $response = new SimpleResponse($element->getAssociativeArray());
+            // TODO - handle fail cases
             $response->setHeader(200);
             header($response->getHeader());
             echo $response->getRepresentation();
             break;
+        
+        
         case MethodsEnum::POST:
             sendHeader(successful);
             // If needed
             sendData(result);
             break;
+        
+        
         case MethodsEnum::PUT:
           
             // If there is an ID attached, then we are being asked to update
@@ -153,19 +149,26 @@ require_once "AuthorizeUser.php";
             header($response->getHeader());           
                         
             break;
+            
+            
         case MethodsEnum::DELETE:
             // Delete needs to send no data other than a header
             $element = existingElementFactory($request->getId(), $storage);
             $element->delete();
+            // TODO - Handle fail cases
             $response = new SimpleResponse();
             $response->setHeader(200);
             header($response->getHeader());
             break;
             break;
+        
+        
         case MethodsEnum::UPDATE:
             sendHeader(sucessful);
             // should be no need to send data since it is idemnipotentent
             break;
+        
+        
         default:
             echo "ERROR  - Bad method";
             //sendHeader(serverError);
