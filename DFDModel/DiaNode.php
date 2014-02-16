@@ -7,6 +7,7 @@ require_once 'DataFlowDiagram.php';
  * Description of DiaNode
  *
  * @author Josh Clark
+ * @author Eugene Davis
  */
 class DiaNode extends Node
 {
@@ -17,35 +18,65 @@ class DiaNode extends Node
    //</editor-fold>
    //<editor-fold desc="Constructor" defaultstate="collapsed">
    
-   /**
-* constructor. if no arguments are specified a new object is created with
-* a random id. if three arguments are specified, the oject is loaded from the
-* DB if an entry with a matching id exists
-* @param PDO $pdo
-* @param string $id
-* @param DataFlowDiagram $parent
-*/
+    /**
+     * Constructs the DiaNode. Always requires a storage object. If passed an ID of
+     * an existing DiaNode, loads that from the storage object. If passed the ID
+     * of an existing Diagram, creates a new DiaNode in that object. If passed
+     * an associativeArray which represents a DiaNode, loads that.
+     * @param {Read,Write}Storable $storage
+     * @param String $id (Optional if associative array is passed instead)
+     * @param Mixed[] $associativeArray (Optionial if ID is passed instead)
+    */
    public function __construct()
-   {
-      // Case when the constructor is passed only a storage object
-      // and a parent DFD
-      if (func_num_args() == 2)
-      {
-         // Since we don't require linking up to a DFD on construction,
-         // the construction is almost identical to a node object'
-         parent::__construct(func_get_arg(0), func_get_arg(1));
-         $this->subDiagram = NULL;
-      }
-      // If constructor is passed a storage object, and an ID,
-      // load from storage
-      else if (func_num_args() == 2)
-      {
-         parent::__construct(func_get_arg(0), func_get_arg(1));
+   {     
+      if (func_num_args() == 2 )
+        {   
+            parent::__construct(func_get_arg(0), func_get_arg(1));
+            // Find out if handed an ID or an assocative array for the second arg
+            if (is_string(func_get_arg(1)))
+            {
+                $id = func_get_arg(1);
+                // TODO - add exception handling to getTypeFromUUID call such that it at a minimum gives 
+                // information specific to this class in addition to passing the original error
+                $type = $this->storage->getTypeFromUUID($id);
+                // Find if the type of the second argument is Diagram, if so, its a new node
+                if (is_subclass_of($type, "Diagram"))
+                {
+                   $this->subDiagram = NULL;
+                }
+                //if the type of the second argument is not a Diagram, then load from storage
+                elseif (is_subclass_of($type, "Node"))
+                {
+                    $this->id = $id;
          
-         // Load mapping of diaNode to DFD, unlike most load functions
-         // this one returns a single value rather than an assocative array
-         $this->subDiagram = $this->storage->loadDiaNode($this->id);         
-      }
+                    // Load mapping of diaNode to DFD, unlike most load functions
+                    // this one returns a single value rather than an assocative array
+                    $this->subDiagram = $this->storage->loadDiaNode($this->id);   
+
+                }
+                else
+                {
+                    throw new BadConstructorCallException("Passed ID was for neither a Node nor a Diagram.");
+                }
+            }
+            // Otherwise if it is an array, load it, other than the linked diagram,
+            // everything is loaded by Node
+            elseif (is_array(func_get_arg(1)))
+            {
+                $assocativeArray = func_get_arg(1);
+                // TODO - make sure this diagram is either Null or exists
+                $this->subDiagram = $assocativeArray['diagramId'];
+            }
+            else
+            {
+                throw new BadConstructorCallException("Invalid second parameter, can be neither an ID or an assocative array");
+            }
+        }
+        else
+        {
+            throw new BadConstructorCallException("Invalid number of input parameters were passed to this constructor");
+        }
+      
    }
 
    //</editor-fold>
