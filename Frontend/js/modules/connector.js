@@ -12,10 +12,40 @@ define(["modules/response", "jquery"], function (Response, $) {
    var publicGet = function (url, successCallback, failCallback) {
        $.ajax({
            accepts: "application/json",
-           url: url
+           url: url,
+           dataType: "text"
        }).done(function (data, textStatus) {
            // Request was successful
-           successCallback(parseJson(data));
+           var jsonData = false;
+           var exception = false;
+           try {
+               jsonData = JSON.parse(data);
+           } catch (e) {
+               exception = e;
+           }
+           
+           if (jsonData && !exception) {
+               // Data received was successfully parsed as JSON
+                var response = new Response();
+
+                response.setData(jsonData);
+                if (textStatus) {
+                     response.setStatus(textStatus);
+                }
+                successCallback(response);
+           } else {
+               // JSON was not parsed successfully
+                var response = new Response();
+
+                // Data was received, but was not JSON
+                if (data) {
+                    response.setData(data);
+                }
+                response.setStatus(textStatus);
+                response.setError("GET " + url + " " + data);
+                
+                failCallback(response);
+           }
        }).fail(function (jqXHR, textStatus, errorThrown) {
            // Request failed for some reason
            var response = new Response();
@@ -38,13 +68,44 @@ define(["modules/response", "jquery"], function (Response, $) {
        $.ajax({
            type: "DELETE",
            accepts: "application/json",
-           url: url
+           url: url,
+           dataType: "text"
        }).done(function (data, textStatus) {
-           successCallback(parseJson(data));
+           // Request was successful
+           var jsonData = false;
+           var exception = false;
+           try {
+               jsonData = JSON.parse(data);
+           } catch (e) {
+               exception = e;
+           }
+           
+           if (jsonData && !exception) {
+               // Data received was successfully parsed as JSON
+                var response = new Response();
+
+                response.setData(jsonData);
+                if (textStatus) {
+                     response.setStatus(textStatus);
+                }
+                successCallback(response);
+           } else {
+               // JSON was not parsed successfully
+                var response = new Response();
+
+                // Data was received, but was not JSON
+                if (data) {
+                    response.setData(data);
+                }
+                response.setStatus(textStatus);
+                response.setError("GET " + url + " " + data);
+                
+                failCallback(response);
+           }
        }).fail(function (jqXHR, textStatus, errorThrown) {
            // Request failed for some reason
            var response = new Response();
-
+           
            response.setData(errorThrown);
            response.setStatus(textStatus);
            response.setError("DELETE " + url + " " + jqXHR.status + " (" + jqXHR.statusText + ")");
@@ -67,37 +128,50 @@ define(["modules/response", "jquery"], function (Response, $) {
            url: url,
            data: dataString,
            processData: false,
-           contentType: "application/json"
+           contentType: "application/json",
+           dataType: "text"
        }).done(function (data, textStatus) {
-           successCallback(parseJson(data));
+           // Request was successful
+           var jsonData = false;
+           var exception = false;
+           try {
+               jsonData = JSON.parse(data);
+           } catch (e) {
+               exception = e;
+           }
+           
+           if (jsonData && !exception) {
+               // Data received was successfully parsed as JSON
+                var response = new Response();
+
+                response.setData(jsonData);
+                if (textStatus) {
+                     response.setStatus(textStatus);
+                }
+                successCallback(response);
+           } else {
+               // JSON was not parsed successfully
+                var response = new Response();
+
+                // Data was received, but was not JSON
+                if (data) {
+                    response.setData(data);
+                }
+                response.setStatus(textStatus);
+                response.setError("GET " + url + " " + data);
+                
+                failCallback(response);
+           }
        }).fail(function (jqXHR, textStatus, errorThrown) {
            // Request failed for some reason
            var response = new Response();
-
+           
            response.setData(errorThrown);
            response.setStatus(textStatus);
-           response.setError("DELETE " + url + " " + jqXHR.status + " (" + jqXHR.statusText + ")");
+           response.setError("PUT " + url + " " + jqXHR.status + " (" + jqXHR.statusText + ")");
 
            failCallback(response);
-
        });
-
-   };
-
-   /**
-    * Parse a JSON object
-    * @param {jsonObject} jsonObject JSON document that has been translated by jQuery to an Object
-    * @param {String} textStatus Status text from jQuery.ajax
-    */
-   var parseJson = function (jsonObject, textStatus) {
-       var response = new Response();
-
-       response.setData(jsonObject);
-       if (textStatus) {
-            response.setStatus(textStatus);
-       }
-
-       return response;
    };
 
    return {
