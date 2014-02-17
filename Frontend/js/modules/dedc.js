@@ -124,15 +124,23 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             $(deleteButton).button().click(function () {
                 var c = getCurrentCanvas();
                 if (c) {
-                    var onSuccess = function(response) {
-                        c.removeElementFromSelection();
-                    };
-                    
-                    var onFail = function(response) {
-                        console.log("Removing element failed. " + response.getError());
-                    };
-                    
-                    Connector.delete("Controller.php/delete/0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx_id", onSuccess, onFail);
+                                       
+                    c.getSelection().forEach(function (entry) {
+                        if (entry.getData() && entry.getData().id) {
+                            // Element exists in the backend because it has an id
+                            var onSuccess = function(response) {
+                                c.removeElementById(entry.getData().id);
+                            };
+                            var onFail = function(response) {
+                                console.log("Removing element failed. " + response.getError());
+                            };
+                            
+                            Connector.delete("Controller.php/" + entry.getData().id, onSuccess, onFail);
+                        } else {
+                            // Element did not exist in the backend
+                            c.removeElement(entry);
+                        }
+                    });
                 } else {
                     console.log("No tab currently selected.");
                 }

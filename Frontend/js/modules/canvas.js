@@ -149,6 +149,14 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
                }
            }
        };
+       
+       /**
+        * Get an array of the currently selected elements
+        * @returns {Array} Array of Elements
+        */
+       this.getSelection = function () {
+           return selection;
+       };
 
        /**
         * Unselect all of the elements on the canvas
@@ -269,6 +277,27 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
                elements.splice(index, 1);
                return true;
            }
+           return false;
+       };
+       
+       /**
+        * Remove an element from the canvas using the id
+        * @param {type} id Id of the element
+        * @return {boolean} True if the element was removed, false otherwise
+        */
+       this.removeElementById = function (id) {
+           var element;
+
+           elements.forEach(function (entry) {
+               if (entry.getData().id === id) {
+                   element = entry;
+               }
+           });
+           
+           if (element) {
+               return this.removeElement(element);
+           }
+           
            return false;
        };
 
