@@ -1,6 +1,8 @@
 requirejs.config({
-    // Load modules from Frontend/js/lib by default
+    // Load modules from Frontend/js by default
     baseUrl: 'Frontend/js',
+    // Prevent caching by inserting the current time as a query string
+    urlArgs: "bust=" + (new Date()).getTime(),
 
     // Map shorthand names to file paths relative to baseUrl
     paths: {
