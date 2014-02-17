@@ -5,7 +5,7 @@ require_once 'Entity.php';
  * which contains most of the functionality for diagram objects like 
  * DataFlowDiagram
  *
- * @author eugene
+ * @author Eugene Davis
  */
 abstract class Diagram extends Entity
 {
@@ -57,71 +57,93 @@ abstract class Diagram extends Entity
      * first parameter will always be the storage and is required
      * second parameter is optional; this is either the UUID of a parent node 
      * or a UUID of a diagram to load from storage
-     * @param Readable/Writable $storage
-     * @param String $id this is the UUID of either the DiaNode this is 
-     *                  connected to or the UUID of the DFD to load from storeage 
+     * @param {Read,Write}Storable $storage
+     * @param String $id ID of a Diagram or DiaNode to link to (optionial if an assocative array is in its place)
+     * @param Mixed[] $associativeArray associative array representing a diagram object (optional if an ID is in its place) 
      */
    public function __construct()
    {
-      parent::__construct();
-      $this->storage = func_get_arg(0);
-      $this->nodeList = array();
-      $this->linkList = array();
-      $this->diaNodeList = array();
-      // If there is only one argument (the storage object) then this is a
-      // root DFD
-      // DataFlowDiagram($storage)
+      parent::__construct(func_get_arg(0), func_get_arg(1));
+        $this->storage = func_get_arg(0);
+        $this->nodeList = array();
+        $this->linkList = array();
+        $this->diaNodeList = array();
+        // TODO - handle storage at a higher level
+        $this->storage = func_get_arg(0);
+        // Check that the first parameter implements both Readable and Writable
+        if (!is_subclass_of($this->storage, "ReadStorable"))
+        {
+            throw new BadConstructorCallException("Passed storage object does not implement ReadStorable.");
+        }
+        if (!is_subclass_of($this->storage, "WriteStorable"))
+        {
+            throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
+        }
+      
+      // Setup a new diagram if only the storage object was passed
       if (func_num_args() == 1)
       {
          $this->ancestry = null;
          $this->diaNode = null;
       }
-      // If creating a new DFD connected to a DiaNode
-      // DataFlowDiagram($storage, $DiaNode)
-      else if (func_num_args() == 2 )
-      {
-          if(  is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "DiaNode")  ) 
-          {
-            $this->diaNode = func_get_arg(1);
+      
+      elseif (func_num_args() == 2 )
+        {                     
+            // Find out if handed an ID or an assocative array for the second arg
+            if (is_string(func_get_arg(1)))
+            {
+                $id = func_get_arg(1);
+                // TODO - add exception handling to getTypeFromUUID call such that it at a minimum gives 
+                // information specific to this class in addition to passing the original error
+                $type = $this->storage->getTypeFromUUID($id);
+                // Find if the type of the second argument is Diagram, if so, its a new node
+                if (is_subclass_of($type, "DiaNode"))
+                {
+                    $this->diaNode = func_get_arg(1);
 
-             // Initialize the linked DiaNode so we can get its parent and link
-             // ourselves into it
-             $type = getTypeFromUUID($this->diaNode);
-             $subDFDNode = new $type($this->storage);
+                    // Initialize the linked DiaNode so we can get its parent and link
+                    // ourselves into it
+                    $subDFDNode = new $type($this->storage);
 
-             $parentDFD_id = $subDFDNode->getParent();
+                    $parentDFD_id = $subDFDNode->getParent();
 
-             // Initialize the parent DFD and get its ancenstry
-             $type = getTypeFromUUID($parentDFD_id);
-             $parentDFD = new $type($parentDFD_id);
-             $this->ancestry = $parentDFD->getAncestry();
-             // Add immediate parent to stack
-             array_push($this->ancestry, $parentDFD->getId());    
-          }
-          // If this is an existing DFD to load, get the ID of the DFD
-          // DataFlowDiagram($storage, $DFD)
-          else if ( is_subclass_of($this->storage->getTypeFromUUID(func_get_arg(1)), "Diagram") )
-          {
-            $this->id = func_get_arg(1);
-            $vars = $this->storage->loadDFD($this->id);
+                    // Initialize the parent DFD and get its ancenstry
+                    $type = getTypeFromUUID($parentDFD_id);
+                    $parentDFD = new $type($parentDFD_id);
+                    $this->ancestry = $parentDFD->getAncestry();
+                    // Add immediate parent to stack
+                    array_push($this->ancestry, $parentDFD->getId());    
+                }
+                //if the type of the second argument is not a Diagram, then load from storage
+                elseif (is_subclass_of($type, "Node"))
+                {
+                    $assocativeArray = $this->storage->loadNode($this->id);
 
-            // Load up values from the associative array
-            $this->label = $vars['label'];
-            $this->originator = $vars['originator'];
-            $this->nodeList = $vars['nodeList'];
-            $this->linkList = $vars['linkList'];
-            $this->diaNodeList = $vars['DiaNodeList'];
-            $this->ancestry = $vars['ancestry'];
-          }
-          else
-          {
-              throw new BadConstructorCallException('UUID that was passed did not belong to a Diagram or  DiaNode');
-          }
-      }
-      else
-      {
-          throw  new BadConstructorCallException('incorect number of parameters was passed to the constructor');
-      }
+                    $this->loadAssociativeArray($assocativeArray);
+
+                }
+                else
+                {
+                    throw new BadConstructorCallException("Passed ID was for neither a DiaNode nor a Diagram.");
+                }
+            }
+            // Otherwise if it is an array, load it
+            // TODO - figure out if this can be called at a higher level (e.g. entity) while still using the entire chain of load functions
+            elseif (is_array(func_get_arg(1)))
+            {
+                $assocativeArray = func_get_arg(1);
+                
+                $this->loadAssociativeArray($assocativeArray);
+            }
+            else
+            {
+                throw new BadConstructorCallException("Invalid second parameter, can be neither an ID or an assocative array");
+            }
+        }
+        else
+        {
+            throw new BadConstructorCallException("Invalid number of input parameters were passed to this constructor");
+        }
    }
 
     //</editor-fold>
@@ -470,6 +492,26 @@ abstract class Diagram extends Entity
        
        return $dfdArray;
    }
+   
+    /**
+     * Takes an assocative array representing an object and loads it into this
+     * object.
+     * @param Mixed[] $assocativeArray
+     */
+    protected function loadAssociativeArray($associativeArray)
+    {
+        // TODO - error handling for missing elements/invalid elements
+        // Potentially this section could be rewritten using a foreach loop
+        // on the array and reflection on the current node to determine
+        // what it should store locally
+        parent::loadAssociativeArray($associativeArray);
+        
+        $this->nodeList = $associativeArray['nodeList'];
+        $this->linkList = $associativeArray['linkList'];
+        $this->diaNodeList = $associativeArray['DiaNodeList'];
+        $this->diaNode = $associativeArray['diaNode'];
+        $this->ancestry = $associativeArray['ancestry'];
+    }
     //</editor-fold>
     //<editor-fold desc="Storage functions" defaultstate="collapsed">
     /**
