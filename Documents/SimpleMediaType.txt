@@ -73,7 +73,7 @@ Definition for a single diaNode
     "x": "value",
     "y": "value",
     "originator": "string",
-    "subDFD": "string",
+    "diagramId": "string",
     "linkList": 
     [ 
         { 

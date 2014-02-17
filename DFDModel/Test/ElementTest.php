@@ -17,7 +17,7 @@ class ElementTest extends PHPUnit_Framework_TestCase
     */
    protected function setUp()
    {
-      $this->object = new Process;
+      $this->object = new realizedElement;
    }
 
    /**
@@ -95,4 +95,12 @@ class ElementTest extends PHPUnit_Framework_TestCase
       $this->assertEquals($testX_Y, $this->object->getLocation());
    }
 
+}
+
+/**
+ * non abstract version of element used for testing
+ */
+class realizedElement extends Element
+{
+    
 }

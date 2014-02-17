@@ -4,6 +4,7 @@ require_once '../Multiprocess.php';
 require_once '../Node.php';
 require_once '../Process.php';
 require_once '../DataFlow.php';
+require_once '../DiaNode.php';
 require_once 'testDB_functions.php';
 
 /**

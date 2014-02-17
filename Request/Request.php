@@ -1,5 +1,6 @@
 <?php
 require_once 'Requestable.php';
+require_once 'associativeArrayManager.php';
 
 /**
   * Abstract object which parses the incoming requests objects and provides
@@ -22,6 +23,8 @@ abstract class Request implements Requestable {
     protected $path; // Path to the object from a root DFD
     protected $query; // Query data from the URL (optional)
     private $uuidTag = "_id"; // Tag that identifies a UUID
+    protected $rawData; // Data from the client
+    protected $associativeArray; // Data after being processed into default form
         //<editor-fold desc="Header Attributes" defaultstate="expanded">
         /**
          * Array of the acceptable content types according to the client.
@@ -64,7 +67,7 @@ abstract class Request implements Requestable {
         {
             $idLength = strlen($id);
             $tagLength = strlen($this->uuidTag);
-            $this->id = substr($id, 0, $idLength - $tagLength);
+            $this->id = stripTag($id, $idLength - $tagLength);
         }
     }
     protected function setAcceptTypes($type)
@@ -74,6 +77,10 @@ abstract class Request implements Requestable {
     protected function setPath($path)
     {
         $this->path = $path;
+    }
+    public function setData($data)
+    {
+        $this->rawData = $data;
     }
     //</editor-fold>
     
@@ -94,6 +101,10 @@ abstract class Request implements Requestable {
     {
         return $this->path;
     }
+    public function getData()
+    {
+        return $this->associativeArray;
+    }
     //</editor-fold>
     /**
      * Creates a new request object from data from the HTTP reuest, and puts
@@ -102,13 +113,16 @@ abstract class Request implements Requestable {
      * @param String $accept
      * @param String $method
      */
-    public function __construct($accept, $method, $uri)
+    public function __construct($accept, $method, $uri, $rawData)
     {
         // Save method type used to access (from enum)
         $this->setMethod($method);
         // Save the acceptable types
         $delim = ", "; // Delimiter between acceptable content types
         $this->accept = explode($delim, $accept);
+        
+        // Save the body data
+        $this->setData($rawData);
         
         // Figure out if URI is UUID or path
         

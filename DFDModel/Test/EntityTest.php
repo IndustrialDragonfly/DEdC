@@ -19,7 +19,7 @@ class EntityTest extends PHPUnit_Framework_TestCase
     */
    protected function setUp()
    {
-      $this->object = new Process;
+      $this->object = new realizedEntity();
    }
 
    /**
@@ -66,7 +66,7 @@ class EntityTest extends PHPUnit_Framework_TestCase
     */
    public function testGetId_randomnessOfId()
    {
-      $aEntity =new Process;
+      $aEntity = new realizedEntity;
       $this->assertTrue( $this->object->getId() != $aEntity->getId());
    }
 
@@ -114,4 +114,10 @@ class EntityTest extends PHPUnit_Framework_TestCase
       $this->assertEquals($testStr, $this->object->getOrganization());
    }
 
+}
+
+
+class realizedEntity extends Entity
+{
+    
 }

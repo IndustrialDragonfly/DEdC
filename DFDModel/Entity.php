@@ -1,24 +1,59 @@
 <?php
 /**
- * Description of Entity
+ * This class represents an object that has a UUID, a label and can be stored 
+ * into some manner of storage medium
+ * 
+ * Known direct subclasses:
+ *    Element
+ *    DataFlowDiagram
  *
  * @author Josh Clark
  */
 abstract class Entity 
 {
    //<editor-fold desc="Attributes" defaultstate="collapsed">
+   /**
+    * This is a container which holds the name of the object
+    * @var String
+    */
    protected $label;
+   
+   /**
+    * This contains a universally unique identifier
+    * @var String
+    */
    protected $id;
+   
+   /**
+     * UUID of the originator of this DFD
+     * @var String 
+     */
    protected $originator;
+   
+   /**
+    * This is a container for the organization that this object belongs to
+    * @var String
+    */
    protected $organization;
+   
+   
+   /**
+    * Storage object, should be readable and/or writable (depending on whether
+    * this is a normal data store, import data source, or export data format)
+    * @var Readable/Writable
+    */
+   protected $storage;
+   
    //</editor-fold>
    
    //<editor-fold desc="Constructor" defaultstate="collapsed">
    /**
-    * create a new Entity object with a 128 bit random number as an id
+    * This creates a new Entity object with a 256 bit random number as an id
     */
    public function __construct()
    {
+       // TODO - handle setting storage, and armor this constructor against issues
+       // TODO - this constructor should know when it should set things to be null and when it is being loaded other ways
       $this->id = $this->generateId();
       $this->label = '';
       $this->originator = '';
@@ -26,8 +61,8 @@ abstract class Entity
    }
    
    /**
-    * function that generates an UUID of length 256 bits
-    * @return string a random 256 bit value
+    * This is a function that generates a UUID String with a length of 265 bits
+    * @return String
     */
    private function generateId()
    {
@@ -41,43 +76,100 @@ abstract class Entity
    
    //<editor-fold desc="Accessor functions" defaultstate="collapsed">
    //<editor-fold desc="label Accessors" defaultstate="collapsed">
+   /**
+    * This is a function that sets the label of this object
+    * @param String $newLabel
+    */
    public function setLabel($newLabel)
    {
       $this->label = $newLabel;
    }
-   
+   /**
+    * This is a function that returns the label of the current opject
+    * @return String 
+    */
    public function getLabel()
    {
       return $this->label;
    }
    //</editor-fold>
    //<editor-fold desc="id Accessors" defaultstate="collapsed">
+   /**
+    * This function returns the UUID of this object
+    * @return String
+    */
+   
    public function getId()
    {
       return $this->id;
    }
+   //intentionally no setId()
    //</editor-fold>
    //<editor-fold desc="owner Accessors" defaultstate="collapsed">
+   /**
+    * This is a function that sets the Originator of this object
+    * @param String $newOriginator
+    */
    public function setOriginator($newOriginator)
    {
       $this->originator = $newOriginator;
    }
+   
+   /**
+    * This is a function that retrieves the Originator of this object
+    * @return String
+    */
    public function getOriginator()
    {
       return $this->originator;
    }
    //</editor-fold>
    //<editor-fold desc="Organization Accessors" defaultstate="collapsed">
+   /**
+    * This is a function that sets the Organization that this object belongs to
+    * @param String $newOrg
+    */
    public function setOrganization($newOrg)
    {
        $this->organization = $newOrg;
    }
    
+   /**
+    * This is a function that retrieves the Organization that this object 
+    * belongs to
+    * @return String
+    */
    public function getOrganization()
    {
        return $this->organization;
    }
-   //</editor-fold
+   //</editor-fold>
+   //<editor-fold desc="Storage Accessors" defaultstate="collapsed">
+   /**
+    * This a a function that will set the storage object that is associated 
+    * with this object
+    * 
+    * should this function exist?
+    *   -nope
+    * 
+    * @param Readable/Writable $newStorage
+    */
+   /* disabled
+   public function setStorage($newStorage)
+   {
+      $this->storage = $newStorage;
+   }*/
+   
+   /**
+    * This is a function that retrieves the Storage object that is associated 
+    * with this object
+    * @return Readable/Writable
+    */
+   public function getStorage()
+   {
+      return $this->storage;
+   }
+   //</editor-fold>
    
    //</editor-fold>
    
@@ -124,12 +216,26 @@ abstract class Entity
        }
        else
        {
-           // Throw relevant exception
+           // TODO - Throw relevant exception
        }
        
        $entityArray['genericType'] = $genericType;
        
        return $entityArray;
+   }
+   
+       /**
+     * Takes an assocative array representing an object and loads it into this
+     * object.
+     * @param Mixed[] $assocativeArray
+     */
+   protected function loadAssociativeArray($associativeArray)
+   {
+       // TODO - error handling for missing elements/invalid elements
+        $this->id = $associativeArray['id'];
+        $this->label = $associativeArray['label'];
+        $this->originator = $associativeArray['originator'];
+        $this->organization = $associativeArray['organization'];
    }
 }
 
