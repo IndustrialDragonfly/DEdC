@@ -64,7 +64,8 @@ abstract class Entity
     * This is a function that generates a UUID String with a length of 265 bits
     * @return String
     */
-   private function generateId()
+   // TODO - rework constructors so that this only needs to be called in Entity
+   protected function generateId()
    {
       $length = 256;
       $numberOfBytes = $length/8;

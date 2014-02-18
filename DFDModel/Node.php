@@ -40,6 +40,7 @@ abstract class Node extends Element
         {
             parent::__construct(func_get_arg(0), func_get_arg(1));
             $this->linkList = array();
+            // TODO - handle storage at a higher level
             $this->storage = func_get_arg(0);
             // Check that the first parameter implements both Readable and Writable
             if (!is_subclass_of($this->storage, "ReadStorable"))
@@ -83,6 +84,12 @@ abstract class Node extends Element
                 $assocativeArray = func_get_arg(1);
                 
                 $this->loadAssociativeArray($assocativeArray);
+                // TODO - work things back out so this is only done in Entity
+                // If no ID was passed (i.e. the frontend has made a new element)
+                if ($this->id == NULL)
+                {
+                    $this->id = $this->generateId();
+                }
             }
             else
             {
