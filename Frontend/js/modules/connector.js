@@ -123,13 +123,13 @@ define(["modules/response", "jquery"], function (Response, $) {
     */
    var publicPut = function(url, data, successCallback, failCallback) {
        var dataString = JSON.stringify(data);
+       console.log("Sending data: " + dataString);
        $.ajax({
            type: "PUT",
            url: url,
            data: dataString,
            processData: false,
-           contentType: "application/json",
-           dataType: "text"
+           dataType: "applications/json"
        }).done(function (data, textStatus) {
            // Request was successful
            var jsonData = false;

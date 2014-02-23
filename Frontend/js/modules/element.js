@@ -11,7 +11,8 @@ define(function () {
             set = null,
             textBox, 
             hasMoved = false,
-            myData = null;
+            myData = null,
+            myType = null;
 
         /**
          * Set a data object
@@ -27,6 +28,22 @@ define(function () {
          */
         this.getData = function () {
             return myData;
+        };
+        
+        /**
+         * Set a type of the Element
+         * @param {ELETYPE} Element type
+         */
+        this.setData = function (data) {
+            myData = data;
+        };
+
+        /**
+         * Get the type of Element
+         * @returns {ELETYPE} Element Type
+         */
+        this.getData = function () {
+            return myType;
         };
         
         /**
@@ -127,6 +144,23 @@ define(function () {
             }); // Bottom
             return points;
         };
+        
+        /**
+         * Get the center point of the Element
+         * @returns {Object}
+         * {
+         *      x: {Number} x coordinate
+         *      y: {Number} y coordinate
+         * }
+         */
+        this.getPosition = function () {
+            var bb = this.getBBox();
+            var point = {
+                x: (bb.x + bb.x2) / 2,
+                y: (bb.y + bb.y2) / 2
+            };
+            return point;
+        };
 
         /**
          * Set the text label for the element
@@ -186,6 +220,22 @@ define(function () {
                 set = null;
             }
         };
+        
+        /**
+         * Get the Element type
+         * @returns {ELETYPE}
+         */
+        this.getType = function() {
+            return myType;
+        }
+        
+        /**
+         * Set the Element type
+         * @param {ELETYPE} type
+         */
+        this.setType = function(type) {
+            myType = type;
+        }
 
     };
 

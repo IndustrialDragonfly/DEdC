@@ -11,6 +11,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             deleteButton,
             load,
             newTab,
+            saveButton,
             tabs, // jQuery tab widget
             canvases = []; // Array of all open canvases
         
@@ -38,7 +39,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
          * @param {string} newTabText - New Tab DOM button
          */
         var publicSetupUi = function (
-            contentText, sidebarText, usersText, tabContainerText, processText, multiprocessText, datastoreText, extinteractorText, connectText, deleteButtonText, loadText, newTabText) {
+            contentText, sidebarText, usersText, tabContainerText, processText, multiprocessText, datastoreText, extinteractorText, connectText, deleteButtonText, loadText, newTabText, saveButtonText) {
             content = contentText;
             sidebar = sidebarText;
             users = usersText;
@@ -51,6 +52,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             deleteButton = deleteButtonText;
             load = loadText;
             newTab = newTabText;
+            saveButton = saveButtonText;
 
             /**
              * Resize the currently selected canvas
@@ -149,12 +151,16 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             // Load DFD button
             $(load).button().click(function () {
                 // Controller.php is required until the rewrite rules work correctly
-                getDfd("Controller.php/0SrNZZv12jdsHcdS10ztKGnXDLq9236REL2qCjnjHnUx_id");
+                getDfd("Controller.php/ljGmxv7q3E5E07bbXYjpNpfiM3wr8DeyWo5EZFseujEx");
             });
 
             // New tab button
             $(newTab).button().click(function () {
                 createNewTab();
+            });
+            
+            $(saveButton).button().click(function () {
+                saveCurrentDfd(getCurrentCanvas());
             });
         };
 
@@ -242,6 +248,90 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
 
             // Execute the GET request
             Connector.get(url, onSuccess, onFail);
+        };
+               
+        /**
+         * 
+         * @param {Canvas} canvas
+         * @returns {undefined}
+         */
+        var saveCurrentDfd = function (canvas) {
+            // Responses
+            var onSuccess = function (response) {
+                console.log("Request to save DFD was successful.");
+            };
+            
+            var onFail = function(response) {
+                console.log("Request to save DFD failed. " + response.getError());
+            };
+            
+            // Check if the Canvas has its data set
+            if (!canvas.getData()) {
+                // Save new DFD
+                var data = {};
+                // DFD Definition
+                data.id = "";
+                data.label = canvas.getLabel();
+                data.type = "CHANGEME";
+                data.originator = canvas.getOriginator();
+                data.genericType = "CHANGEME";
+                data.diaNode = "";
+                data.nodeList = [];
+                data.linkList = [];
+                data.DiaNodeList = [];
+                
+                // Node definition
+                canvas.getElements().forEach(function (entry) {
+                    data.nodeList.push({
+                        id: "",
+                        type: entry.getType().name,
+                        genericType: "CHANGEME",
+                        label: entry.getText(),
+                        x: entry.getPosition().x,
+                        y: entry.getPosition().y,
+                        originator: canvas.getOriginator(),
+                        linkList: []
+                    });
+                });
+                
+                // Link definition
+                /*canvas.getDataflows().forEach(function (entry) {
+                    data.linkList.push({
+                        id: "",
+                        type: "CHANGEME",
+                        genericType: "CHANGEME",
+                        label: entry.getText(),
+                        originator: entry.getOriginator(),
+                        originNode: entry.getSource().getId(), // Not implemented
+                        destinationNode: entry.getTarget().getId(), // Not implemented
+                        x: entry.getPosition().x,
+                        y: entry.getPosition().y
+                    });
+                });*/  
+                
+                // DiaNodeList definition
+                /*canvas.getElements().forEach(function (entry) {
+                    data.DiaNodeList.push({
+                        id: "",
+                        type: entry.getType().name,
+                        genericType: "CHANGEME",
+                        label: entry.getText(),
+                        x: entry.getPosition().x,
+                        y: entry.getPosition().y,
+                        originator: canvas.getOriginator(),
+                        diagramId: "",
+                        linkList: []
+                    });
+                });*/
+
+
+            } else {
+                // Update an existing DFD
+            }
+            
+            
+            // Execute the request
+            Connector.put("Controller.php", data, onSuccess, onFail);
         };
         
         // Expose methods to be public

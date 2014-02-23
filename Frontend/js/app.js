@@ -22,6 +22,6 @@ requirejs.config({
 // Start the main app logic.
 requirejs(['modules/dedc'], function (DEdC) {
     $(document).ready(function () {
-        DEdC.setupUi("#content", "#sidebar1", "#users", "#tabsContainer", "#process", "#multiprocess", "#datastore", "#extinteractor", "#connect", "#delete", "#load", "#newTab");
+        DEdC.setupUi("#content", "#sidebar1", "#users", "#tabsContainer", "#process", "#multiprocess", "#datastore", "#extinteractor", "#connect", "#delete", "#load", "#newTab", "#save");
     });
 });

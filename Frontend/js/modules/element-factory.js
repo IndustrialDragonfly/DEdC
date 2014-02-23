@@ -57,6 +57,7 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
                     "stroke-width": "2px"
                 }]);
                 e.draggable();
+                e.setType(globals.ELETYPE.PROCESS);
                 canvas.pushElement(e);
             } else if (type === globals.ELETYPE.MULTIPROCESS.name) {
                 // Create multiprocess
@@ -81,6 +82,7 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
                 }]);
 
                 e.draggable();
+                e.setType(globals.ELETYPE.MULTIPROCESS);
                 canvas.pushElement(e);
             } else if (type === globals.ELETYPE.DATASTORE.name) {
                 // Create datastore
@@ -111,6 +113,7 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
                     fill: "#FFF"
                 }]);
                 e.draggable();
+                e.setType(globals.ELETYPE.DATASTORE);
                 canvas.pushElement(e);
             } else if (type === globals.ELETYPE.EXTINTERACTOR.name) {
                 // Create external interactor
@@ -127,6 +130,7 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
                     "stroke-width": "2px"
                 }]);
                 e.draggable();
+                e.setType(globals.EXTINTERACTOR.DATASTORE);
                 canvas.pushElement(e);
             } else {
                 // The type was not recognized

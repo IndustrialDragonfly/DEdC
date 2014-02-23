@@ -55,7 +55,9 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
        var paper = Raphael(container, width, height);
 
        // Datamodel
-       var myData;
+       var myData = null,
+           myOriginator = "",
+           myLabel = "";
 
        // Element and Dataflow arrays
        var elements = [];
@@ -93,7 +95,7 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
         * @returns {Object}
         */
        this.getData = function () {
-           return data;
+           return myData;
        };
 
        /**
@@ -189,19 +191,19 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
        };
 
        /**
-        * Get number of Elements on the canvas
-        * @return {number} Number of Elements
+        * Get Elements on the canvas
+        * @return {Array} Elements
         */
-       this.getNumberOfElements = function () {
-           return elements.length;
+       this.getElements = function () {
+           return elements;
        };
 
        /**
-        * Get number of Dataflows on the canvas
-        * @return {number} Number of Dataflows
+        * Get Dataflows on the canvas
+        * @return {number} Dataflows
         */
-       this.getNumberOfDataflows = function () {
-           return dataflows.length;
+       this.getDataflows = function () {
+           return dataflows;
        };
 
        /**
@@ -371,5 +373,38 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
        this.createPath = function (pathString) {
            return paper.path(pathString);
        };
+       
+       /**
+        * Get Canvas's label
+        * @returns {String}
+        */
+       this.getLabel = function () {
+           return myLabel;
+       };
+       
+       /**
+        * Set the Canvas's label
+        * @param {String} label New label
+        */
+       this.setLabel = function (label) {
+           myLabel = label;
+       };
+       
+       /**
+        * Get Canvas's originator
+        * @returns {String}
+        */
+       this.getOriginator = function () {
+           return myOriginator;
+       };
+       
+       /**
+        * Set the Canvas's originator
+        * @param {String} originator New originator
+        */
+       this.setOriginator = function (originator) {
+           myOriginator = originator;
+       };
+
     };
 });

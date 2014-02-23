@@ -71,6 +71,7 @@ echo <<<EOF
                             <button id="delete">Delete Element</button>
                             <button id="load">Load DFD</button>
                             <button id="newTab">New Tab</button>
+                            <button id="save">Save DFD</button>
                     </div>
                     <ul id="menu">
                     </ul>
