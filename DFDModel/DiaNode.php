@@ -68,6 +68,12 @@ class DiaNode extends Node
                 // to its parent versions
                 $associativeArray = func_get_arg(1);
                 $this->loadAssociativeArray($associativeArray);
+                // TODO - work things back out so this is only done in Entity
+                // If no ID was passed (i.e. the frontend has made a new element)
+                if ($this->id == NULL)
+                {
+                    $this->id = $this->generateId();
+                }
                 
             }
             else
