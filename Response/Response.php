@@ -54,6 +54,9 @@ abstract class Response implements Responsable
             //</editor-fold>
 
             //<editor-fold desc="4xx Client Error" defaultstate="collapsed">
+            case 404:
+                $header = $header . " 404 Not Found";
+
             //</editor-fold>
 
             //<editor-fold desc="5xx Server Error" defaultstate="collapsed">

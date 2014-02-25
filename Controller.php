@@ -101,10 +101,29 @@ require_once "AuthorizeUser.php";
     switch ($request->getMethod())
     {
         case MethodsEnum::GET:
-            $element = existingElementFactory($request->getId(), $storage);
-            $response = new SimpleResponse($element->getAssociativeArray());
-            // TODO - handle fail cases
-            $response->setHeader(200);
+            $response;
+            $element;
+            try
+            {
+                $element = existingElementFactory($request->getId(), $storage);
+            }
+            catch (Exception $e) // TODO: Make more specific catch cases
+            {
+                // Error response
+                $response = new SimpleResponse();
+                $response->setRawData($e->getMessage());
+                $response->setHeader(404);
+            }
+            
+            // Successful Response
+            if (!$response) 
+            {
+                $response = new SimpleResponse($element->getAssociativeArray());
+                $response->createRepresentation();
+                // TODO - handle fail cases
+                $response->setHeader(200);
+            }
+            
             header($response->getHeader());
             echo $response->getRepresentation();
             break;
