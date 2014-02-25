@@ -23,11 +23,17 @@ abstract class Node extends Element
     protected $linkList;
 
     //</editor-fold>
+    
     //<editor-fold desc="Constructor" defaultstate="collapsed">
     /**
-     * This is a constructor that takes in 2 parameters.  The first parameter is 
-     * always a valid storage medium.  the second paramenter is either the UUID 
-     * of a Diagram or a UUID of a node decended object to load.  
+     * This is the constructor for the Node Class.  It takes in 2 parameters; 
+     * the first is always a valid storage medium, the second one is either an 
+     * id or an associative array.  If the second parameter is an id of a valid 
+     * node subclass the node is loaded in from the storage medium.  If the 
+     * second parameter was an id of anything else it is passed to the 
+     * constructor for Element for it to handle.  If the second parameter is an 
+     * associative array it is likewise passed to the Element constructor for it
+     *  to handle.  
      * @param {ReadStorable,WriteStorable} $datastore
      * @param string $id    the UUID of either the parent Diagram or the id of the 
      *                      Node to be loaded (can be replaced by an assocative array
@@ -36,74 +42,53 @@ abstract class Node extends Element
      */
     public function __construct()
     {
-        if (func_num_args() == 2 )
+        //check number of paramenters
+        if(func_num_args() == 2)
         {
-            parent::__construct(func_get_arg(0), func_get_arg(1));
-            $this->linkList = array();
-            // TODO - handle storage at a higher level
-            $this->storage = func_get_arg(0);
-            // Check that the first parameter implements both Readable and Writable
-            if (!is_subclass_of($this->storage, "ReadStorable"))
-            {
-                throw new BadConstructorCallException("Passed storage object does not implement ReadStorable.");
-            }
-            if (!is_subclass_of($this->storage, "WriteStorable"))
-            {
-                throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
-            }
-                        
-            // Find out if handed an ID or an assocative array for the second arg
+            //check type of second parameter
             if (is_string(func_get_arg(1)))
             {
-                $id = func_get_arg(1);
-                // TODO - add exception handling to getTypeFromUUID call such that it at a minimum gives 
-                // information specific to this class in addition to passing the original error
-                $type = $this->storage->getTypeFromUUID($id);
-                // Find if the type of the second argument is Diagram, if so, its a new node
-                if (is_subclass_of($type, "Diagram"))
+                //if second parameter is an id of a node subclass object
+                $type = func_get_arg(0)->getTypeFromUUID($id);
+                if (is_subclass_of($type, "Node"))
                 {
-                    $this->parent = $id;
-                }
-                //if the type of the second argument is not a Diagram, then load from storage
-                elseif (is_subclass_of($type, "Node"))
-                {
+                    $this->id = func_get_arg(1);
+                    $this->storage = func_get_arg(0);
+                    if (!is_subclass_of($this->storage, "ReadStorable"))
+                    {
+                        throw new BadConstructorCallException("Passed storage object does not implement ReadStorable.");
+                    }
+                    if (!is_subclass_of($this->storage, "WriteStorable"))
+                    {
+                        throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
+                    }
                     $assocativeArray = $this->storage->loadNode($this->id);
-
                     $this->loadAssociativeArray($assocativeArray);
-
                 }
+                //second parameter was an id but not of a node type so create an empty object (should be a Diagram object)
                 else
                 {
-                    throw new BadConstructorCallException("Passed ID was for neither a Node nor a Diagram.");
+                    //call the parent constructor and set the linkList to be an empty list
+                    parent::__construct(func_get_arg(0), func_get_arg(1));
+                    $this->linkList = array();
                 }
             }
-            // Otherwise if it is an array, load it
-            // TODO - figure out if this can be called at a higher level (e.g. entity) while still using the entire chain of load functions
-            elseif (is_array(func_get_arg(1)))
-            {
-                $assocativeArray = func_get_arg(1);
-                
-                $this->loadAssociativeArray($assocativeArray);
-                // TODO - work things back out so this is only done in Entity
-                // If no ID was passed (i.e. the frontend has made a new element)
-                if ($this->id == NULL)
-                {
-                    $this->id = $this->generateId();
-                }
-            }
+            //second parameter should be an associative array so pass it along to Element's constructor
             else
             {
-                throw new BadConstructorCallException("Invalid second parameter, can be neither an ID or an assocative array");
+                parent::__construct(func_get_arg(0), func_get_arg(1));
             }
         }
         else
         {
-            throw new BadConstructorCallException("Invalid number of input parameters were passed to this constructor");
+            throw new BadConstructorCallException("An incorrect number of parameters were passed to the Node constructor");
         }
     }
 
     //</editor-fold>
+    
     //<editor-fold desc="Accessor functions" defaultstate="collapsed">
+    //<editor-fold desc="Link functions" defaultstate="collapsed">
 
     /**
      * This is a function that gets the number of links that connect to this node
@@ -185,48 +170,8 @@ abstract class Node extends Element
         }
         return null;
     }
-
-    /**
-     * Returns an assocative array representing the entity object. This 
-     * assocative array has the following elements and types:
-     * id String
-     * label String
-     * originator String
-     * organization String 
-     * type String
-     * genericType String
-     * x Int
-     * y Int
-     * parent String
-     * links String[]
-     * 
-     * @return Mixed[]
-     */
-    public function getAssociativeArray()
-    {
-        $nodeArray = parent::getAssociativeArray();
-        $nodeArray['linkList'] = $this->linkList;
-
-        return $nodeArray;
-    }
     
-    /**
-     * Takes an assocative array representing an object and loads it into this
-     * object.
-     * @param Mixed[] $assocativeArray
-     */
-    protected function loadAssociativeArray($associativeArray)
-    {
-        // TODO - error handling for missing elements/invalid elements
-        // Potentially this section could be rewritten using a foreach loop
-        // on the array and reflection on the current node to determine
-        // what it should store locally
-        parent::loadAssociativeArray($associativeArray);
-        $this->linkList = $associativeArray['linkList'];
-    }
-
-    //</editor-fold>
-
+    
     /**
      * removes a specified DataFlow from the list of links
      * Should only be called by Link object
@@ -299,6 +244,49 @@ abstract class Node extends Element
         unset($this->linkList);
         $this->linkList = array();
     }
+    //</editor-fold>
+    //<editor-fold desc="AssociativeArray functions" defaultstate="collapsed">
+    /**
+     * Returns an assocative array representing the entity object. This 
+     * assocative array has the following elements and types:
+     * id String
+     * label String
+     * originator String
+     * organization String 
+     * type String
+     * genericType String
+     * x Int
+     * y Int
+     * parent String
+     * links String[]
+     * 
+     * @return Mixed[]
+     */
+    public function getAssociativeArray()
+    {
+        $nodeArray = parent::getAssociativeArray();
+        $nodeArray['linkList'] = $this->linkList;
+
+        return $nodeArray;
+    }
+    
+    /**
+     * Takes an assocative array representing an object and loads it into this
+     * object.
+     * @param Mixed[] $assocativeArray
+     */
+    protected function loadAssociativeArray($associativeArray)
+    {
+        // TODO - error handling for missing elements/invalid elements
+        // Potentially this section could be rewritten using a foreach loop
+        // on the array and reflection on the current node to determine
+        // what it should store locally
+        parent::loadAssociativeArray($associativeArray);
+        $this->linkList = $associativeArray['linkList'];
+    }
+
+    //</editor-fold>
+    //</editor-fold>
 
     //<editor-fold desc="Save/Delete/Update" defaultstate="collapsed">
     /**

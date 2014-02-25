@@ -3,8 +3,7 @@
 require_once 'Element.php';
 require_once 'Constants.php';
 /**
- * Abstract class from which dataflows and similar objects will inherit
- * from
+ * Abstract class which implementes the conections between Node objects
  *
  * @author Josh Clark
  * @author Eugene Davis
@@ -27,79 +26,62 @@ abstract class Link extends Element
     //</editor-fold>
 //<editor-fold desc="Constructor" defaultstate="collapsed">
     /**
-     * constructor. if no arguments are specified a new object is created with
-     * a random id. if three arguments are specified, the oject is loaded from the
-     * DB if an entry with a matching id exists
-     * @param {Read,Write}Storable $storage
-     * @param string $id (Optional if associative array is in its place)
-     * @param Mixed[] $associativeArray (Optional if a Link or Diagram ID is in its place)
+     * This is the constructor for the Link Class.  It takes in 2 parameters; 
+     * the first is always a valid storage medium, the second one is either an 
+     * ID or an associative array.  If the second parameter is an id of a valid 
+     * Link subclass the Link is loaded in from the storage medium.  If the 
+     * second parameter was an ID of anything else it is passed to the 
+     * constructor for Element for it to handle.  If the second parameter is an 
+     * associative array it is likewise passed to the Element constructor for it
+     *  to handle.  
+     * @param {ReadStorable,WriteStorable} $datastore
+     * @param string $id    the UUID of either the parent Diagram or the id of the 
+     *                      Link to be loaded 
+     * @param Mixed[] $assocativeArray
      */
     public function __construct()
-    {  
-        if (func_num_args() == 2 )
+    {
+        //check number of paramenters
+        if(func_num_args() == 2)
         {
-             parent::__construct(func_get_arg(0), func_get_arg(1));
-            // TODO - Get storage setting moved up the stack so it isn't repeated all over the place
-            $this->storage = func_get_arg(0);
-            // Check that the first parameter implements both Readable and Writable
-            if (!is_subclass_of($this->storage, "ReadStorable"))
-            {
-                throw new BadConstructorCallException("Passed storage object does not implement ReadStorable.");
-            }
-            if (!is_subclass_of($this->storage, "WriteStorable"))
-            {
-                throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
-            }
-                        
-            // Find out if handed an ID or an assocative array for the second arg
+            //check type of second parameter
             if (is_string(func_get_arg(1)))
             {
-                $id = func_get_arg(1);
-                // TODO - add exception handling to getTypeFromUUID call such that it at a minimum gives 
-                // information specific to this class in addition to passing the original error
-                $type = $this->storage->getTypeFromUUID($id);
-                // Find if the type of the second argument is Diagram, if so, its a new node
-                if (is_subclass_of($type, "Diagram"))
+                //if second parameter is an id of a link subclass object
+                $type = func_get_arg(0)->getTypeFromUUID($id);
+                if (is_subclass_of($type, "Link"))
                 {
-                    $this->parent = $id;
+                    $this->id = func_get_arg(1);
+                    $this->storage = func_get_arg(0);
+                    if (!is_subclass_of($this->storage, "ReadStorable"))
+                    {
+                        throw new BadConstructorCallException("Passed storage object does not implement ReadStorable.");
+                    }
+                    if (!is_subclass_of($this->storage, "WriteStorable"))
+                    {
+                        throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
+                    }
+                    $assocativeArray = $this->storage->loadLink($this->id);
+                    $this->loadAssociativeArray($assocativeArray);
+                }
+                //second parameter was an id but not of a link type so create an empty object (should be a Diagram object)
+                else
+                {
+                    //call the parent constructor and set the linkList to be an empty list
+                    parent::__construct(func_get_arg(0), func_get_arg(1));
                     $this->originNode = NULL;
                     $this->destinationNode = NULL;
                 }
-                //if the type of the second argument is not a Diagram, then load from storage
-                elseif (is_subclass_of($type, "Link"))
-                {                    
-                    $associativeArray = $this->storage->loadLink($this->id);
-
-                    $this->loadAssociativeArray($associativeArray);
-                    // TODO - work things back out so this is only done in Entity
-                    // If no ID was passed (i.e. the frontend has made a new element)
-                    if ($this->id == NULL)
-                    {
-                        $this->id = $this->generateId();
-                    }
-
-                }
-                else
-                {
-                    throw new BadConstructorCallException("Passed ID was for neither a Link nor a Diagram.");
-                }
             }
-            // Otherwise if it is an array, load it
-            // TODO - figure out if this can be called at a higher level (e.g. entity) while still using the entire chain of load functions
-            elseif (is_array(func_get_arg(1)))
-            {
-                $assocativeArray = func_get_arg(1);
-                
-                $this->loadAssociativeArray($assocativeArray);
-            }
+            //second parameter should be an associative array so pass it along to Element's constructor
             else
             {
-                throw new BadConstructorCallException("Invalid second parameter, can be neither an ID or an assocative array");
+                parent::__construct(func_get_arg(0), func_get_arg(1));
             }
         }
         else
         {
-            throw new BadConstructorCallException("Invalid number of input parameters were passed to this constructor");
+            throw new BadConstructorCallException("An incorrect number of parameters were passed to the Link constructor");
         }
     }
 
