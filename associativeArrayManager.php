@@ -14,6 +14,7 @@
  */
 function addTags($rawData, $tag)
 {
+    // TODO: Check if Ids are null first
     // One thing that always holds true is it has an id, so set it here
     $rawData['id'] = $rawData['id'] . "$tag";
     
@@ -84,6 +85,7 @@ function addTags($rawData, $tag)
  */
 function stripTags($rawData, $tag)
 {
+    // TODO: Check if Ids are null first
     // Find the length of an ID with no tag
     $idLength = strlen($rawData['id']) - strlen($tag);
     
@@ -157,6 +159,10 @@ function stripTags($rawData, $tag)
  */
 function stripTag($id, $length)
 {
+    if (func_num_args() != 2)
+    {
+        throw new BadFunctionCallException("Not the correct number of inputs to stripTag");
+    }
     return substr($id, 0, $length);
 }
 ?>

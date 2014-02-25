@@ -94,7 +94,6 @@ require_once "AuthorizeUser.php";
     $body = file_get_contents('php://input'); // Get the body of the request
     $request = new SimpleRequest($_SERVER['HTTP_ACCEPT'], 
             $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], $body);
-    
     // Initialize a storage object
     $storage = new DatabaseStorage(); 
     
@@ -160,6 +159,7 @@ require_once "AuthorizeUser.php";
             
             if (NULL === $request->getData())
             {
+                // TODO: More specific exception handling
                 // Error response
                 $response = new SimpleResponse();
                 $response->setRawData('No data, bad request.');
@@ -168,23 +168,52 @@ require_once "AuthorizeUser.php";
             else
             {
                 $elementArray = $request->getData();
-
-                // The only time this should be null is for Diagram types
-                $parentDia = $elementArray['parent'];
-
-                // Create a new element using the associative array
-                if ($parentDia == NULL && $elementArray['genericType'] != 'Diagram')
+                // TODO: Get actual list from database instead of hardcoding
+                $validTypesArray = array('Process', 'Multiprocess', 'ExternalInteractor', 'DataStore', 'DataFlowDiagram', 'DataFlow');
+                if (!in_array($elementArray['type'], $validTypesArray))
                 {
-                    // TODO - send an unhappy header saying it was an element with no parent
+                    // Error response
+                    $response = new SimpleResponse();
+                    $response->setRawData('Element type: "' . $elementArray['type'] . '" was invalid');
+                    $response->setHeader(400);
+                } 
+                else 
+                {
+                
+                    // The only time this should be null is for Diagram types
+                    $parentDia = $elementArray['parent'];
+
+                    // Create a new element using the associative array
+                    if ($parentDia == NULL && $elementArray['genericType'] != 'Diagram')
+                    {
+                        // TODO - send an unhappy header saying it was an element with no parent
+                    }
+
+                    // Create a new element, loading it from the element array
+                    $element;
+                    try
+                    {
+                        $element = new $elementArray['type']($storage, $elementArray);
+                    }
+                    catch (Exception $e)
+                    {
+                        // TODO: More specific exception handling
+                        // Error response
+                        $response = new SimpleResponse();
+                        $response->setRawData($e->getMessage());
+                        $response->setHeader(400);
+                    }
+
+                    // If the element was created, save it
+                    if ($element)
+                    {
+                        $element->save();
+                    }
+
+                    // Setup a response object with just a header
+                    $response = new SimpleResponse($element->getAssociativeArray());
+                    $response->setHeader(201);
                 }
-
-                // Create a new element, loading it from the element array
-                $element = new $elementArray['type']($storage, $elementArray);
-                $element->save();
-
-                // Setup a response object with just a header
-                $response = new SimpleResponse($element->getAssociativeArray());
-                $response->setHeader(201);
             }
             
             // Return the header

@@ -30,8 +30,8 @@ final class SimpleRequest extends Request implements GETRequestable, DELETEReque
     {
         if ($data != NULL)
         {
-            $data = json_decode($data);
-            $data = stripTag($tag);
+            // TODO: Catch false and null returns from json_decode
+            $data = json_decode($data, true);
             return $data;
         }
         return NULL;
