@@ -138,11 +138,12 @@ require_once "AuthorizeUser.php";
             // If there is an ID attached, then we are being asked to update
             // an existing element
             $element;
-            if (NULL != $request->getId)
+            if (NULL != $request->getId())
             {
                 // Start by loading then deleting the element
                 try 
                 {
+                    // TODO: Check that element types are the same before deleting
                     $element = existingElementFactory($request->getId(), $storage);
                 } 
                 catch (Exception $e) 

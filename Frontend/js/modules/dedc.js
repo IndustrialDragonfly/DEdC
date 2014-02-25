@@ -262,34 +262,36 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             };
             
             var onFail = function(response) {
-                console.log("Request to save DFD failed. " + response.getError());
+                console.log("Request to save DFD failed. " + response.getError() + " " + response.getData());
             };
             
             // Check if the Canvas has its data set
             if (!canvas.getData()) {
                 // Save new DFD
                 var data = {};
+                data.type = "DataFlowDiagram";
+                data.label = "It worrk!";
                 // DFD Definition
-                data.id = "";
+                /*data.id = "";
                 data.label = canvas.getLabel();
-                data.type = "CHANGEME";
+                data.type = "DataFlowDiagram";
                 data.originator = canvas.getOriginator();
-                data.genericType = "CHANGEME";
+                data.genericType = "Diagram";
                 data.diaNode = "";
                 data.nodeList = [];
                 data.linkList = [];
-                data.DiaNodeList = [];
+                data.DiaNodeList = [];*/
                 
                 // Node definition
                 canvas.getElements().forEach(function (entry) {
                     data.nodeList.push({
-                        id: "",
+                        //id: "",
                         type: entry.getType().name,
-                        genericType: "CHANGEME",
+                        genericType: "Node",
                         label: entry.getText(),
                         x: entry.getPosition().x,
                         y: entry.getPosition().y,
-                        originator: canvas.getOriginator(),
+                        //originator: canvas.getOriginator(),
                         linkList: []
                     });
                 });

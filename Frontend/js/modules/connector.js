@@ -98,7 +98,7 @@ define(["modules/response", "jquery"], function (Response, $) {
                     response.setData(data);
                 }
                 response.setStatus(textStatus);
-                response.setError("GET " + url + " " + data);
+                response.setError("DELETE " + url + " " + data);
                 
                 failCallback(response);
            }
@@ -128,9 +128,11 @@ define(["modules/response", "jquery"], function (Response, $) {
            type: "PUT",
            url: url,
            data: dataString,
-           processData: false,
-           dataType: "applications/json"
+           processData: false, // Send in body, not as a query string
+           accepts: "application/json",
+           dataType: "text"
        }).done(function (data, textStatus) {
+           console.log("Success from jQuery");
            // Request was successful
            var jsonData = false;
            var exception = false;
@@ -158,11 +160,12 @@ define(["modules/response", "jquery"], function (Response, $) {
                     response.setData(data);
                 }
                 response.setStatus(textStatus);
-                response.setError("GET " + url + " " + data);
+                response.setError("PUT " + url + " " + data);
                 
                 failCallback(response);
            }
        }).fail(function (jqXHR, textStatus, errorThrown) {
+           console.log("Failure from jQuery");
            // Request failed for some reason
            var response = new Response();
            
