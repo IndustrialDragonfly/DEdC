@@ -259,6 +259,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             // Responses
             var onSuccess = function (response) {
                 console.log("Request to save DFD was successful.");
+                console.log(response.getData());
             };
             
             var onFail = function(response) {
@@ -271,6 +272,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                 var data = {};
                 data.type = "DataFlowDiagram";
                 data.label = "It worrk!";
+                //data.nodeList = [];
                 // DFD Definition
                 /*data.id = "";
                 data.label = canvas.getLabel();
@@ -283,7 +285,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                 data.DiaNodeList = [];*/
                 
                 // Node definition
-                canvas.getElements().forEach(function (entry) {
+                /*canvas.getElements().forEach(function (entry) {
                     data.nodeList.push({
                         //id: "",
                         type: entry.getType().name,
@@ -294,7 +296,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                         //originator: canvas.getOriginator(),
                         linkList: []
                     });
-                });
+                });*/
                 
                 // Link definition
                 /*canvas.getDataflows().forEach(function (entry) {
