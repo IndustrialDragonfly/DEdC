@@ -48,14 +48,22 @@ abstract class Response implements Responsable
             //<editor-fold desc="2xx Successful" defaultstate="collapsed">
             case 200:
                 $header = $header . " 200 OK";
+                break;
+            case 201:
+                $header = $header . " 201 Created";
+                break;
             //</editor-fold>
 
             //<editor-fold desc="3xx Redirection" defaultstate="collapsed">
             //</editor-fold>
 
             //<editor-fold desc="4xx Client Error" defaultstate="collapsed">
+            case 400:
+                $header = $header . " 400 Bad Request";
+                break;
             case 404:
                 $header = $header . " 404 Not Found";
+                break;
 
             //</editor-fold>
 

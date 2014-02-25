@@ -46,6 +46,7 @@ final class SimpleResponse extends Response implements GETResponsable, DELETERes
     public function setRawData($data)
     {
         $this->rawData = $data;
+        $this->createRepresentation();
     }
     
     /**
@@ -53,9 +54,21 @@ final class SimpleResponse extends Response implements GETResponsable, DELETERes
      * Just switches between templates for different objects, hopefully
      * more sophisticated media types can be created in a cleaner way.
      */
-    public function createRepresentation()
+    private function createRepresentation()
     {
-        $this->representation = json_encode(addTags($this->rawData, $this->uuidTag));
+        if (is_array($this->rawData))
+        {
+            $this->representation = json_encode(addTags($this->rawData, $this->uuidTag));
+        }
+        elseif (is_string($this->rawData))
+        {
+            $messageArray = array('Message' => $this->rawData);
+            $this->representation = json_encode($messageArray);
+        }
+        else
+        {
+            // TODO: Throw an exception
+        }
     }
     
     /**

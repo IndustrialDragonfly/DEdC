@@ -119,7 +119,6 @@ require_once "AuthorizeUser.php";
             if (!$response) 
             {
                 $response = new SimpleResponse($element->getAssociativeArray());
-                $response->createRepresentation();
                 // TODO - handle fail cases
                 $response->setHeader(200);
             }
@@ -137,36 +136,61 @@ require_once "AuthorizeUser.php";
         
         
         case MethodsEnum::PUT:
-          
             // If there is an ID attached, then we are being asked to update
             // an existing element
+            $element;
             if (NULL != $request->getId)
             {
                 // Start by loading then deleting the element
-                $element = existingElementFactory($request->getId(), $storage);
-                $element->delete();
+                try 
+                {
+                    $element = existingElementFactory($request->getId(), $storage);
+                } 
+                catch (Exception $e) 
+                {
+                    // TODO: Handle error exception
+                }
+                
+                // Delete element if it was found
+                if ($element)
+                {
+                    $element->delete();
+                }
             }
-            $elementArray = $request->getData();
             
-            // The only time this should be null is for Diagram types
-            $parentDia = $elementArray['parent'];
-            
-            // Create a new element using the associative array
-            if ($parentDia == NULL && $elementArray['genericType'] != 'Diagram')
+            if (NULL === $request->getData())
             {
-                // TODO - send an unhappy header saying it was an element with no parent
+                // Error response
+                $response = new SimpleResponse();
+                $response->setRawData('No data, bad request.');
+                $response->setHeader(400);
+            }
+            else
+            {
+                $elementArray = $request->getData();
+
+                // The only time this should be null is for Diagram types
+                $parentDia = $elementArray['parent'];
+
+                // Create a new element using the associative array
+                if ($parentDia == NULL && $elementArray['genericType'] != 'Diagram')
+                {
+                    // TODO - send an unhappy header saying it was an element with no parent
+                }
+
+                // Create a new element, loading it from the element array
+                $element = new $elementArray['type']($storage, $elementArray);
+                $element->save();
+
+                // Setup a response object with just a header
+                $response = new SimpleResponse($element->getAssociativeArray());
+                $response->setHeader(201);
             }
             
-            // Create a new element, loading it from the element array
-            $element = new $elementArray['type']($storage, $elementArray);
-            $element->save();
-            
-            // Setup a response objcet with just a header
-            $response = new SimpleResponse();
-            $response->setHeader(200);
             // Return the header
             header($response->getHeader());           
-                        
+            echo $response->getRepresentation();
+
             break;
             
             
@@ -176,9 +200,8 @@ require_once "AuthorizeUser.php";
             $element->delete();
             // TODO - Handle fail cases
             $response = new SimpleResponse();
-            $response->setHeader(200);
+            $response->setHeader(404);
             header($response->getHeader());
-            break;
             break;
         
         
