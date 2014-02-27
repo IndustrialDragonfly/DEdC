@@ -48,7 +48,7 @@ abstract class Link extends Element
             if (is_string(func_get_arg(1)))
             {
                 //if second parameter is an id of a link subclass object
-                $type = func_get_arg(0)->getTypeFromUUID($id);
+                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
                 if (is_subclass_of($type, "Link"))
                 {
                     $this->id = func_get_arg(1);
@@ -61,7 +61,7 @@ abstract class Link extends Element
                     {
                         throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
                     }
-                    $assocativeArray = $this->storage->loadLink($this->id);
+                    $assocativeArray = $this->storage->loadLink(func_get_arg(1));
                     $this->loadAssociativeArray($assocativeArray);
                 }
                 //second parameter was an id but not of a link type so create an empty object (should be a Diagram object)

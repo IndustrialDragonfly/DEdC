@@ -61,7 +61,7 @@ abstract class Element extends Entity
                 $this->x = 0;
                 $this->y = 0;
                 // Find if the type of the second argument is an id of Diagram, if so, its a new node
-                $type = $this->storage->getTypeFromUUID($id);
+                $type = $this->storage->getTypeFromUUID(func_get_arg(1));
                 if (is_subclass_of($type, "Diagram"))
                 {
                     $this->parent = func_get_arg(1);

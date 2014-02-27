@@ -49,7 +49,7 @@ abstract class Node extends Element
             if (is_string(func_get_arg(1)))
             {
                 //if second parameter is an id of a node subclass object
-                $type = func_get_arg(0)->getTypeFromUUID($id);
+                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
                 if (is_subclass_of($type, "Node"))
                 {
                     $this->id = func_get_arg(1);
@@ -62,7 +62,7 @@ abstract class Node extends Element
                     {
                         throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
                     }
-                    $assocativeArray = $this->storage->loadNode($this->id);
+                    $assocativeArray = $this->storage->loadNode(func_get_arg(1));
                     $this->loadAssociativeArray($assocativeArray);
                 }
                 //second parameter was an id but not of a node type so create an empty object (should be a Diagram object)
