@@ -20,7 +20,7 @@ abstract class Request implements Requestable {
      * @var string
      */
     protected $id; 
-    protected $path; // Path to the object from a root DFD
+    protected $resource; // Path to resource
     protected $query; // Query data from the URL (optional)
     private $uuidTag = "_id"; // Tag that identifies a UUID
     protected $rawData; // Data from the client
@@ -74,9 +74,9 @@ abstract class Request implements Requestable {
     {
         $this->type = $type;
     }
-    protected function setPath($path)
+    protected function setResource($resource)
     {
-        $this->path = $path;
+        $this->resource = $resource;
     }
     public function setData($data)
     {
@@ -97,9 +97,9 @@ abstract class Request implements Requestable {
     {
         return $this->accept;
     }
-    public function getPath()
+    public function getResource()
     {
-        return $this->path;
+        return $this->resource;
     }
     public function getData()
     {
@@ -124,7 +124,7 @@ abstract class Request implements Requestable {
         // Save the body data
         $this->setData($rawData);
         
-        // Figure out if URI is UUID or path
+        // Figure out if URI is UUID or resource
         
         // If it is a UUID, it should have the uuidTag on it
         if (FALSE !== stripos($uri, $this->uuidTag))
@@ -132,12 +132,13 @@ abstract class Request implements Requestable {
             // Get the last / in the URI, and return everything after it
             $uriId = substr($uri, strrpos($uri, "/") + 1);
             $this->setId($uriId);
-            $this->setPath(NULL);
+            $this->setResource(NULL);
         }
-        // If it is a path, set it as the path
+        // If it is a resource, e.g. elements
         else 
         {
-            $this->setPath($uri);
+            $resource = substr($uri, strrpos($uri, "/") + 1);
+            $this->setResource($resource);
             $this->setId(NULL);
         }
     }

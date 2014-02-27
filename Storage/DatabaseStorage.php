@@ -81,7 +81,8 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $selectStatement->bindParam(1, $type);
         $selectStatement->execute();
         
-        $elementsArray = $selectStatement->fetchAll();
+        $elementsArray = array();
+        $elementsArray[$type] = $selectStatement->fetchAll();
         
         return $elementsArray;
     }

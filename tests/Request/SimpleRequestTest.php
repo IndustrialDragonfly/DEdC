@@ -130,12 +130,12 @@ class SimpleRequestTest extends PHPUnit_Framework_TestCase
         // Test with a UUID
         $this->object = new SimpleRequest($accept, "$method", $resource);
         $this->assertEquals("uuid100", $this->object->getId());
-        $this->assertNull($this->object->getPath());
+        $this->assertNull($this->object->getResource());
         
         // Test with a path
         $resource = "/dfd/ab/some_element";
         $this->object = new SimpleRequest($accept, "$method", $resource);
         $this->assertNull($this->object->getId());
-        $this->assertEquals("/dfd/ab/some_element", $this->object->getPath());
+        $this->assertEquals("/dfd/ab/some_element", $this->object->getResource());
     }
 }

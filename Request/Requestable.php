@@ -20,7 +20,7 @@ interface Requestable
      * 
      * @returns String
      */
-    public function getPath();
+    public function getResource();
     
     /**
      * Returns the acceptable media types in an array

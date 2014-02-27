@@ -102,26 +102,58 @@ require_once "AuthorizeUser.php";
         case MethodsEnum::GET:
             $response;
             $element;
-            try
+
+            // If it is a request to a resource
+            if (NULL != $request->getResource())
             {
-                $element = existingElementFactory($request->getId(), $storage);
+                $elementArray;
+                if ("elements" == $request->getResource())
+                {
+                    $elementArray = $storage->getListByType("*");
+                }
+                else
+                {
+                    try
+                    {
+                        $elementArray = $storage->getListByType($request->getResource());
+                    } 
+                    catch (Exception $ex) {
+                        $response = new SimpleResponse();
+                        $response->setRawData($e->getMessage());
+                        $response->setHeader(400);
+                    }
+                }
+                
+                if ($elementArray)
+                {
+                    $response = new SimpleResponse();
+                    $response->setRawData($elementArray);
+                    $response->setHeader(200);
+                }
             }
-            catch (Exception $e) // TODO: Make more specific catch cases
+            else // It is a request to a resource
             {
-                // Error response
-                $response = new SimpleResponse();
-                $response->setRawData($e->getMessage());
-                $response->setHeader(404);
+                try
+                {
+                    $element = existingElementFactory($request->getId(), $storage);
+                }
+                catch (Exception $e) // TODO: Make more specific catch cases
+                {
+                    // Error response
+                    $response = new SimpleResponse();
+                    $response->setRawData($e->getMessage());
+                    $response->setHeader(404);
+                }
+
+                // Successful Response
+                if (!$response) 
+                {
+                    $response = new SimpleResponse($element->getAssociativeArray());
+                    // TODO - handle fail casels
+                    $response->setHeader(200);
+                }
+
             }
-            
-            // Successful Response
-            if (!$response) 
-            {
-                $response = new SimpleResponse($element->getAssociativeArray());
-                // TODO - handle fail cases
-                $response->setHeader(200);
-            }
-            
             header($response->getHeader());
             echo $response->getRepresentation();
             break;
