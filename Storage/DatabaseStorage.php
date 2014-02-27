@@ -363,7 +363,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     
      /**
      * loadLink takes an input of a UUID and returns an associative array of
-     * all the informaiton related to that ID from the database.dragonfly
+     * all the information related to that ID from the database.
      * 
      * @param string $id
      */
