@@ -51,7 +51,6 @@ abstract class Element extends Entity
      */
     public function __construct()
     {
-        // TODO - this constructor should know when it should set things to be null and when it is being loaded other ways
         if(func_num_args() == 2)
         {
             //if the second parameter is an ID

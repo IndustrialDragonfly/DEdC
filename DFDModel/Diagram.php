@@ -84,7 +84,7 @@ abstract class Diagram extends Entity
             {
                 
                 $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
-                //if the id belonged to a 
+                //if the id belonged to a Diagram object load it
                 if (is_subclass_of($type, "Diagram"))
                 {
                     $this->id = func_get_arg(1);
