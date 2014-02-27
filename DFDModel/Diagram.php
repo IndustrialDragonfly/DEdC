@@ -53,7 +53,7 @@ abstract class Diagram extends Entity
      * This is a constructor that takes in a variable number of arguments: 
      * 1 parameter: create a new "root" Diagram which has no parents
      * 2 parameters: create a create a new Diagram with a parent or load a 
-     * diagram from storage
+     * diagram from storage or load from an assocative array
      * first parameter will always be the storage and is required
      * second parameter is optional; this is either the UUID of a parent node 
      * or a UUID of a diagram to load from storage
@@ -63,95 +63,82 @@ abstract class Diagram extends Entity
      */
    public function __construct()
    {
-      parent::__construct(func_get_arg(0), func_get_arg(1));
-        $this->storage = func_get_arg(0);
-        $this->nodeList = array();
-        $this->linkList = array();
-        $this->diaNodeList = array();
-        // TODO - handle storage at a higher level
-        $this->storage = func_get_arg(0);
-        // Check that the first parameter implements both Readable and Writable
-        if (!is_subclass_of($this->storage, "ReadStorable"))
+        //if only a storage medium is passed create an empty root Diagram
+        if(func_num_args())
         {
-            throw new BadConstructorCallException("Passed storage object does not implement ReadStorable.");
+            parent::__construct(func_get_arg(0));
+            $this->ancestry = array();
+            $this->diaNode = null;
+            $this->diaNodeList = array();
+            $this->linkList = array();
+            $this->nodeList = array();
+                    
         }
-        if (!is_subclass_of($this->storage, "WriteStorable"))
+        //if 2 things were passed we are either loading a Diagram from storage, 
+        //or loading from a associative array, or we are creating a new mostly 
+        //empty Diagram with a specified parent
+        else if (func_num_args() == 2)
         {
-            throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
-        }
-      
-      // Setup a new diagram if only the storage object was passed
-      if (func_num_args() == 1)
-      {
-         $this->ancestry = null;
-         $this->diaNode = null;
-      }
-      
-      elseif (func_num_args() == 2 )
-        {                     
-            // Find out if handed an ID or an assocative array for the second arg
-            if (is_string(func_get_arg(1)))
+            //the second parameter was an ID of either a Diagram to be loaded or DiaNode which will be the parent
+            if(is_string(func_get_arg(1)))
             {
-                $id = func_get_arg(1);
-                // TODO - add exception handling to getTypeFromUUID call such that it at a minimum gives 
-                // information specific to this class in addition to passing the original error
-                $type = $this->storage->getTypeFromUUID($id);
-                // Find if the type of the second argument is Diagram, if so, its a new node
-                if (is_subclass_of($type, "DiaNode"))
+                
+                $type = func_get_arg(0)->getTypeFromUUID($id);
+                //if the id belonged to a 
+                if (is_subclass_of($type, "Diagram"))
                 {
-                    $this->diaNode = func_get_arg(1);
-
-                    // Initialize the linked DiaNode so we can get its parent and link
-                    // ourselves into it
-                    $subDFDNode = new $type($this->storage);
-
-                    $parentDFD_id = $subDFDNode->getParent();
-
-                    // Initialize the parent DFD and get its ancenstry
-                    $type = getTypeFromUUID($parentDFD_id);
-                    $parentDFD = new $type($parentDFD_id);
-                    $this->ancestry = $parentDFD->getAncestry();
-                    // Add immediate parent to stack
-                    array_push($this->ancestry, $parentDFD->getId());    
-                }
-                //if the type of the second argument is not a Diagram, then load from storage
-                elseif (is_subclass_of($type, "Node"))
-                {
-                    $assocativeArray = $this->storage->loadNode($this->id);
-
+                    $this->id = func_get_arg(1);
+                    $this->storage = func_get_arg(0);
+                    if (!is_subclass_of($this->storage, "ReadStorable"))
+                    {
+                        throw new BadConstructorCallException("Passed storage object does not implement ReadStorable.");
+                    }
+                    if (!is_subclass_of($this->storage, "WriteStorable"))
+                    {
+                        throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
+                    }
+                    $assocativeArray = $this->storage->loadDiagram($this->id);
                     $this->loadAssociativeArray($assocativeArray);
-
+                }
+                //second parameter was an id of a DiaNode object create an empty object with that diaNode as its parent and set up your ancestry accordingly
+                else if (is_subclass_of($type, "DiaNode"))
+                {
+                    //call the parent constructor and set the linkList to be an empty list
+                    parent::__construct(func_get_arg(0));
+                    $this->linkList = array();
+                    $this->diaNodeList = array();
+                    $this->nodeList = array();
+                    $this->diaNode = func_get_arg(1);
+                    
+                    //to set the ancestry load the parent Diagram and then set this object's ancestry equal to it then add the parent Diagram to it
+                    $type = $this->storage->getTypeFromUUID($this->diaNode);
+                    $parentDiaNode = new $type(func_get_arg(0), $this->diaNode);
+                    $parentDiagramId = $parentDiaNode->getParent();
+                    $type = $this->storage->getTypeFromUUID($parentDiagramId);
+                    $parentDiagram = new $type(func_get_arg(0), $parentDiagramId);
+                    $this->ancestry = $parentDiagram->getAncestry();
+                    array_push($this->ancestry, $parentDiagram->getId()); 
                 }
                 else
                 {
-                    throw new BadConstructorCallException("Passed ID was for neither a DiaNode nor a Diagram.");
+                    throw new BadConstructorCallException("the ID passed to the Diagram constructor was neither a Diagram nor a DiaNode");
                 }
-            }
-            // Otherwise if it is an array, load it
-            // TODO - figure out if this can be called at a higher level (e.g. entity) while still using the entire chain of load functions
-            elseif (is_array(func_get_arg(1)))
-            {
-                $assocativeArray = func_get_arg(1);
-                
-                $this->loadAssociativeArray($assocativeArray);
-                // TODO - work things back out so this is only done in Entity
-                // If no ID was passed (i.e. the frontend has made a new element)
-                if ($this->id == NULL)
-                {
-                    $this->id = $this->generateId();
-                }
-            }
-            else
-            {
-                throw new BadConstructorCallException("Invalid second parameter, can be neither an ID or an assocative array");
-            }
-        }
-        else
-        {
-            throw new BadConstructorCallException("Invalid number of input parameters were passed to this constructor");
-        }
+           }
+           //if the second parameter was an associative array pass the parameters on to the parent constructor
+           else if(is_array(func_get_arg(1)))
+           {
+               parent::__construct(func_get_arg(0), func_get_arg(1));
+           }
+           else
+           {
+               throw new BadConstructorCallException("The second parameter passed to the Diagram constructor with neither an Id nor an assocaitive array");
+           }
+       }
+       else
+       {
+           throw new BadConstructorCallException("An incorrect number of parameters were passed to the constructor for Diagram");
+       }
    }
-
     //</editor-fold>
     //<editor-fold desc="Accessor functions" defaultstate="collapsed">
     //<editor-fold desc="linkList Accessors" defaultstate="collapsed">
