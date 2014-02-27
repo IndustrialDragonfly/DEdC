@@ -66,6 +66,40 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          return $type['type'];
     }
     
+    /**
+     * Returns a list of of a given type by the given type from the datastore
+     * 
+     * @param String $type
+     * @return String[]
+     * @throws BadFunctionCallException
+     */
+    public function getListByType($type)
+    {
+        // TODO: Check for valid type (maybe)
+        
+        $selectStatement = $this->dbh->prepare("SELECT id, label FROM entity WHERE type=?");
+        $selectStatement->bindParam(1, $type);
+        $selectStatement->execute();
+        
+        $elementsArray = $selectStatement->fetchAll();
+        
+        return $elementsArray;
+    }
+    
+    /**
+     * Returns a list of types from the datastore
+     * 
+     * @return String[]
+     */
+    public function getTypes()
+    {
+        $selectStatement = $this->dbh->prepare("SELECT type FROM types");
+        
+        $typesArray = $selectStatement->fetchAll();
+        
+        return $typesArray;
+    }
+    
 //<editor-fold desc="Node Related Functions" defaultstate="collapsed">
     public function saveNode($id, $label, $type, $originator, $x, $y, $links, $numLinks, $parentId)
     {

@@ -19,6 +19,20 @@ interface ReadStorable
      */
     public function getTypeFromUUID($resource);
     
+    /**
+     * Returns a list of of a given type by the given type from the datastore
+     * 
+     * @param String $type
+     */
+    public function getListByType($type);
+    
+    /**
+     * Returns a list of types from the datastore
+     * 
+     * @return String[]
+     */
+    public function getTypes();
+    
      /**
      * loadNode takes as input a UUID and returns an associative array
      * of all information related to that ID from the database.
