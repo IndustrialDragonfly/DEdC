@@ -64,7 +64,7 @@ abstract class Diagram extends Entity
    public function __construct()
    {
         //if only a storage medium is passed create an empty root Diagram
-        if(func_num_args())
+        if(func_num_args() == 1)
         {
             parent::__construct(func_get_arg(0));
             $this->ancestry = array();
@@ -83,7 +83,7 @@ abstract class Diagram extends Entity
             if(is_string(func_get_arg(1)))
             {
                 
-                $type = func_get_arg(0)->getTypeFromUUID($id);
+                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
                 //if the id belonged to a 
                 if (is_subclass_of($type, "Diagram"))
                 {
@@ -97,7 +97,7 @@ abstract class Diagram extends Entity
                     {
                         throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
                     }
-                    $assocativeArray = $this->storage->loadDiagram($this->id);
+                    $assocativeArray = $this->storage->loadDiagram(func_get_arg(1));
                     $this->loadAssociativeArray($assocativeArray);
                 }
                 //second parameter was an id of a DiaNode object create an empty object with that diaNode as its parent and set up your ancestry accordingly
