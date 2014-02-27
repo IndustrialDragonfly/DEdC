@@ -151,7 +151,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             // Load DFD button
             $(load).button().click(function () {
                 // Controller.php is required until the rewrite rules work correctly
-                getDfd("Controller.php/ljGmxv7q3E5E07bbXYjpNpfiM3wr8DeyWo5EZFseujEx");
+                getDfd("Controller.php/47xy0gqAIZLrv9O0vdvrJxslGrx35Yje18QovIgJZHUx_id");
             });
 
             // New tab button
