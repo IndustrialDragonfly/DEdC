@@ -86,7 +86,7 @@ abstract class Entity
             }
             else
             {
-                throw new BadConstructorCallException("Paramater 1 was not an associative array.");
+                throw new BadConstructorCallException("Parameter 1 was not an associative array.");
             }
         }
         else
