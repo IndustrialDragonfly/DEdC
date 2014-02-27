@@ -64,7 +64,7 @@ abstract class Diagram extends Entity
    public function __construct()
    {
         //if only a storage medium is passed create an empty root Diagram
-        if(func_num_args())
+        if(func_num_args() == 1)
         {
             parent::__construct(func_get_arg(0));
             $this->ancestry = array();
@@ -83,8 +83,8 @@ abstract class Diagram extends Entity
             if(is_string(func_get_arg(1)))
             {
                 
-                $type = func_get_arg(0)->getTypeFromUUID($id);
-                //if the id belonged to a 
+                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
+                //if the id belonged to a Diagram object load it
                 if (is_subclass_of($type, "Diagram"))
                 {
                     $this->id = func_get_arg(1);

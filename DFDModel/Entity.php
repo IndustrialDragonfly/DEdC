@@ -57,8 +57,6 @@ abstract class Entity
      */
     public function __construct()
     {
-        // TODO - this constructor should know when it should set things to be null and when it is being loaded other ways 
-        // not sure that this is needed as we already have the loadAssociativeArray function to do just that
         $this->id = $this->generateId();
         $this->storage = func_get_arg(0);
         if (!is_subclass_of($this->storage, "ReadStorable"))
@@ -255,7 +253,7 @@ abstract class Entity
         }
         else
         {
-            // TODO - Throw relevant exception
+            throw new BadFunctionCallException("This object does not decend from an valid base classes, it should decend from either: Diagram, DiaNode, Node or Link");
         }
 
         $entityArray['genericType'] = $genericType;
