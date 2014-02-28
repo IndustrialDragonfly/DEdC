@@ -82,8 +82,13 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $selectStatement->execute();
         
         $elementsArray = array();
-        $elementsArray[$type] = $selectStatement->fetchAll();
+        // PDO::FETCH_ASSOC means we only get the associative array, not the associative array and normal array
+        $elementsArray['list'] = $selectStatement->fetchAll(PDO::FETCH_ASSOC);
         
+        // Needs to be added manually
+        $elementsArray['genericType'] = 'List';
+        $elementsArray['listType'] = $type;
+                
         return $elementsArray;
     }
     

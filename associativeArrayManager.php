@@ -15,12 +15,10 @@
 function addTags($rawData, $tag)
 {
     // TODO: Check if Ids are null first
-    // One thing that always holds true is it has an id, so set it here
-    $rawData['id'] = $rawData['id'] . "$tag";
-    
     switch($rawData['genericType'])
     {
         case "Diagram":
+            $rawData['id'] = $rawData['id'] . "$tag";
             foreach ($rawData['nodeList'] as &$node)
             {
                 $node['id'] = $node['id'] . "$tag";
@@ -47,10 +45,12 @@ function addTags($rawData, $tag)
             break;
            
         case "diaNode":
+            $rawData['id'] = $rawData['id'] . "$tag";
             $rawData['diagramId'] = $rawData['diagramId'] . "$tag";
             // Intentionally let it fall through to Node so that we only
             // have to write linkList code here once
         case "Node":
+            $rawData['id'] = $rawData['id'] . "$tag";
             foreach ($rawData['linkList'] as &$link)
             {
                 $link['id'] = $link['id'] . "$tag";
@@ -60,9 +60,17 @@ function addTags($rawData, $tag)
             break;
         
         case "Link":
+            $rawData['id'] = $rawData['id'] . "$tag";
             foreach ($rawData['nodeList'] as &$node)
             {
                 $node['id'] = $node['id'] . "$tag";
+            }
+            break;
+            
+        case "List":
+            for ($i = 0; $i < count($rawData['list']); $i++)
+            {
+                $rawData['list'][$i]['id'] = $rawData['list'][$i]['id'] . "$tag";
             }
             break;
         
