@@ -267,37 +267,25 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                 console.log("Request to save DFD failed. " + response.getError() + " " + response.getData());
             };
             
+            var data = {};
             // Check if the Canvas has its data set
             if (!canvas.getData()) {
                 // Save new DFD
-                var data = {};
                 data.type = "DataFlowDiagram";
-                data.label = "It worrk!";
-                //data.nodeList = [];
-                // DFD Definition
-                /*data.id = "";
-                data.label = canvas.getLabel();
-                data.type = "DataFlowDiagram";
-                data.originator = canvas.getOriginator();
-                data.genericType = "Diagram";
-                data.diaNode = "";
+                data.label = "Some Label";
                 data.nodeList = [];
                 data.linkList = [];
-                data.DiaNodeList = [];*/
+                data.DiaNodeList = [];
                 
                 // Node definition
-                /*canvas.getElements().forEach(function (entry) {
+                canvas.getElements().forEach(function (entry) {
                     data.nodeList.push({
-                        //id: "",
                         type: entry.getType().name,
-                        genericType: "Node",
                         label: entry.getText(),
                         x: entry.getPosition().x,
-                        y: entry.getPosition().y,
-                        //originator: canvas.getOriginator(),
-                        linkList: []
+                        y: entry.getPosition().y
                     });
-                });*/
+                });
                 
                 // Link definition
                 /*canvas.getDataflows().forEach(function (entry) {
@@ -331,9 +319,24 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
 
 
             } else {
-                // Update an existing DFD
+                // Update an existing DFD with new elements
+                data.id = canvas.getData().id;
+                data.type = "DataFlowDiagram";
+                data.label = "Some Label";
+                data.nodeList = [];
+                data.linkList = [];
+                data.DiaNodeList = [];
+                
+                // Node definition
+                canvas.getElements().forEach(function (entry) {
+                    data.nodeList.push({
+                        type: entry.getType().name,
+                        label: entry.getText(),
+                        x: entry.getPosition().x,
+                        y: entry.getPosition().y
+                    });
+                });            
             }
-            
             
             // Execute the request
             Connector.put("Controller.php", data, onSuccess, onFail);
