@@ -227,7 +227,7 @@ define(function () {
          */
         this.getType = function() {
             return myType;
-        }
+        };
         
         /**
          * Set the Element type
@@ -235,7 +235,7 @@ define(function () {
          */
         this.setType = function(type) {
             myType = type;
-        }
+        };
 
     };
 
