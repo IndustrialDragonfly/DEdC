@@ -14,22 +14,20 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
             canvas.setData({
                 "id": response.getData().id,
                 "label": response.getData().label,
-                "type": response.getData().type,
                 "originator": response.getData().originator,
-                "genericType": response.getData().genericType,
-                "subDFDNode": response.getData().subDFDNode
+                "diaNode": response.getData().diaNode
             });
 
-            response.getData().nodes.forEach(function (entry) {
+            response.getData().nodeList.forEach(function (entry) {
                 publicLoadElement(canvas, entry);
             });
 
-            response.getData().subDFDNodes.forEach(function (entry) {
+            response.getData().DiaNodeList.forEach(function (entry) {
                 // TODO: Handle subDFDNodes
                 publicLoadElement(canvas, entry);
             });
 
-            response.getData().links.forEach(function (entry) {
+            response.getData().linkList.forEach(function (entry) {
                 publicLoadDataflow(canvas, entry);
             });
         };
@@ -155,10 +153,8 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
             e.setText(entry.label);
             e.setData({
                 "id": entry.id,
-                "type": entry.type
-                //"label": entry.label, // These will be pulled from the graphical representation
-                //"x": entry.x,
-                //"y": entry.y
+                "type": entry.type,
+                "originator": entry.originator
             });
 
             return e;
@@ -176,12 +172,8 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
             // Set the Dataflow's id and text label
             d.setData({
                 "id": entry.id,
-                "type": entry.type
-                //"label": entry.label, // These will be pulled from the graphical representation
-                //"x": entry.x,
-                //"y": entry.y
-                //"origin_id": entry.origin_id,
-                //"dest_id": entry.dest_id
+                "type": entry.type,
+                "originator": entry.originator
             });
 
             // Set the text label

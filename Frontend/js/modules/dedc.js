@@ -151,7 +151,8 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             // Load DFD button
             $(load).button().click(function () {
                 // Controller.php is required until the rewrite rules work correctly
-                getDfd("Controller.php/47xy0gqAIZLrv9O0vdvrJxslGrx35Yje18QovIgJZHUx_id");
+                // TODO: Use entity list to get ids
+                getDfd("Controller.php/yVYNOTznetcICmTIY42RjHWJH7bdAsZ3kVzMKYuy1f8x_id");
             });
 
             // New tab button
