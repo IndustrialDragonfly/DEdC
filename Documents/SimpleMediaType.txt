@@ -12,38 +12,9 @@ Definition for a DFD (note there are no nested DFDs in this definition)
     "originator": "string",
     "genericType": "string",
     "diaNode": "string",
-    "nodeList": 
-    [
-        {
-            "id": "string",
-            "type": "string",
-            "label": "string",
-            "x": "value",
-            "y": "value"
-        }
-    ],
-    "linkList": 
-        [
-            {
-                "id": "string",
-                "type": "string",
-                "label": "string",
-                "originNode": "string",
-                "destinationNode": "string",
-                "x": "value",
-                "y": "value"
-            }
-        ],
-    "DiaNodeList": 
-    [
-        {
-            "id": "string",
-            "type": "string",
-            "label": "string",
-            "x": "value",
-            "y": "value"
-        }
-    ]
+    "nodeList": [],
+    "linkList": [],
+    "DiaNodeList": []
 }
 
 Definition for a single node
