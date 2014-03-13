@@ -299,7 +299,6 @@ abstract class Link extends Element
     public function loadAssociativeArray($associativeArray)
     {
         parent::loadAssociativeArray($associativeArray);
-        // TODO - error handling for missing elements/invalid elements
         if(isset($associativeArray['originNode']))
         {
             $this->originNode = $associativeArray['originNode'];

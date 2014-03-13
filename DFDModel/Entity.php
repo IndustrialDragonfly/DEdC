@@ -267,8 +267,6 @@ abstract class Entity
      */
     public function loadAssociativeArray($associativeArray)
     {
-        // TODO - error handling for missing elements/invalid elements
-        //$this->id = $associativeArray['id'];
         if(isset($associativeArray['label']))
         {
             $this->label = $associativeArray['label'];

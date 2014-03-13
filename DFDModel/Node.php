@@ -176,18 +176,14 @@ abstract class Node extends Element
      * @param type $link the link to be removed
      * @return boolean if the link was in the array
      * @throws BadFunctionCallException if the input was not a DataFlow]
-     * TODO - Clean up the var dumps
      */
     public function removeLink($link)
     {
         
         if (is_subclass_of($link, "Link"))
         {
-            //var_dump($this->linkList);
-            //var_dump($link->getId());
-            //find if the link is in the list and get its location if it is
+            //find if the link is in the list and get its location if it is in the array
             //$loc = array_search($link->getId(), $this->linkList, True);
-            //var_dump($loc);
             $loc = FALSE;
             for ($i = 0; $i < count($this->linkList); $i++)
             {
@@ -276,7 +272,6 @@ abstract class Node extends Element
      */
     public function loadAssociativeArray($associativeArray)
     {
-        // TODO - error handling for missing elements/invalid elements
         // Potentially this section could be rewritten using a foreach loop
         // on the array and reflection on the current node to determine
         // what it should store locally
