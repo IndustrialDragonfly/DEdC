@@ -183,13 +183,15 @@ abstract class Diagram extends Entity
      * This is a function that adds a new Link to the list of Links
      * @param Link $link the link to be added
      */
-    public function addLink($link)
+    public function addLink($newLink)
     {
         //ensure that a valid link child was passed
-        if (is_subclass_of($link, 'Link')  )
+        if (is_subclass_of($newLink, 'Link')  )
         {
             //add it to the list
-            array_push($this->linkList, $link->getId());
+            $link['id'] = $newLink->getId();
+            $link['label'] = $newLink->getLabel();
+            array_push($this->linkList, $link);
         }
         else
         {
@@ -266,13 +268,18 @@ abstract class Diagram extends Entity
      * @param Node $node
      * @throws BadFunctionCallException 
      */
-    public function addNode($node)
+    public function addNode($newNode)
     {
         //ensure that a valid Node child was passed
-        if (is_subclass_of($node, 'Node')  )
+        if (is_subclass_of($newNode, 'Node')  )
         {
             //add it to the list
-            array_push($this->nodeList, $node->getId());
+            $node['id'] = $newNode->getId();
+            $node['label'] = $newNode->getLabel();
+            $node['x'] = $newNode->getX();
+            $node['y'] = $newNode->getY();
+            
+            array_push($this->nodeList, $node);
         }
         else
         {

@@ -118,15 +118,13 @@ abstract class Node extends Element
      */
     public function addLink($newLink)
     {
-        // Check that it is a link, and that it isn't already in the array
-        // This allows either link or node to add link, without going into
-        // infinite look
+        // Check that it is a link
         if (is_subclass_of($newLink, "Link"))
         {
-            //if (!array_search($newLink->getId(), $this->linkList))
-            {
-                array_push($this->linkList, $newLink->getId());
-            }
+            //create an new associative array and add it to the list
+            $link['id']  = $newLink->getId();
+            $link['label'] = $newLink->getLabel();
+            array_push($this->linkList, $link);
         }
         else
         {
@@ -177,18 +175,19 @@ abstract class Node extends Element
      * Should only be called by Link object
      * @param type $link the link to be removed
      * @return boolean if the link was in the array
-     * @throws BadFunctionCallException if the input was not a DataFlow
+     * @throws BadFunctionCallException if the input was not a DataFlow]
+     * TODO - Clean up the var dumps
      */
     public function removeLink($link)
     {
         
         if (is_subclass_of($link, "Link"))
         {
-            var_dump($this->linkList);
-            var_dump($link->getId());
+            //var_dump($this->linkList);
+            //var_dump($link->getId());
             //find if the link is in the list and get its location if it is
             $loc = array_search($link->getId(), $this->linkList, True);
-            var_dump($loc);
+            //var_dump($loc);
             $loc = FALSE;
             for ($i = 0; $i < count($this->linkList); $i++)
             {
