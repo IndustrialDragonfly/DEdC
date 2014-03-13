@@ -45,7 +45,7 @@ abstract class Diagram extends Entity
      * Can be null if root
      * @var String 
      */
-    protected $diaNode;
+    protected $parentDiaNode;
 
     //</editor-fold>
     //<editor-fold desc="Constructor" defaultstate="collapsed">
@@ -68,7 +68,7 @@ abstract class Diagram extends Entity
         {
             parent::__construct(func_get_arg(0));
             $this->ancestry = array();
-            $this->diaNode = null;
+            $this->parentDiaNode = null;
             $this->diaNodeList = array();
             $this->linkList = array();
             $this->nodeList = array();
@@ -108,7 +108,7 @@ abstract class Diagram extends Entity
                     $this->linkList = array();
                     $this->diaNodeList = array();
                     $this->nodeList = array();
-                    $this->diaNode = func_get_arg(1);
+                    $this->parentDiaNode = func_get_arg(1);
                     
                     //to set the ancestry load the parent Diagram and then set this object's ancestry equal to it then add the parent Diagram to it
                     $type = $this->storage->getTypeFromUUID($this->diaNode);
@@ -307,7 +307,7 @@ abstract class Diagram extends Entity
         }
     }
     //</editor-fold>
-    //<editor-fold desc="$diaNodeList Accessors" defaultstate="collapsed">
+    //<editor-fold desc="diaNodeList Accessors" defaultstate="collapsed">
     /**
      * This is a function that returns the number of DiaNodes contained within 
      * this Diagram
@@ -453,7 +453,27 @@ abstract class Diagram extends Entity
         return $this->ancestry;
     }
     //</editor-fold>
+    //<editor-fold desc="ParentDiaNode functions" defaultstate="collapsed">
+    /**
+     * This is a function that will return the ID of the DiaNode that contains this Diagram
+     * @return String
+     */
+    public function getParentDiaNode()
+    {
+        return $this->parentDiaNode;
+    }
     
+    /**
+     * This is a function that will set the ID of the DiaNode that contains this Diagram
+     * TODO - should this function exist?
+     * @param String $newParentDiaNodeID
+     */
+    public function setParentDiaNode($newParentDiaNodeID)
+    {
+        $this->parentDiaNode = $newParentDiaNodeID;
+    }
+    //</editor-fold>
+    //<editor-fold desc="Associative Array functions" defaultstate="collapsed">
     /**
     * Returns an assocative array representing the DFD object. This assocative
     * array has the following elements and types:
@@ -481,7 +501,7 @@ abstract class Diagram extends Entity
        $dfdArray['nodeList'] = $this->nodeList;
        $dfdArray['linkList'] = $this->linkList;
        $dfdArray['DiaNodeList'] = $this->diaNodeList;
-       $dfdArray['diaNode'] = $this->diaNode;
+       $dfdArray['diaNode'] = $this->parentDiaNode;
        
        return $dfdArray;
    }
@@ -502,9 +522,10 @@ abstract class Diagram extends Entity
         $this->nodeList = $associativeArray['nodeList'];
         $this->linkList = $associativeArray['linkList'];
         $this->diaNodeList = $associativeArray['DiaNodeList'];
-        $this->diaNode = $associativeArray['diaNode'];
+        $this->parentDiaNode = $associativeArray['diaNode'];
         $this->ancestry = $associativeArray['ancestry'];
     }
+    //</editor-fold>
     //</editor-fold>
     //<editor-fold desc="Storage functions" defaultstate="collapsed">
     /**
@@ -515,7 +536,7 @@ abstract class Diagram extends Entity
     {
         $this->storage->saveDiagram($this->id, get_class($this), $this->label, 
                 $this->originator, $this->ancestry, $this->nodeList, 
-                $this->linkList, $this->diaNodeList, $this->diaNode);
+                $this->linkList, $this->diaNodeList, $this->parentDiaNode);
     }
 
     /**
