@@ -186,7 +186,7 @@ abstract class Node extends Element
             //var_dump($this->linkList);
             //var_dump($link->getId());
             //find if the link is in the list and get its location if it is
-            $loc = array_search($link->getId(), $this->linkList, True);
+            //$loc = array_search($link->getId(), $this->linkList, True);
             //var_dump($loc);
             $loc = FALSE;
             for ($i = 0; $i < count($this->linkList); $i++)
@@ -274,14 +274,21 @@ abstract class Node extends Element
      * object.
      * @param Mixed[] $assocativeArray
      */
-    protected function loadAssociativeArray($associativeArray)
+    public function loadAssociativeArray($associativeArray)
     {
         // TODO - error handling for missing elements/invalid elements
         // Potentially this section could be rewritten using a foreach loop
         // on the array and reflection on the current node to determine
         // what it should store locally
         parent::loadAssociativeArray($associativeArray);
-        $this->linkList = $associativeArray['linkList'];
+        if( isset($associativeArray['linkList']))
+        {
+            $this->linkList = $associativeArray['linkList'];
+        }
+        else
+        {
+            $this->linkList = array();
+        }
     }
 
     //</editor-fold>

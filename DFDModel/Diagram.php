@@ -210,7 +210,16 @@ abstract class Diagram extends Entity
         $type = $this->storage->getTypeFromUUID($linkid);
         $link = new $type($this->storage, $linkid);
         $link->delete();
-        $loc = array_search($linkid, $this->linkList);
+        //$loc = array_search($linkid, $this->linkList);
+        $loc = FALSE;
+        for ($i = 0; $i < count($this->linkList); $i++)
+        {
+            $current = $this->linkList[$i];
+            if( $current['id'] == $linkid)
+            {
+                $loc = $i;
+            }
+        }
         if ($loc !== FALSE)
         {
             //remove the link from the list
@@ -298,7 +307,17 @@ abstract class Diagram extends Entity
         $type = $this->storage->getTypeFromUUID($nodeId);
         $node = new $type($this->storage, $nodeId);
         $node->delete();
-        $loc = array_search($nodeId, $this->nodeList);
+        //$loc = array_search($nodeId, $this->nodeList);
+        //find the location of the id in the list of nodes
+        $loc = FALSE;
+        for ($i = 0; $i < count($this->nodeList); $i++)
+        {
+            $current = $this->nodeList[$i];
+            if( $current['id'] == $nodeId)
+            {
+                $loc = $i;
+            }
+        }
         if ($loc !== FALSE)
         {
 
@@ -518,7 +537,7 @@ abstract class Diagram extends Entity
      * object.
      * @param Mixed[] $assocativeArray
      */
-    protected function loadAssociativeArray($associativeArray)
+    public function loadAssociativeArray($associativeArray)
     {
         // TODO - error handling for missing elements/invalid elements
         // Potentially this section could be rewritten using a foreach loop
@@ -563,12 +582,12 @@ abstract class Diagram extends Entity
         // Remove its links
         foreach ($this->linkList as $link)
         {
-            $this->removeLink($link);
+            $this->removeLink($link['id']);
         }
         // Remove its nodes
         foreach ($this->nodeList as $node)
         {
-            $this->removeNode($node);
+            $this->removeNode($node['id']);
         }
         // Remove its diaNodes
         foreach ($this->diaNodeList as $diaNode)

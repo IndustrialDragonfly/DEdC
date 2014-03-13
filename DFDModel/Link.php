@@ -296,12 +296,26 @@ abstract class Link extends Element
      * object.
      * @param Mixed[] $assocativeArray
      */
-    protected function loadAssociativeArray($associativeArray)
+    public function loadAssociativeArray($associativeArray)
     {
         parent::loadAssociativeArray($associativeArray);
         // TODO - error handling for missing elements/invalid elements
-        $this->originNode = $associativeArray['originNode'];
-        $this->destinationNode = $associativeArray['destinationNode'];
+        if(isset($associativeArray['originNode']))
+        {
+            $this->originNode = $associativeArray['originNode'];
+        }
+        else
+        {
+            $this->originNode = NULL;
+        }
+        if(isset($associativeArray['destinationNode']))
+        {
+            $this->destinationNode = $associativeArray['destinationNode'];
+        }
+        else
+        {
+            $this->destinationNode = NULL;
+        }
         
     }
 

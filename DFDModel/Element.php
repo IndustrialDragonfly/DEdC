@@ -78,7 +78,7 @@ abstract class Element extends Entity
             //if the second paramenter wasnt an ID or an array throw an exception
             else
             {
-                throw new BadConstructorCallException("Invalid second parameter, can be neither an ID or an assocative array");
+                throw new BadConstructorCallException("Invalid second parameter passed to Element constructor, can be either an ID or an assocative array");
             }
             
         }
@@ -169,7 +169,8 @@ abstract class Element extends Entity
     {
         return $this->parent;
     }
-
+    //</editor-fold>
+    //<editor-fold desc="AssociativeArray Accessors" defaultstate="collapsed">
     /**
      * Returns an assocative array representing the element object. This 
      * assocative array has the following elements and types:
@@ -192,7 +193,7 @@ abstract class Element extends Entity
         // Add Entity attributes to entity array
         $elementArray['x'] = $this->x;
         $elementArray['y'] = $this->y;
-        $elementArray['parent'] = $this->parent;
+        $elementArray['diagramId'] = $this->parent;
 
         return $elementArray;
     }
@@ -202,13 +203,35 @@ abstract class Element extends Entity
      * object.
      * @param Mixed[] $assocativeArray
      */
-    protected function loadAssociativeArray($associativeArray)
+    public function loadAssociativeArray($associativeArray)
     {
         // TODO - error handling for missing elements/invalid elements
         parent::loadAssociativeArray($associativeArray);
-        $this->x = $associativeArray['x'];
-        $this->y = $associativeArray['y'];
-        $this->parent = $associativeArray['diagramId'];
+        if( isset($associativeArray['x']))
+        {
+            $this->x = $associativeArray['x'];
+        }
+        else
+        {
+            $this->x = 0;
+        }
+        if( isset($associativeArray['y']))
+        {
+            $this->y = $associativeArray['y'];
+        }
+        else
+        {
+            $this->y = 0;
+        }
+        if( isset($associativeArray['diagramId']))
+        {
+            $this->parent = $associativeArray['diagramId'];
+        }
+        else
+        {
+            //TODO - should this throw an exception?
+            $this->parent = null;
+        }
     }
 
     //</editor-fold>

@@ -130,7 +130,7 @@ class DiaNode extends Node
      * object.
      * @param Mixed[] $assocativeArray
      */
-    protected function loadAssociativeArray($associativeArray)
+    public function loadAssociativeArray($associativeArray)
     {
         parent::loadAssociativeArray($associativeArray);
 
