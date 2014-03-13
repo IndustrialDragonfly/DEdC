@@ -11,14 +11,12 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
             // TODO: Check type to make sure it's a Dfd
 
             // Set the DFD view's datamodel
-            canvas.setData({
-                "id": response.getData().id,
-                "label": response.getData().label,
-                "originator": response.getData().originator,
-                "diaNode": response.getData().diaNode
-            });
+            canvas.setId(response.getData().id);
+            canvas.setLabel(response.getData().lable);
+            canvas.setOriginator(response.getData().originator);
+            //canvas.setDiaNode(response.getData().diaNode);
 
-            response.getData().nodeList.forEach(function (entry) {
+            /*response.getData().nodeList.forEach(function (entry) {
                 publicLoadElement(canvas, entry);
             });
 
@@ -29,7 +27,7 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
 
             response.getData().linkList.forEach(function (entry) {
                 publicLoadDataflow(canvas, entry);
-            });
+            });*/
         };
 
     /**

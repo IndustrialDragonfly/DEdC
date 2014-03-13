@@ -62,6 +62,13 @@ interface ReadStorable
      * @return String
      */
     public function loadDiaNode($id);
+    
+    /**
+     * doesUUIDExist takes a id, and checks to see if it is in the database
+     * @param String $id
+     * @return Bool
+     */
+    public function doesUUIDExist($id);
 }
 
 ?>

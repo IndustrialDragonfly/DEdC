@@ -733,6 +733,27 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $delete->bindParam(1, $id);
         $delete->execute();
     }
+    
+    /**
+     * doesUUIDExist takes a id, and checks to see if it is in the database
+     * @param String $id
+     * @return Bool
+     */
+    public function doesUUIDExist($id)
+    {
+        $entity = $this->dbh->prepare("SELECT id FROM entity WHERE id=?");
+        $entity->bindParam(1, $id);
+        $entity->execute();
+        
+        if ($entity->rowCount() == 0)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
 }
 
 ?>

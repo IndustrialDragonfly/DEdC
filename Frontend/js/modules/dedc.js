@@ -152,7 +152,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             $(load).button().click(function () {
                 // Controller.php is required until the rewrite rules work correctly
                 // TODO: Use entity list to get ids
-                getDfd("Controller.php/yVYNOTznetcICmTIY42RjHWJH7bdAsZ3kVzMKYuy1f8x_id");
+                getDfd("Controller.php/X4xz1yFuAvUcuppqlJ0a338c2bfB8NNx6v34XqXxtQ0x");
             });
 
             // New tab button
@@ -237,6 +237,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
         var getDfd = function (url) {
             // If GET is successful, load SimpleMediaType DFD
             var onSuccess = function (response) {
+                console.log(response.getData());
                 var canvas = createNewTab(response.getData().label);
                 ElementFactory.loadDfd(canvas, response);
             };
@@ -260,7 +261,37 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             // Responses
             var onSuccess = function (response) {
                 console.log("Request to save DFD was successful.");
+                // Debugging purposes
                 console.log(response.getData());
+                
+                // ID is only new information from server.
+                canvas.setId(response.getData().id);
+                
+                // Save elements now
+                canvas.getElements().forEach(function (entry) {
+                    var onSuccess = function (response) {
+                        entry.setId(response.getData().id);
+                    };
+                    
+                    var onFail = function (response) {
+                        console.log("Failed to save the element. " + response.getError());
+                    };
+                    
+                    console.log(canvas.getId());
+                    var data = {
+                        diagramId: canvas.getId(),
+                        type: entry.getType().name,
+                        label: entry.getText(),
+                        x: entry.getPosition().x,
+                        y: entry.getPosition().y
+                    };
+
+                    Connector.put("Controller.php", data, onSuccess, onFail);
+                });
+                
+
+                
+                
             };
             
             var onFail = function(response) {
@@ -269,23 +300,23 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             
             var data = {};
             // Check if the Canvas has its data set
-            if (!canvas.getData()) {
+            if (!canvas.getId()) {
                 // Save new DFD
                 data.type = "DataFlowDiagram";
                 data.label = "Some Label";
-                data.nodeList = [];
+                /*data.nodeList = [];
                 data.linkList = [];
-                data.DiaNodeList = [];
+                data.DiaNodeList = [];*/
                 
                 // Node definition
-                canvas.getElements().forEach(function (entry) {
+                /*canvas.getElements().forEach(function (entry) {
                     data.nodeList.push({
                         type: entry.getType().name,
                         label: entry.getText(),
                         x: entry.getPosition().x,
                         y: entry.getPosition().y
                     });
-                });
+                });*/
                 
                 // Link definition
                 /*canvas.getDataflows().forEach(function (entry) {

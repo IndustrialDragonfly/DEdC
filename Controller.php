@@ -106,10 +106,47 @@ require_once "AuthorizeUser.php";
             // If it is a request to a resource
             if (NULL != $request->getResource())
             {
+                // Element List
                 $elementArray;
                 if ("elements" == $request->getResource())
                 {
                     $elementArray = $storage->getListByType("*");
+                    
+                    if ($elementArray)
+                    {
+                        $response = new SimpleResponse();
+                        $response->setRawData($elementArray);
+                        $response->setHeader(200);
+                    }
+                    else
+                    {
+                        $response = new SimpleResponse();
+                        $response->setRawData("Could not complete request for \"elements\"");
+                        $response->setHeader(400);
+                    }
+                }
+                else if ($storage->doesUUIDExist($request->getResource()))
+                {
+                    // Entity
+                    try
+                    {
+                        $element = existingElementFactory($request->getId(), $storage);
+                    }
+                    catch (Exception $e) // TODO: Make more specific catch cases
+                    {
+                        // Error response
+                        $response = new SimpleResponse();
+                        $response->setRawData($e->getMessage());
+                        $response->setHeader(404);
+                    }
+
+                    // Successful Response
+                    if (!$response) 
+                    {
+                        $response = new SimpleResponse($element->getAssociativeArray());
+                        // TODO - handle fail cases
+                        $response->setHeader(200);
+                    }
                 }
                 else
                 {
@@ -122,37 +159,20 @@ require_once "AuthorizeUser.php";
                         $response->setRawData($e->getMessage());
                         $response->setHeader(400);
                     }
-                }
-                
-                if ($elementArray)
-                {
-                    $response = new SimpleResponse();
-                    $response->setRawData($elementArray);
-                    $response->setHeader(200);
+                    
+                    if ($elementArray)
+                    {
+                        $response = new SimpleResponse();
+                        $response->setRawData($elementArray);
+                        $response->setHeader(200);
+                    }
                 }
             }
-            else // It is a request to a resource
+            else
             {
-                try
-                {
-                    $element = existingElementFactory($request->getId(), $storage);
-                }
-                catch (Exception $e) // TODO: Make more specific catch cases
-                {
-                    // Error response
-                    $response = new SimpleResponse();
-                    $response->setRawData($e->getMessage());
-                    $response->setHeader(404);
-                }
-
-                // Successful Response
-                if (!$response) 
-                {
-                    $response = new SimpleResponse($element->getAssociativeArray());
-                    // TODO - handle fail casels
-                    $response->setHeader(200);
-                }
-
+                $response = new SimpleResponse();
+                $response->setRawData("Cannot request a null object");
+                $response->setHeader(400);
             }
             header($response->getHeader());
             echo $response->getRepresentation();

@@ -11,40 +11,8 @@ define(function () {
             set = null,
             textBox, 
             hasMoved = false,
-            myData = null,
+            myId = null;
             myType = null;
-
-        /**
-         * Set a data object
-         * @param {Object} data object
-         */
-        this.setData = function (data) {
-            myData = data;
-        };
-
-        /**
-         * Get the set data object
-         * @returns {Object}
-         */
-        this.getData = function () {
-            return myData;
-        };
-        
-        /**
-         * Set a type of the Element
-         * @param {ELETYPE} Element type
-         */
-        this.setData = function (data) {
-            myData = data;
-        };
-
-        /**
-         * Get the type of Element
-         * @returns {ELETYPE} Element Type
-         */
-        this.getData = function () {
-            return myType;
-        };
         
         /**
          * Get the internal Raphael.Set
@@ -235,6 +203,22 @@ define(function () {
          */
         this.setType = function(type) {
             myType = type;
+        };
+        
+        /**
+         * Get the Element's id
+         * @returns {id}
+         */
+        this.getId = function() {
+            return myId;
+        };
+        
+        /**
+         * Set the id of the Element
+         * @param {String} id
+         */
+        this.setId = function(id) {
+            myId = id;
         };
 
     };

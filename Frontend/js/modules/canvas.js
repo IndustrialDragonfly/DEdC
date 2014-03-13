@@ -55,9 +55,9 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
        var paper = Raphael(container, width, height);
 
        // Datamodel
-       var myData = null,
-           myOriginator = "",
-           myLabel = "";
+       var myOriginator = "",
+           myLabel = "",
+           myId = null;
 
        // Element and Dataflow arrays
        var elements = [];
@@ -81,23 +81,7 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
                ctrlState = globals.KEYSTATE.UP;
            }
        });
-
-       /**
-        * Set a data object
-        * @param {Object} data object
-        */
-       this.setData = function (data) {
-           myData = data;
-       };
-
-       /**
-        * Get the set data object
-        * @returns {Object}
-        */
-       this.getData = function () {
-           return myData;
-       };
-
+       
        /**
         * Event called when an Element on the canvas is clicked
         * It handles the selection of elements;
@@ -405,6 +389,22 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
        this.setOriginator = function (originator) {
            myOriginator = originator;
        };
+       
+       /**
+        * Get the backend ID
+        * @returns {id}
+        */
+       this.getId = function() {
+           return myId;
+       };
+       
+       /**
+        * Set the backend ID
+        * @param {type} id
+        */
+       this.setId = function(id) {
+           myId = id;
+       }
 
     };
 });
