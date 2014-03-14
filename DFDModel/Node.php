@@ -184,11 +184,8 @@ abstract class Node extends Element
         
         if (is_subclass_of($link, "Link"))
         {
-            var_dump($this->linkList);
-            var_dump($link->getId());
             //find if the link is in the list and get its location if it is
             $loc = array_search($link->getId(), $this->linkList, True);
-            var_dump($loc);
             $loc = FALSE;
             for ($i = 0; $i < count($this->linkList); $i++)
             {
