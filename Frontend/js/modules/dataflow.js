@@ -17,7 +17,24 @@ define(function() {
                 myData,
                 textBox,
                 sourcePoint,
-                targetPoint;
+                targetPoint,
+                myId;
+        
+        /**
+         * Get the Dataflow's Id
+         * @returns {String} id
+         */
+        this.getId = function () {
+            return myId;
+        };
+        
+        /**
+         * Set the Dataflow's Id
+         * @param {String} id
+         */
+        this.setId = function (id) {
+            myId = id;
+        };
         
         /**
          * Get the Source Element
