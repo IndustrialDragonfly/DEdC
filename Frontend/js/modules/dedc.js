@@ -288,10 +288,6 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
 
                     Connector.put("Controller.php", data, onSuccess, onFail);
                 });
-                
-
-                
-                
             };
             
             var onFail = function(response) {
@@ -303,6 +299,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             if (!canvas.getId()) {
                 // Save new DFD
                 data.type = "DataFlowDiagram";
+                // TODO: Get label from GUI
                 data.label = "Some Label";
                 /*data.nodeList = [];
                 data.linkList = [];
@@ -353,6 +350,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                 // Update an existing DFD with new elements
                 data.id = canvas.getData().id;
                 data.type = "DataFlowDiagram";
+                // TODO: Get label from canvas
                 data.label = "Some Label";
                 data.nodeList = [];
                 data.linkList = [];
