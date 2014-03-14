@@ -13,6 +13,7 @@ define(function () {
             hasMoved = false,
             myId = null;
             myType = null;
+            myOriginator = null;
         
         /**
          * Get the internal Raphael.Set
@@ -219,6 +220,23 @@ define(function () {
          */
         this.setId = function(id) {
             myId = id;
+        };
+        
+        /**
+         * Get the Originator
+         * @returns {myOriginator|originator}
+         */
+        this.getOriginator = function () {
+            return myOriginator;
+        };
+        
+        /**
+         * Set the Originator
+         * @param {type} originator
+         * @returns {undefined}
+         */
+        this.setOriginator = function (originator) {
+            myOriginator = originator;
         };
 
     };

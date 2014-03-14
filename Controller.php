@@ -100,61 +100,43 @@ require_once "AuthorizeUser.php";
     switch ($request->getMethod())
     {
         case MethodsEnum::GET:
+            // Response to return at the end of this block
             $response;
-            $element;
 
             // If it is a request to a resource
             if (NULL != $request->getResource())
-            {
-                // Element List
-                $elementArray;
+            {  
                 if ("elements" == $request->getResource())
                 {
+                    // List of all elements
                     $elementArray = $storage->getListByType("*");
                     
                     if ($elementArray)
                     {
+                        // Success response
                         $response = new SimpleResponse();
                         $response->setRawData($elementArray);
                         $response->setHeader(200);
                     }
                     else
                     {
+                        // Fail response
                         $response = new SimpleResponse();
                         $response->setRawData("Could not complete request for \"elements\"");
                         $response->setHeader(400);
                     }
                 }
-                else if ($storage->doesUUIDExist($request->getResource()))
-                {
-                    // Entity
-                    try
-                    {
-                        $element = existingElementFactory($request->getId(), $storage);
-                    }
-                    catch (Exception $e) // TODO: Make more specific catch cases
-                    {
-                        // Error response
-                        $response = new SimpleResponse();
-                        $response->setRawData($e->getMessage());
-                        $response->setHeader(404);
-                    }
-
-                    // Successful Response
-                    if (!$response) 
-                    {
-                        $response = new SimpleResponse($element->getAssociativeArray());
-                        // TODO - handle fail cases
-                        $response->setHeader(200);
-                    }
-                }
                 else
                 {
+                    // Get elements based on type such as DataFlowDiagram
+                    // TODO: Check to see if the type is valid
                     try
                     {
                         $elementArray = $storage->getListByType($request->getResource());
                     } 
-                    catch (Exception $ex) {
+                    catch (Exception $ex) 
+                    {
+                        // Fail response
                         $response = new SimpleResponse();
                         $response->setRawData($e->getMessage());
                         $response->setHeader(400);
@@ -162,16 +144,42 @@ require_once "AuthorizeUser.php";
                     
                     if ($elementArray)
                     {
+                        // Success response
                         $response = new SimpleResponse();
                         $response->setRawData($elementArray);
                         $response->setHeader(200);
                     }
                 }
             }
+            else if ($request->getId() != NULL)
+            {
+                // Get an Entity
+                $element;
+                try
+                {
+                    $element = existingElementFactory($request->getId(), $storage);
+                }
+                catch (Exception $e) // TODO: Make more specific catch cases
+                {
+                    // Error response
+                    $response = new SimpleResponse();
+                    $response->setRawData($e->getMessage());
+                    $response->setHeader(404);
+                }
+
+                // Successful Response
+                if (!$response) 
+                {
+                    $response = new SimpleResponse($element->getAssociativeArray());
+                    // TODO - handle fail cases
+                    $response->setHeader(200);
+                }
+            }
             else
             {
+                // No other action was choosen
                 $response = new SimpleResponse();
-                $response->setRawData("Cannot request a null object");
+                $response->setRawData("Request had no resource or id.");
                 $response->setHeader(400);
             }
             header($response->getHeader());

@@ -149,11 +149,8 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
 
             // Set the text label and id for the element
             e.setText(entry.label);
-            e.setData({
-                "id": entry.id,
-                "type": entry.type,
-                "originator": entry.originator
-            });
+            e.setId(entry.id);
+            e.setOriginator(entry.originator);
 
             return e;
         };
