@@ -310,7 +310,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                     };
                     
                     var onFail = function (response) {
-                        console.log("Failed to save the element. " + response.getError());
+                        console.log("Failed to save an element. " + response.getError());
                     };
                     
                     var data = {
@@ -321,6 +321,31 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                         y: entry.getPosition().y
                     };
 
+                    Connector.put("Controller.php", data, onSuccess, onFail, false);
+                });
+                
+                // Save dataflows, needs to be executed after all of the elements are saved
+                canvas.getDataflows().forEach(function (entry) {
+                    var onSuccess = function (response) {
+                        entry.setId(response.getData().id);
+                    };
+                    
+                    var onFail = function (response) {
+                        console.log("Failed to save a Dataflow. " + response.getError());
+                    };
+                    
+                    var data = {
+                        diagramId: canvas.getId(),
+                        genericType: "Link",
+                        type: "DataFlow",
+                        originNode: {
+                            id: entry.getSource().getId()
+                        },
+                        destinationNode: {
+                            id: entry.getTarget().getId()
+                        }
+                    };
+                    
                     Connector.put("Controller.php", data, onSuccess, onFail);
                 });
             };
