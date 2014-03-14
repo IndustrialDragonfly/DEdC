@@ -240,6 +240,18 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                 console.log(response.getData());
                 var canvas = createNewTab(response.getData().label);
                 ElementFactory.loadDfd(canvas, response);
+                
+                response.getData().nodeList.forEach(function (entry) {
+                    var onSuccess = function (response) {
+                        ElementFactory.loadElement(canvas, response.getData());
+                    };
+                    
+                    var onFail = function (response) {
+                        console.log("Error loading element into DFD. " + response.getError());
+                    };
+                    
+                    Connector.get("Controller.php/" + entry.id, onSuccess, onFail);
+                });
             };
 
             // If GET is not successful
