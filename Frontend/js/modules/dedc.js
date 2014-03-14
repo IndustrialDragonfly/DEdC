@@ -152,7 +152,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             $(load).button().click(function () {
                 // Controller.php is required until the rewrite rules work correctly
                 // TODO: Use entity list to get ids
-                getDfd("Controller.php/X4xz1yFuAvUcuppqlJ0a338c2bfB8NNx6v34XqXxtQ0x");
+                getDfd("Controller.php/yTLMJM5AIt7G3WxCedjw2vqsgCbEsNnoK1bqBu5DFQQx_id");
             });
 
             // New tab button
