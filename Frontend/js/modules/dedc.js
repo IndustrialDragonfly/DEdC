@@ -152,7 +152,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             $(load).button().click(function () {
                 // Controller.php is required until the rewrite rules work correctly
                 // TODO: Use entity list to get ids
-                getDfd("Controller.php/yTLMJM5AIt7G3WxCedjw2vqsgCbEsNnoK1bqBu5DFQQx_id");
+                getDfd("Controller.php/3PQktbvgZi1kTlx33B48NfJZw30KIWrCVxIxjRQR9pgx_id");
             });
 
             // New tab button
@@ -287,10 +287,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
         var saveCurrentDfd = function (canvas) {
             // Responses
             var onSuccess = function (response) {
-                console.log("Request to save DFD was successful.");
-                // Debugging purposes
-                console.log(response.getData());
-                
+                console.log("Request to save DFD was successful.");                
                 // ID is only new information from server.
                 canvas.setId(response.getData().id);
                 
