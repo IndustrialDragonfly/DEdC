@@ -116,12 +116,16 @@ define(["modules/response", "jquery"], function (Response, $) {
 
    /**
     * Ajax PUT method
-    * @param {type} url Url of resource
-    * @param {type} data String or plain object that will be sent
-    * @param {type} successCallback Callback to execute on success
-    * @param {type} failCallback Callback to execute on failure
+    * @param {String} url Url of resource
+    * @param {String} data String or plain object that will be sent
+    * @param {Function} successCallback Callback to execute on success
+    * @param {Funtion} failCallback Callback to execute on failure
+    * @param {Bool} async (Optional) If true, the request will be sent asynchronously, false otherwise. Defaults to true.
     */
-   var publicPut = function(url, data, successCallback, failCallback) {
+   var publicPut = function(url, data, successCallback, failCallback, async) {
+       // Handle optional argument, defaults to true
+       async = (typeof async === "undefined") ? true : async;
+       
        var dataString = JSON.stringify(data);
        console.log("Sending data: " + dataString);
        $.ajax({
@@ -130,7 +134,8 @@ define(["modules/response", "jquery"], function (Response, $) {
            data: dataString,
            processData: false, // Send in body, not as a query string
            accepts: "application/json",
-           dataType: "text"
+           dataType: "text",
+           async: async
        }).done(function (data, textStatus) {
            console.log("Success from jQuery");
            // Request was successful
