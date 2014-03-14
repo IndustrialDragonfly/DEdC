@@ -59,6 +59,7 @@ Definition for a single link
     "id": "string",
     "type": "string",
     "genericType": "string",
+    "label": "string",
     "originNode": 
         {
             "id": "string",
