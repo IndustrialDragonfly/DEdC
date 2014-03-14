@@ -81,7 +81,7 @@ echo <<<EOF
             </div>
 
             <div id="footer" class="ui-layout-south">
-                    &copy;2013 Industrial Dragonfly
+                    &copy;2014 Industrial Dragonfly
             </div>
 
     </body>
