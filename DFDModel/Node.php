@@ -118,15 +118,13 @@ abstract class Node extends Element
      */
     public function addLink($newLink)
     {
-        // Check that it is a link, and that it isn't already in the array
-        // This allows either link or node to add link, without going into
-        // infinite look
+        // Check that it is a link
         if (is_subclass_of($newLink, "Link"))
         {
-            //if (!array_search($newLink->getId(), $this->linkList))
-            {
-                array_push($this->linkList, $newLink->getId());
-            }
+            //create an new associative array and add it to the list
+            $link['id']  = $newLink->getId();
+            $link['label'] = $newLink->getLabel();
+            array_push($this->linkList, $link);
         }
         else
         {
@@ -177,15 +175,16 @@ abstract class Node extends Element
      * Should only be called by Link object
      * @param type $link the link to be removed
      * @return boolean if the link was in the array
-     * @throws BadFunctionCallException if the input was not a DataFlow
+     * @throws BadFunctionCallException if the input was not a DataFlow]
      */
     public function removeLink($link)
     {
         
         if (is_subclass_of($link, "Link"))
         {
-            //find if the link is in the list and get its location if it is
-            $loc = array_search($link->getId(), $this->linkList, True);
+
+            //find if the link is in the list and get its location if it is in the array
+            //$loc = array_search($link->getId(), $this->linkList, True);
             $loc = FALSE;
             for ($i = 0; $i < count($this->linkList); $i++)
             {
@@ -272,14 +271,20 @@ abstract class Node extends Element
      * object.
      * @param Mixed[] $assocativeArray
      */
-    protected function loadAssociativeArray($associativeArray)
+    public function loadAssociativeArray($associativeArray)
     {
-        // TODO - error handling for missing elements/invalid elements
         // Potentially this section could be rewritten using a foreach loop
         // on the array and reflection on the current node to determine
         // what it should store locally
         parent::loadAssociativeArray($associativeArray);
-        $this->linkList = $associativeArray['linkList'];
+        if( isset($associativeArray['linkList']))
+        {
+            $this->linkList = $associativeArray['linkList'];
+        }
+        else
+        {
+            $this->linkList = array();
+        }
     }
 
     //</editor-fold>

@@ -45,7 +45,7 @@ abstract class Diagram extends Entity
      * Can be null if root
      * @var String 
      */
-    protected $diaNode;
+    protected $parentDiaNode;
 
     //</editor-fold>
     //<editor-fold desc="Constructor" defaultstate="collapsed">
@@ -68,7 +68,7 @@ abstract class Diagram extends Entity
         {
             parent::__construct(func_get_arg(0));
             $this->ancestry = array();
-            $this->diaNode = null;
+            $this->parentDiaNode = null;
             $this->diaNodeList = array();
             $this->linkList = array();
             $this->nodeList = array();
@@ -108,7 +108,7 @@ abstract class Diagram extends Entity
                     $this->linkList = array();
                     $this->diaNodeList = array();
                     $this->nodeList = array();
-                    $this->diaNode = func_get_arg(1);
+                    $this->parentDiaNode = func_get_arg(1);
                     
                     //to set the ancestry load the parent Diagram and then set this object's ancestry equal to it then add the parent Diagram to it
                     $type = $this->storage->getTypeFromUUID($this->diaNode);
@@ -183,13 +183,15 @@ abstract class Diagram extends Entity
      * This is a function that adds a new Link to the list of Links
      * @param Link $link the link to be added
      */
-    public function addLink($link)
+    public function addLink($newLink)
     {
         //ensure that a valid link child was passed
-        if (is_subclass_of($link, 'Link')  )
+        if (is_subclass_of($newLink, 'Link')  )
         {
             //add it to the list
-            array_push($this->linkList, $link->getId());
+            $link['id'] = $newLink->getId();
+            $link['label'] = $newLink->getLabel();
+            array_push($this->linkList, $link);
         }
         else
         {
@@ -208,7 +210,16 @@ abstract class Diagram extends Entity
         $type = $this->storage->getTypeFromUUID($linkid);
         $link = new $type($this->storage, $linkid);
         $link->delete();
-        $loc = array_search($linkid, $this->linkList);
+        //$loc = array_search($linkid, $this->linkList);
+        $loc = FALSE;
+        for ($i = 0; $i < count($this->linkList); $i++)
+        {
+            $current = $this->linkList[$i];
+            if( $current['id'] == $linkid)
+            {
+                $loc = $i;
+            }
+        }
         if ($loc !== FALSE)
         {
             //remove the link from the list
@@ -266,13 +277,18 @@ abstract class Diagram extends Entity
      * @param Node $node
      * @throws BadFunctionCallException 
      */
-    public function addNode($node)
+    public function addNode($newNode)
     {
         //ensure that a valid Node child was passed
-        if (is_subclass_of($node, 'Node')  )
+        if (is_subclass_of($newNode, 'Node')  )
         {
             //add it to the list
-            array_push($this->nodeList, $node->getId());
+            $node['id'] = $newNode->getId();
+            $node['label'] = $newNode->getLabel();
+            $node['x'] = $newNode->getX();
+            $node['y'] = $newNode->getY();
+            
+            array_push($this->nodeList, $node);
         }
         else
         {
@@ -291,7 +307,17 @@ abstract class Diagram extends Entity
         $type = $this->storage->getTypeFromUUID($nodeId);
         $node = new $type($this->storage, $nodeId);
         $node->delete();
-        $loc = array_search($nodeId, $this->nodeList);
+        //$loc = array_search($nodeId, $this->nodeList);
+        //find the location of the id in the list of nodes
+        $loc = FALSE;
+        for ($i = 0; $i < count($this->nodeList); $i++)
+        {
+            $current = $this->nodeList[$i];
+            if( $current['id'] == $nodeId)
+            {
+                $loc = $i;
+            }
+        }
         if ($loc !== FALSE)
         {
 
@@ -307,7 +333,7 @@ abstract class Diagram extends Entity
         }
     }
     //</editor-fold>
-    //<editor-fold desc="$diaNodeList Accessors" defaultstate="collapsed">
+    //<editor-fold desc="diaNodeList Accessors" defaultstate="collapsed">
     /**
      * This is a function that returns the number of DiaNodes contained within 
      * this Diagram
@@ -453,7 +479,27 @@ abstract class Diagram extends Entity
         return $this->ancestry;
     }
     //</editor-fold>
+    //<editor-fold desc="ParentDiaNode functions" defaultstate="collapsed">
+    /**
+     * This is a function that will return the ID of the DiaNode that contains this Diagram
+     * @return String
+     */
+    public function getParentDiaNode()
+    {
+        return $this->parentDiaNode;
+    }
     
+    /**
+     * This is a function that will set the ID of the DiaNode that contains this Diagram
+     * TODO - should this function exist?
+     * @param String $newParentDiaNodeID
+     */
+    public function setParentDiaNode($newParentDiaNodeID)
+    {
+        $this->parentDiaNode = $newParentDiaNodeID;
+    }
+    //</editor-fold>
+    //<editor-fold desc="Associative Array functions" defaultstate="collapsed">
     /**
     * Returns an assocative array representing the DFD object. This assocative
     * array has the following elements and types:
@@ -481,7 +527,7 @@ abstract class Diagram extends Entity
        $dfdArray['nodeList'] = $this->nodeList;
        $dfdArray['linkList'] = $this->linkList;
        $dfdArray['DiaNodeList'] = $this->diaNodeList;
-       $dfdArray['diaNode'] = $this->diaNode;
+       $dfdArray['diaNode'] = $this->parentDiaNode;
        
        return $dfdArray;
    }
@@ -491,7 +537,7 @@ abstract class Diagram extends Entity
      * object.
      * @param Mixed[] $assocativeArray
      */
-    protected function loadAssociativeArray($associativeArray)
+    public function loadAssociativeArray($associativeArray)
     {
         // TODO - error handling for missing elements/invalid elements
         // Potentially this section could be rewritten using a foreach loop
@@ -502,9 +548,10 @@ abstract class Diagram extends Entity
         $this->nodeList = $associativeArray['nodeList'];
         $this->linkList = $associativeArray['linkList'];
         $this->diaNodeList = $associativeArray['DiaNodeList'];
-        $this->diaNode = $associativeArray['diaNode'];
+        $this->parentDiaNode = $associativeArray['diaNode'];
         $this->ancestry = $associativeArray['ancestry'];
     }
+    //</editor-fold>
     //</editor-fold>
     //<editor-fold desc="Storage functions" defaultstate="collapsed">
     /**
@@ -515,7 +562,7 @@ abstract class Diagram extends Entity
     {
         $this->storage->saveDiagram($this->id, get_class($this), $this->label, 
                 $this->originator, $this->ancestry, $this->nodeList, 
-                $this->linkList, $this->diaNodeList, $this->diaNode);
+                $this->linkList, $this->diaNodeList, $this->parentDiaNode);
     }
 
     /**
@@ -535,12 +582,12 @@ abstract class Diagram extends Entity
         // Remove its links
         foreach ($this->linkList as $link)
         {
-            $this->removeLink($link);
+            $this->removeLink($link['id']);
         }
         // Remove its nodes
         foreach ($this->nodeList as $node)
         {
-            $this->removeNode($node);
+            $this->removeNode($node['id']);
         }
         // Remove its diaNodes
         foreach ($this->diaNodeList as $diaNode)

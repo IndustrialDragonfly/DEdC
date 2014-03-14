@@ -97,8 +97,7 @@ abstract class Entity
      * This is a function that generates a UUID String with a length of 265 bits
      * @return String
      */
-    // TODO - rework constructors so that this only needs to be called in Entity
-    protected function generateId()
+    private function generateId()
     {
         $length = 256;
         $numberOfBytes = $length / 8;
@@ -266,13 +265,33 @@ abstract class Entity
      * object.
      * @param Mixed[] $assocativeArray
      */
-    protected function loadAssociativeArray($associativeArray)
+    public function loadAssociativeArray($associativeArray)
     {
-        // TODO - error handling for missing elements/invalid elements
-        //$this->id = $associativeArray['id'];
-        $this->label = $associativeArray['label'];
-        $this->originator = $associativeArray['originator'];
-        $this->organization = $associativeArray['organization'];
+        if(isset($associativeArray['label']))
+        {
+            $this->label = $associativeArray['label'];
+        }
+        else
+        {
+            $this->label = "";
+        }
+        
+        if(isset($associativeArray['originator']))
+        {
+            $this->originator = $associativeArray['originator'];
+        }
+        else
+        {
+            $this->originator = "";
+        }
+        if(isset($associativeArray['organization']))
+        {
+            $this->organization = $associativeArray['organization'];
+        }
+        else
+        {
+            $this->organization = "";
+        }
     }
 
     //</editor-fold>
