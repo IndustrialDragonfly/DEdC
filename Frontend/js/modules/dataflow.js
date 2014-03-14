@@ -18,6 +18,22 @@ define(function() {
                 textBox,
                 sourcePoint,
                 targetPoint;
+        
+        /**
+         * Get the Source Element
+         * @returns {Element}
+         */
+        var getSource = function () {
+            return mySource;
+        };
+        
+        /**
+         * Get the Target Element
+         * @returns {Element}
+         */
+        var getTarget = function() {
+            return myTarget;
+        };
 
         /**
          * Update the position of the text label
