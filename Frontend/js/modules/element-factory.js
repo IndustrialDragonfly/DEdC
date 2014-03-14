@@ -126,7 +126,7 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
                     "stroke-width": "2px"
                 }]);
                 e.draggable();
-                e.setType(globals.EXTINTERACTOR.DATASTORE);
+                e.setType(globals.ELETYPE.EXTINTERACTOR);
                 canvas.pushElement(e);
             } else {
                 // The type was not recognized
