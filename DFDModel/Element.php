@@ -193,7 +193,7 @@ abstract class Element extends Entity
         // Add Entity attributes to entity array
         $elementArray['x'] = $this->x;
         $elementArray['y'] = $this->y;
-        $elementArray['parent'] = $this->parent;
+        $elementArray['diagramId'] = $this->parent;
 
         return $elementArray;
     }
@@ -222,9 +222,9 @@ abstract class Element extends Entity
         {
             $this->y = 0;
         }
-        if( isset($associativeArray['parent']))
+        if( isset($associativeArray['diagramId']))
         {
-            $this->parent = $associativeArray['parent'];
+            $this->parent = $associativeArray['diagramId'];
         }
         else
         {
