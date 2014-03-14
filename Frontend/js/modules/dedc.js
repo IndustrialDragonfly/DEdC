@@ -237,13 +237,28 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
         var getDfd = function (url) {
             // If GET is successful, load SimpleMediaType DFD
             var onSuccess = function (response) {
+                // Create Canvas
                 console.log(response.getData());
                 var canvas = createNewTab(response.getData().label);
                 ElementFactory.loadDfd(canvas, response);
                 
+                // Load nodes
                 response.getData().nodeList.forEach(function (entry) {
                     var onSuccess = function (response) {
                         ElementFactory.loadElement(canvas, response.getData());
+                    };
+                    
+                    var onFail = function (response) {
+                        console.log("Error loading element into DFD. " + response.getError());
+                    };
+                    
+                    Connector.get("Controller.php/" + entry.id, onSuccess, onFail);
+                });
+                
+                // Load links
+                response.getData().linkList.forEach(function (entry) {
+                    var onSuccess = function (response) {
+                        ElementFactory.loadDataflow(canvas, response.getData());
                     };
                     
                     var onFail = function (response) {
@@ -289,7 +304,6 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                         console.log("Failed to save the element. " + response.getError());
                     };
                     
-                    console.log(canvas.getId());
                     var data = {
                         diagramId: canvas.getId(),
                         type: entry.getType().name,
