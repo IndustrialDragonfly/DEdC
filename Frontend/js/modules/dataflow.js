@@ -23,7 +23,7 @@ define(function() {
          * Get the Source Element
          * @returns {Element}
          */
-        var getSource = function () {
+        this.getSource = function () {
             return mySource;
         };
         
@@ -31,7 +31,7 @@ define(function() {
          * Get the Target Element
          * @returns {Element}
          */
-        var getTarget = function() {
+        this.getTarget = function() {
             return myTarget;
         };
 
