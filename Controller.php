@@ -72,7 +72,7 @@ require_once "conf.php";
     $authenticator = new $authenModule($storage);    
     
     // Pass authentication information from client
-    if (!$authenticator->authenticateUser())
+    if (!$authenticator->authenticateClient())
     {
         // TODO - handle authentication
         exit;

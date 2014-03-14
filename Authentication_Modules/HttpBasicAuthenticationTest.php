@@ -8,7 +8,7 @@
  *
  * @author eugene
  */
-class HttpBasicAuthenticationTest
+class HttpBasicAuthenticationTest implements Authenticatable
 {
     /**
      *
@@ -29,14 +29,15 @@ class HttpBasicAuthenticationTest
     
     public function __construct($storage)
     {
+        // TODO: Use filtering functions on Globals
         $this->username = $_SERVER['PHP_AUTH_USER'];
         $this->password = $_SERVER['PHP_AUTH_PW'];
         $this->storage = $storage;
     }
     
-   public function authenticateUser()
+   public function authenticateClient()
    {
-        if (!isset($this->username) ||  ($_POST['SeenBefore'] == 1 && $_POST['OldAuth'] == $_SERVER['PHP_AUTH_USER'])) 
+        if (!isset($this->username) ||  ($_POST['SeenBefore'] == 1 && $_POST['OldAuth'] == $this->username)) 
         {
             header('WWW-Authenticate: Basic realm="DEdC"');
             // If user hits cancel, goes to this next line
@@ -57,7 +58,7 @@ class HttpBasicAuthenticationTest
         }
    }
    
-   
+   // TODO: Make the reply more generic so that controller can handle it
    private function unauthorized()
    {
         header('HTTP/1.0 401 Unauthorized');
