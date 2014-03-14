@@ -173,4 +173,30 @@ function stripTag($id, $length)
     }
     return substr($id, 0, $length);
 }
+
+/**
+ * Determines if the given parameter is a UUID. Returns True if "_id" is 
+ * present at the end of the given parameter, False otherwise.
+ * @param String $resource
+ * @return Bool
+ */
+function isUUID($resource)
+{
+    if (func_num_args() != 1)
+    {
+        throw new BadFunctionCallException("isUUID expects 1 argument.");
+    }
+    
+    $resourceLength = strlen($resource);
+    $tag = substr($resource, $resourceLength - strlen("_id"), $resourceLength);
+
+    if ($tag == "_id")
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 ?>
