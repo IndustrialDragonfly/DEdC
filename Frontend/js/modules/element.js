@@ -11,8 +11,8 @@ define(function () {
             set = null,
             textBox, 
             hasMoved = false,
-            myId = null;
-            myType = null;
+            myId = null,
+            myType = null,
             myOriginator = null;
         
         /**
