@@ -49,26 +49,35 @@ function __autoload($classname)
     {
         require_once "Storage/" . $classname . ".php";
     }
+    elseif (file_exists("Authentication_Modules/" . $classname . ".php"))
+    {
+        require_once "Authentication_Modules/" . $classname . ".php";
+    }
     else
     {
-        // Make throw an exception later
-        echo "Problem loading file";
+        // TODO: Make throw an exception later
+        echo "Problem loading class";
         exit;
     }
 }
 
 require_once "MethodsEnum.php";
-require_once "Authentication.php";
 require_once "AuthorizeUser.php";
+require_once "conf.php";
 
-    // Decode URL if needed
+    // Initialize a storage object
+    $storage = new DatabaseStorage(); 
+
+     // Instantiate a new authentication module as named by conf.php
+    $authenticator = new $authenModule($storage);    
     
     // Pass authentication information from client
-    if (!authenticateUser())
+    if (!$authenticator->authenticateUser())
     {
         // TODO - handle authentication
         exit;
     }
+        
     // Determine if user has correct permissions to perform the action
     if (!authorizeUser())
     {
@@ -94,8 +103,6 @@ require_once "AuthorizeUser.php";
     $body = file_get_contents('php://input'); // Get the body of the request
     $request = new SimpleRequest($_SERVER['HTTP_ACCEPT'], 
             $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], $body);
-    // Initialize a storage object
-    $storage = new DatabaseStorage(); 
     
     switch ($request->getMethod())
     {
