@@ -14,11 +14,11 @@ define(function() {
                 myCanvas = canvas,
                 path,
                 arrow,
-                myData,
                 textBox,
                 sourcePoint,
                 targetPoint,
-                myId;
+                myId = "",
+                myOriginator = "";
         
         /**
          * Get the Dataflow's Id
@@ -35,6 +35,22 @@ define(function() {
         this.setId = function (id) {
             myId = id;
         };
+        
+        /**
+         * Get the Dataflow's Originator
+         * @returns {String} originator
+         */
+        this.getOriginator = function () {
+        	return myOriginator;
+        };
+        
+        /**
+         * Set the Dataflow's Originator
+         * @param {String} originator
+         */
+        this.setOriginator = function (originator) {
+        	myOriginator = originator;
+        }
         
         /**
          * Get the Source Element
