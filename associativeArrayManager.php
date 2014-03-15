@@ -44,12 +44,11 @@ function addTags($rawData, $tag)
             break;
            
         case "diaNode":
-            $rawData['id'] = addTag($rawData['id'], "$tag");
-            $rawData['diagramId'] = addTag($rawData['diagramId'], $tag);
             // Intentionally let it fall through to Node so that we only
             // have to write linkList code here once
         case "Node":
             $rawData['id'] = addTag($rawData['id'], $tag);
+            $rawData['diagramId'] = addTag($rawData['diagramId'], $tag);
             foreach ($rawData['linkList'] as &$link)
             {
                 $link['id'] = addTag($link['id'], $tag);
@@ -60,6 +59,7 @@ function addTags($rawData, $tag)
         
         case "Link":
             $rawData['id'] = addTag($rawData['id'], $tag);
+            $rawData['diagramId'] = addTag($rawData['diagramId'], $tag);
             $rawData['originNode']['id'] = addTag($rawData['originNode']['id'], $tag);
             $rawData['destinationNode']['id'] = addTag($rawData['destinationNode']['id'], $tag);
             break;
@@ -125,10 +125,10 @@ function stripTags($rawData, $tag)
             break;
            
         case "diaNode":
-            $rawData['diagramId'] = stripTag($rawData['diagramId'], $idLength);
             // Intentionally let it fall through to Node so that we only
             // have to write linkList code here once
         case "Node":
+            $rawData['diagramId'] = stripTag($rawData['diagramId'], $idLength);
             foreach ($rawData['linkList'] as &$link)
             {
                 $link['id'] = stripTag($link['id'], $idLength);
@@ -138,6 +138,7 @@ function stripTags($rawData, $tag)
             break;
         
         case "Link":
+            $rawData['diagramId'] = stripTag($rawData['diagramId'], $idLength);
             foreach ($rawData['nodeList'] as &$node)
             {
                 $node['id'] = stripTag($node['id'], $idLength);
