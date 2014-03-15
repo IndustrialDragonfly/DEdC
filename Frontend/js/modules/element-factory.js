@@ -162,14 +162,10 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
      */
     var publicLoadDataflow = function (canvas, entry) {
             // Connect Dataflow by the Elements' ids
-            var d = canvas.addDataflowById(entry.origin_id, entry.dest_id);
-
+            var d = canvas.addDataflowById(entry.originNode.id, entry.destinationNode.id);
             // Set the Dataflow's id and text label
-            d.setData({
-                "id": entry.id,
-                "type": entry.type,
-                "originator": entry.originator
-            });
+            d.setId(entry.id);
+            d.setOriginator(entry.originator);
 
             // Set the text label
             d.setText(entry.label);
