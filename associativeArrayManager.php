@@ -139,10 +139,8 @@ function stripTags($rawData, $tag)
         
         case "Link":
             $rawData['diagramId'] = stripTag($rawData['diagramId'], $idLength);
-            foreach ($rawData['nodeList'] as &$node)
-            {
-                $node['id'] = stripTag($node['id'], $idLength);
-            }
+            $rawData['originNode']['id'] = stripTag($rawData['originNode']['id'], $idLength);
+            $rawData['destinationNode']['id'] = stripTag($rawData['destinationNode']['id'], $idLength);
             break;
         
         default:
