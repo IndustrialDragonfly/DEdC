@@ -20,18 +20,6 @@ function existingElementFactory($id, $storage)
     return $element;
 }
 
-/*
- * Checks to see if the incoming request has the proper user agent product,
- * if it does not loads the web client page.
- */
-$web_client_location = "Frontend/";
-$browser_accept = '*/*';
-if (FALSE !== stripos($_SERVER['HTTP_ACCEPT'], $browser_accept))
-{
-    require_once $web_client_location."/index.php";
-    webClient($web_client_location);
-    exit;
-}
 
 /**
  * Autoload function which loads a file based on class name from any of the 
@@ -61,27 +49,35 @@ function __autoload($classname)
     {
         require_once "Storage/" . $classname . ".php";
     }
+    elseif (file_exists("Authentication_Modules/" . $classname . ".php"))
+    {
+        require_once "Authentication_Modules/" . $classname . ".php";
+    }
     else
     {
-        // Make throw an exception later
-        echo "Problem loading file";
+        // TODO: Make throw an exception later
+        echo "Problem loading class";
         exit;
     }
 }
 
 require_once "MethodsEnum.php";
-require_once "Authentication.php";
 require_once "AuthorizeUser.php";
+require_once "conf.php";
 
-    // Decode URL if needed
+    // Initialize a storage object
+    $storage = new DatabaseStorage(); 
+
+     // Instantiate a new authentication module as named by conf.php
+    $authenticator = new $authenModule($storage);    
     
     // Pass authentication information from client
-    if (!authenticateUser())
+    if (!$authenticator->authenticateClient())
     {
         // TODO - handle authentication
         exit;
     }
-    
+        
     // Determine if user has correct permissions to perform the action
     if (!authorizeUser())
     {
@@ -90,12 +86,23 @@ require_once "AuthorizeUser.php";
         exit;
     }
     
+    /*
+    * Checks to see if the incoming request has the proper user agent product,
+    * if it does not loads the web client page.
+    */
+   $web_client_location = "Frontend/";
+   $browser_accept = '*/*';
+   if (FALSE !== stripos($_SERVER['HTTP_ACCEPT'], $browser_accept))
+   {
+       require_once $web_client_location."/index.php";
+       webClient($web_client_location);
+       exit;
+   }
+    
     // Retrieve information about request and put it in a request object
     $body = file_get_contents('php://input'); // Get the body of the request
     $request = new SimpleRequest($_SERVER['HTTP_ACCEPT'], 
             $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], $body);
-    // Initialize a storage object
-    $storage = new DatabaseStorage(); 
     
     switch ($request->getMethod())
     {
