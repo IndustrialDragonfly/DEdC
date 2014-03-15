@@ -8,8 +8,12 @@ define(["modules/response", "jquery"], function (Response, $) {
     * @param {String} url Url of resource
     * @param {Function} successCallback Function called if a request executes successfully
     * @param {Function} failCallback Function called if a request does not execute successfully
+    * @param {Bool} async (Optional) If true, the request will be sent asynchronously, false otherwise. Defaults to true.
     */
-   var publicGet = function (url, successCallback, failCallback) {
+   var publicGet = function (url, successCallback, failCallback, async) {
+       // Handle optional argument, defaults to true
+       async = (typeof async === "undefined") ? true : async;
+
        $.ajax({
            accepts: "application/json",
            url: url,
