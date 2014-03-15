@@ -114,6 +114,7 @@ function stripTags($rawData, $tag)
             foreach ($rawData['DiaNodeList'] as &$diaNode)
             {
                 $diaNode['id'] = stripTag($diaNode['id'], $idLength);
+                $diaNode['childDiagramId'] = stripTag($diaNode['childDiagramId'], $idLength);
             }
 
             for ($i = 0; $i < count($rawData['ancestry']); $i++)
@@ -127,6 +128,7 @@ function stripTags($rawData, $tag)
         case "diaNode":
             // Intentionally let it fall through to Node so that we only
             // have to write linkList code here once
+            $rawData['childDiagramId'] = stripTag($rawData['childDiagramId'], $idLength);
         case "Node":
             $rawData['diagramId'] = stripTag($rawData['diagramId'], $idLength);
             foreach ($rawData['linkList'] as &$link)

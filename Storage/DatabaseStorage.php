@@ -168,7 +168,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $load = $this->dbh->prepare("SELECT * FROM entity NATURAL JOIN element WHERE id=?");
          $load->bindParam(1, $id);
          $load->execute();
-         $node_vars = $load->fetch();
+         $node_vars = $load->fetch(PDO::FETCH_ASSOC);
          if($node_vars == FALSE )
          {
             throw new BadFunctionCallException("No matching id found in entity DB");
@@ -183,7 +183,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $load->execute();
          
          //extract all the ids of the elements
-         $linkList = $load->fetchAll();
+         $linkList = $load->fetchAll(PDO::FETCH_ASSOC);
          
          // Put array of all dataflow ids into array to return as links
          $node_vars['linkList'] = $linkList;
@@ -192,7 +192,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $select_stmt = $this->dbh->prepare('SELECT * FROM element_list WHERE elementId = ?');
         $select_stmt->bindParam(1, $id);
         $select_stmt->execute();
-        $parent =  $select_stmt->fetch();
+        $parent =  $select_stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($parent === FALSE)
         {
@@ -239,9 +239,9 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      */
     public function saveDiaNode($diagramId, $diaNodeId)
     {
-        //<editor-fold desc="save to multiprocess table" defaultstate="collapsed">
+        //<editor-fold desc="save to diaNode table" defaultstate="collapsed">
       // Prepare the statement
-      $insert_stmt = $this->dbh->prepare("INSERT INTO dianode (diagramId, diaNodeId) VALUES(?,?)");
+      $insert_stmt = $this->dbh->prepare("INSERT INTO dianode (childDiagramId, diaNodeId) VALUES(?,?)");
 
       // Bind the parameters of the prepared statement
       $insert_stmt->bindParam(1, $diagramId);
@@ -259,13 +259,13 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      */
     public function loadDiaNode($id)
     {
-         $select_statement = $this->dbh->prepare("SELECT diagramId FROM dianode WHERE diaNodeId=?");
+         $select_statement = $this->dbh->prepare("SELECT childDiagramId FROM dianode WHERE diaNodeId=?");
          $select_statement->bindParam(1, $id);
          $select_statement->execute();
          $diagramId = $select_statement->fetch();
          
          // Return the id from the associative array
-         return $diagramId['diagramId'];
+         return $diagramId['childDiagramId'];
     }
     
     /**
@@ -379,7 +379,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $select_stmt = $this->dbh->prepare('SELECT * FROM entity NATURAL JOIN element WHERE id = ?');
         $select_stmt->bindParam(1, $id);
         $select_stmt->execute();
-        $results =  $select_stmt->fetch();
+        $results =  $select_stmt->fetch(PDO::FETCH_ASSOC);
         
         // If there was no matching ID, thrown an exception
         if($results === FALSE )
@@ -391,7 +391,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $select_stmt = $this->dbh->prepare('SELECT * FROM element_list WHERE elementId = ?');
         $select_stmt->bindParam(1, $id);
         $select_stmt->execute();
-        $parent =  $select_stmt->fetch();
+        $parent =  $select_stmt->fetch(PDO::FETCH_ASSOC);
          
         // If there was no matching ID, thrown an exception
         if($parent === FALSE )
@@ -409,7 +409,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
             ');
         $select_stmt->bindParam(1, $id);
         $select_stmt->execute();
-        $originNode =  $select_stmt->fetch();
+        $originNode =  $select_stmt->fetch(PDO::FETCH_ASSOC);
         
         if($originNode === FALSE )
          {
@@ -427,7 +427,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
             ');
         $select_stmt->bindParam(1, $id);
         $select_stmt->execute();
-        $destNode =  $select_stmt->fetch();
+        $destNode =  $select_stmt->fetch(PDO::FETCH_ASSOC);
         
         if($destNode === FALSE )
          {
@@ -508,23 +508,25 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     {
         // Get the id, label, originator, and curtesy of diaNode, the 
         // diaNode the DFD is linked to
-         $loadDiagram = $this->dbh->prepare("SELECT * 
+         $loadDiagram = $this->dbh->prepare("
+             SELECT id, label, originator, diaNodeId, type 
              FROM entity id
-                JOIN dianode diagramId ON id=diagramId
+                JOIN dianode childDiagramId ON id=childDiagramId
              WHERE id=?");
          $loadDiagram->bindParam(1, $id);
          $loadDiagram->execute();
-         $vars = $loadDiagram->fetch();
+         $vars = $loadDiagram->fetch(PDO::FETCH_ASSOC);
          
          // Must be a root DFD, try without the diaNode table
          if($vars == FALSE )
          {
-             $loadDiagram = $this->dbh->prepare("SELECT * 
+             $loadDiagram = $this->dbh->prepare("
+                SELECT id, label, originator, type
                 FROM entity id
                 WHERE id=?");
             $loadDiagram->bindParam(1, $id);
             $loadDiagram->execute();
-            $vars = $loadDiagram->fetch();
+            $vars = $loadDiagram->fetch(PDO::FETCH_ASSOC);
             if($vars == FALSE )
             {
                 throw new BadFunctionCallException("no matching id found in entity DB");
@@ -536,7 +538,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          // filtering out all diaNodes and links from the list with a
          // a subquery
          $loadDiagram = $this->dbh->prepare("
-             SELECT * 
+            SELECT id, label, type 
             FROM entity id
                     JOIN element_list elementId ON elementId=id
                     NATURAL JOIN element
@@ -546,7 +548,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $loadDiagram->execute();
          
          // Extract all the data of the nodes
-         $nodeList = $loadDiagram->fetchAll();
+         $nodeList = $loadDiagram->fetchAll(PDO::FETCH_ASSOC);
 
          // Add the data of the nodes to the $vars array that is
          // to be returned
@@ -556,7 +558,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          // Get the links list from the database
          // This is performed by joining the relevant tables
          $loadDiagram = $this->dbh->prepare("
-             SELECT * 
+             SELECT id, label, type, originNode, destinationNode 
                 FROM link id 
                         JOIN element_list elementId ON id=elementId
                         NATURAL JOIN entity
@@ -568,7 +570,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $loadDiagram->execute();
          
          // Extract all the data of the nodes
-         $linkList = $loadDiagram->fetchAll();
+         $linkList = $loadDiagram->fetchAll(PDO::FETCH_ASSOC);
          
          // Add the data of the links to the $vars array that is
          // to be returned
@@ -592,7 +594,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
                 ");*/
          // Scarier looking work around version
          $loadDiagram = $this->dbh->prepare("
-             SELECT *
+             SELECT id, label, type, childDiagramId
                 FROM entity id
                         NATURAL JOIN element
                         JOIN dianode diaNodeId ON diaNodeId=id
@@ -602,7 +604,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $loadDiagram->execute();
          
          // Extract all the data of the nodes
-         $DiaNodeList = $loadDiagram->fetchAll();
+         $DiaNodeList = $loadDiagram->fetchAll(PDO::FETCH_ASSOC);
          
          // Add the data from diaNodes to the $vars array that is
          // to be returned
@@ -704,7 +706,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         }
       }
           // Prepare the statement
-      $insert_stmt = $this->dbh->prepare("INSERT INTO dianode (diaNodeId, diagramId) VALUES(?,?)");
+      $insert_stmt = $this->dbh->prepare("INSERT INTO dianode (diaNodeId, childDiagramId) VALUES(?,?)");
 
       // Bind the parameters of the prepared statement
       $insert_stmt->bindParam(1, $diaNode);

@@ -120,7 +120,7 @@ class DiaNode extends Node
     public function getAssociativeArray()
     {
         $diaNodeArray = parent::getAssociativeArray();
-        $diaNodeArray['subDataFlowDiagram'] = $this->subDiagram;
+        $diaNodeArray['childDiagramId'] = $this->subDiagram;
 
         return $diaNodeArray;
     }
@@ -135,7 +135,7 @@ class DiaNode extends Node
         parent::loadAssociativeArray($associativeArray);
 
         // TODO - error handling for missing elements/invalid elements
-        $this->subDiagram = $associativeArray['diagramId'];
+        $this->subDiagram = $associativeArray['childDiagramId'];
     }
 
     //</editor-fold>

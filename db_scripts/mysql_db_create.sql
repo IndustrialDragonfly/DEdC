@@ -88,7 +88,7 @@ ON UPDATE CASCADE
 
 CREATE TABLE dianode
 (
-diagramId CHAR(44),
+childDiagramId CHAR(44),
 diaNodeId CHAR(44) NOT NULL,
 FOREIGN KEY (diaNodeId)
 REFERENCES entity(id)
