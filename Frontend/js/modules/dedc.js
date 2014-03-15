@@ -152,7 +152,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             $(load).button().click(function () {
                 // Controller.php is required until the rewrite rules work correctly
                 // TODO: Use entity list to get ids
-                getDfd("Controller.php/3PQktbvgZi1kTlx33B48NfJZw30KIWrCVxIxjRQR9pgx_id");
+                getDfd("Controller.php/eXlVLVbhhr0VhS2JGrDe0FhaSOUylOUxWLBf49iJxqgx_id");
             });
 
             // New tab button
@@ -251,7 +251,20 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                         console.log("Error loading element into DFD. " + response.getError());
                     };
                     
-                    Connector.get("Controller.php/" + entry.id, onSuccess, onFail);
+                    Connector.get("Controller.php/" + entry.id, onSuccess, onFail, false);
+                });
+                
+                // Load DiaNodes
+                response.getData().DiaNodeList.forEach(function (entry) {
+                    var onSuccess = function (response) {
+                        ElementFactory.loadElement(canvas, response.getData());
+                    };
+                    
+                    var onFail = function (response) {
+                        console.log("Error loading element into DFD. " + response.getError());
+                    };
+                    
+                    Connector.get("Controller.php/" + entry.id, onSuccess, onFail, false);
                 });
                 
                 // Load links
@@ -267,18 +280,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                     Connector.get("Controller.php/" + entry.id, onSuccess, onFail);
                 });
                 
-                // Load DiaNodes
-                response.getData().DiaNodeList.forEach(function (entry) {
-                    var onSuccess = function (response) {
-                        ElementFactory.loadElement(canvas, response.getData());
-                    };
-                    
-                    var onFail = function (response) {
-                        console.log("Error loading element into DFD. " + response.getError());
-                    };
-                    
-                    Connector.get("Controller.php/" + entry.id, onSuccess, onFail);
-                });
+                
             };
 
             // If GET is not successful
