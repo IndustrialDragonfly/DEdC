@@ -217,15 +217,15 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
        this.addDataflowById = function (sourceId, targetId) {
            var source,
                target;
-
+           
            elements.forEach(function (entry) {
-               if (entry.getData().id === sourceId) {
+               if (entry.getId() === sourceId) {
                    source = entry;
-               } else if (entry.getData().id === targetId) {
+               } else if (entry.getId() === targetId) {
                    target = entry;
                }
            });
-
+           
            return this.addDataflow(source, target);
        };
 
