@@ -60,10 +60,8 @@ function addTags($rawData, $tag)
         
         case "Link":
             $rawData['id'] = addTag($rawData['id'], $tag);
-            foreach ($rawData['nodeList'] as &$node)
-            {
-                $node['id'] = addTag($node['id'], $tag);
-            }
+            $rawData['originNode']['id'] = addTag($rawData['originNode']['id'], $tag);
+            $rawData['destinationNode']['id'] = addTag($rawData['destinationNode']['id'], $tag);
             break;
             
         case "List":
