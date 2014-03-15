@@ -14,63 +14,60 @@
  */
 function addTags($rawData, $tag)
 {
-    // TODO: Check if Ids are null first
     switch($rawData['genericType'])
     {
         case "Diagram":
-            $rawData['id'] = $rawData['id'] . "$tag";
+            $rawData['id'] = addTag($rawData['id'], $tag);
             foreach ($rawData['nodeList'] as &$node)
             {
-                $node['id'] = $node['id'] . "$tag";
+                $node['id'] = addTag($node['id'], $tag);
             }
 
             foreach ($rawData['linkList'] as &$link)
             {
-                $link['id'] = $link['id'] . "$tag";
-                $link['originNode'] = $link['originNode'] . "$tag";
-                $link['destinationNode'] = $link['destinationNode'] . "$tag";
+                $link['id'] = addTag($link['id'], $tag);
+                $link['originNode'] = addTag($link['originNode'], $tag);
+                $link['destinationNode'] = addTag($link['destinationNode'], $tag);
             }
 
             foreach ($rawData['DiaNodeList'] as &$diaNode)
             {
-                $diaNode['id'] = $diaNode['id'] . "$tag";
+                $diaNode['id'] = addTag($diaNode['id'], $tag);
             }
 
             for ($i = 0; $i < count($rawData['ancestry']); $i++)
             {
-                $rawData['ancestry'][$i] = $rawData['ancestry'][$i] . "$tag";
+                $rawData['ancestry'][$i] = addTag($rawData['ancestry'][$i], $tag);
             }
 
-            $rawData['diaNode'] = $rawData['diaNode'] . "$tag";
+            $rawData['diaNode'] = addTag($rawData['diaNode'], $tag);
             break;
            
         case "diaNode":
-            $rawData['id'] = $rawData['id'] . "$tag";
-            $rawData['diagramId'] = $rawData['diagramId'] . "$tag";
             // Intentionally let it fall through to Node so that we only
             // have to write linkList code here once
         case "Node":
-            $rawData['id'] = $rawData['id'] . "$tag";
+            $rawData['id'] = addTag($rawData['id'], $tag);
+            $rawData['diagramId'] = addTag($rawData['diagramId'], $tag);
             foreach ($rawData['linkList'] as &$link)
             {
-                $link['id'] = $link['id'] . "$tag";
-                $link['originNode'] = $link['originNode'] . "$tag";
-                $link['destinationNode'] = $link['destinationNode'] . "$tag";
+                $link['id'] = addTag($link['id'], $tag);
+                $link['originNode'] = addTag($link['originNode'], $tag);
+                $link['destinationNode'] = addTag($link['destinationNode'], $tag);
             }
             break;
         
         case "Link":
-            $rawData['id'] = $rawData['id'] . "$tag";
-            foreach ($rawData['nodeList'] as &$node)
-            {
-                $node['id'] = $node['id'] . "$tag";
-            }
+            $rawData['id'] = addTag($rawData['id'], $tag);
+            $rawData['diagramId'] = addTag($rawData['diagramId'], $tag);
+            $rawData['originNode']['id'] = addTag($rawData['originNode']['id'], $tag);
+            $rawData['destinationNode']['id'] = addTag($rawData['destinationNode']['id'], $tag);
             break;
             
         case "List":
             for ($i = 0; $i < count($rawData['list']); $i++)
             {
-                $rawData['list'][$i]['id'] = $rawData['list'][$i]['id'] . "$tag";
+                $rawData['list'][$i]['id'] = addTag($rawData['list'][$i]['id'], $tag);
             }
             break;
         
@@ -93,7 +90,6 @@ function addTags($rawData, $tag)
  */
 function stripTags($rawData, $tag)
 {
-    // TODO: Check if Ids are null first
     // Find the length of an ID with no tag
     $idLength = strlen($rawData['id']) - strlen($tag);
     
@@ -129,10 +125,10 @@ function stripTags($rawData, $tag)
             break;
            
         case "diaNode":
-            $rawData['diagramId'] = stripTag($rawData['diagramId'], $idLength);
             // Intentionally let it fall through to Node so that we only
             // have to write linkList code here once
         case "Node":
+            $rawData['diagramId'] = stripTag($rawData['diagramId'], $idLength);
             foreach ($rawData['linkList'] as &$link)
             {
                 $link['id'] = stripTag($link['id'], $idLength);
@@ -142,10 +138,9 @@ function stripTags($rawData, $tag)
             break;
         
         case "Link":
-            foreach ($rawData['nodeList'] as &$node)
-            {
-                $node['id'] = stripTag($node['id'], $idLength);
-            }
+            $rawData['diagramId'] = stripTag($rawData['diagramId'], $idLength);
+            $rawData['originNode']['id'] = stripTag($rawData['originNode']['id'], $idLength);
+            $rawData['destinationNode']['id'] = stripTag($rawData['destinationNode']['id'], $idLength);
             break;
         
         default:
@@ -171,7 +166,48 @@ function stripTag($id, $length)
     {
         throw new BadFunctionCallException("Not the correct number of inputs to stripTag");
     }
+    
+     // Return null if empty rather than attempting to strip the tag
+    if ($id == NULL)
+    {
+        return NULL;
+    }
+    
+    // Check types of parameters
+     if (!is_string($id) || !is_int($length))
+    {
+        throw new BadFunctionCallException("Invalid parameter type.");
+    }
+    
     return substr($id, 0, $length);
+}
+
+/**
+ * Returns the id with the tag added. If null, returns null.
+ * @param String $id
+ * @param String $tag
+ */
+function addTag($id, $tag)
+{
+    if (func_num_args() != 2)
+    {
+        throw new BadFunctionCallException("Not the correct number of inputs to stripTag");
+    }
+    
+    // Check if id is null
+    if ($id == NULL)
+    {
+        return NULL;
+    }
+    
+    // Check types of parameters
+    if (!is_string($id) || !is_string($tag))
+    {
+        throw new BadFunctionCallException("Invalid parameter type.");
+    }
+    
+    // Return input with tag appended
+    return $id . $tag;
 }
 
 /**

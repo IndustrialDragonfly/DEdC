@@ -168,7 +168,7 @@ require_once "AuthorizeUser.php";
                 }
 
                 // Successful Response
-                if (!$response) 
+                if (!isset($response))
                 {
                     $response = new SimpleResponse($element->getAssociativeArray());
                     // TODO - handle fail cases
