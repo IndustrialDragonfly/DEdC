@@ -13,6 +13,9 @@ echo <<<EOF
             <script data-main="${web_client_location}js/app" src="${web_client_location}js/require.js"></script>
     </head>
     <body>
+            <div id ="dialog-modal" title="DataFlowDiagram Chooser">
+                <ol id="selectable"></ol>
+            </div>
             <div id="header" class="ui-layout-north"><a href="#"><img src="${web_client_location}images/logo.png" width="144" height="57"/></a></div>
 
             <!-- sidebar1Container is required by layout plugin for sidebar1 resizing -->
