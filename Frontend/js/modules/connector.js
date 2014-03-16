@@ -17,7 +17,8 @@ define(["modules/response", "jquery"], function (Response, $) {
        $.ajax({
            accepts: "application/json",
            url: url,
-           dataType: "text"
+           dataType: "text",
+           async: async
        }).done(function (data, textStatus) {
            // Request was successful
            var jsonData = false;
