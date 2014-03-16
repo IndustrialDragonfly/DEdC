@@ -158,7 +158,7 @@ define(["modules/response", "jquery"], function (Response, $) {
                     response.setData(data);
                 }
                 response.setStatus(textStatus);
-                response.setError("GET " + url + " " + data);
+                response.setError("PUT " + url + " " + data);
                 
                 failCallback(response);
            }
