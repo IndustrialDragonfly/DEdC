@@ -160,25 +160,38 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                 modal: true,
                 buttons: {
                     "Open DFDs": function () {
+                        // Open button
+                        // Go through each DOM element with the class ".ui-selected"
                         $(".ui-selected", this).each(function() {
-                           var index = $("#selectable li").index(this);
-                           console.log("Selected: " + index);
+                            // Get the id of the selected element
+                            var id = $("#selectable li").attr('id');
+                            getDfd("Controller.php/" + id);
                         });
                         
                         $(this).dialog("close");
                     },
                     "Cancel": function () {
+                        // Cancel button
                         $(this).dialog("close");
                     }
                 },
                 close: function () {
+                    // Clear out the selections
                     $("#selectable").empty();
                 },
                 open: function () {
+                    // On opening, fill the selection
                     var onSuccess = function (response) {
-                        console.log(response.getData());
-                        $("#selectable").prepend("<li id=\"item1\" class=\"ui-widget-content\">Item 1</li>");
-                        $("#selectable").prepend("<li id=\"item2\" class=\"ui-widget-content\">Item 2</li>");
+                        // Put the list of DFDs in the selectable
+                        response.getData().list.forEach(function (entry) {
+                            var itemString = "<li id=\"#{id}\" class=\"ui-widget-content\">#{label}</li>";
+                            itemString = itemString
+                                    .replace(/#\{id\}/g, entry.id)
+                                    .replace(/#\{label\}/g, entry.label);
+                            $("#selectable").prepend(itemString);
+                        });
+                        
+                        // Create the selectable
                         $("#selectable").selectable();
                     }
                     
