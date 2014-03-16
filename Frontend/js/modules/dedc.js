@@ -151,8 +151,55 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             // Load DFD button
             $(load).button().click(function () {
                 // Controller.php is required until the rewrite rules work correctly
-                // TODO: Use entity list to get ids
-                getDfd("Controller.php/eXlVLVbhhr0VhS2JGrDe0FhaSOUylOUxWLBf49iJxqgx_id");
+                //getDfd("Controller.php/ljGmxv7q3E5E07bbXYjpNpfiM3wr8DeyWo5EZFseujEx");
+                $("#dialog-modal").dialog("open");
+            });
+            
+            $("#dialog-modal").dialog({
+                autoOpen: false,
+                modal: true,
+                buttons: {
+                    "Open DFDs": function () {
+                        // Open button
+                        // Go through each DOM element with the class ".ui-selected"
+                        $(".ui-selected", this).each(function() {
+                            // Get the id of the selected element
+                            var id = $("#selectable li").attr('id');
+                            getDfd("Controller.php/" + id);
+                        });
+                        
+                        $(this).dialog("close");
+                    },
+                    "Cancel": function () {
+                        // Cancel button
+                        $(this).dialog("close");
+                    }
+                },
+                close: function () {
+                    // Clear out the selections
+                    $("#selectable").empty();
+                },
+                open: function () {
+                    // On opening, fill the selection
+                    var onSuccess = function (response) {
+                        // Put the list of DFDs in the selectable
+                        response.getData().list.forEach(function (entry) {
+                            var itemString = "<li id=\"#{id}\" class=\"ui-widget-content\">#{label}</li>";
+                            itemString = itemString
+                                    .replace(/#\{id\}/g, entry.id)
+                                    .replace(/#\{label\}/g, entry.label);
+                            $("#selectable").prepend(itemString);
+                        });
+                        
+                        // Create the selectable
+                        $("#selectable").selectable();
+                    }
+                    
+                    var onFail = function (response) {
+                        console.log("Error getting DataFlowDiagrams. " + response.getError());
+                    }
+                    Connector.get("Controller.php/DataFlowDiagram", onSuccess, onFail, false);
+                }
             });
 
             // New tab button
