@@ -151,7 +151,42 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             // Load DFD button
             $(load).button().click(function () {
                 // Controller.php is required until the rewrite rules work correctly
-                getDfd("Controller.php/ljGmxv7q3E5E07bbXYjpNpfiM3wr8DeyWo5EZFseujEx");
+                //getDfd("Controller.php/ljGmxv7q3E5E07bbXYjpNpfiM3wr8DeyWo5EZFseujEx");
+                $("#dialog-modal").dialog("open");
+            });
+            
+            $("#dialog-modal").dialog({
+                autoOpen: false,
+                modal: true,
+                buttons: {
+                    "Open DFDs": function () {
+                        $(".ui-selected", this).each(function() {
+                           var index = $("#selectable li").index(this);
+                           console.log("Selected: " + index);
+                        });
+                        
+                        $(this).dialog("close");
+                    },
+                    "Cancel": function () {
+                        $(this).dialog("close");
+                    }
+                },
+                close: function () {
+                    $("#selectable").empty();
+                },
+                open: function () {
+                    var onSuccess = function (response) {
+                        console.log(response.getData());
+                        $("#selectable").prepend("<li id=\"item1\" class=\"ui-widget-content\">Item 1</li>");
+                        $("#selectable").prepend("<li id=\"item2\" class=\"ui-widget-content\">Item 2</li>");
+                        $("#selectable").selectable();
+                    }
+                    
+                    var onFail = function (response) {
+                        console.log("Error getting DataFlowDiagrams. " + response.getError());
+                    }
+                    Connector.get("Controller.php/DataFlowDiagram", onSuccess, onFail, false);
+                }
             });
 
             // New tab button
@@ -272,27 +307,27 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                 // DFD Definition
                 data.id = "";
                 data.label = canvas.getLabel();
-                data.type = "CHANGEME";
+                data.type = "DataFlowDiagram";
                 data.originator = canvas.getOriginator();
-                data.genericType = "CHANGEME";
+                data.genericType = "Diagram";
                 data.diaNode = "";
                 data.nodeList = [];
                 data.linkList = [];
                 data.DiaNodeList = [];
                 
                 // Node definition
-                canvas.getElements().forEach(function (entry) {
+                /*canvas.getElements().forEach(function (entry) {
                     data.nodeList.push({
                         id: "",
                         type: entry.getType().name,
-                        genericType: "CHANGEME",
+                        genericType: "Element",
                         label: entry.getText(),
                         x: entry.getPosition().x,
                         y: entry.getPosition().y,
                         originator: canvas.getOriginator(),
                         linkList: []
                     });
-                });
+                });*/
                 
                 // Link definition
                 /*canvas.getDataflows().forEach(function (entry) {
