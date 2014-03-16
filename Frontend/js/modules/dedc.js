@@ -164,8 +164,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                         // Go through each DOM element with the class ".ui-selected"
                         $(".ui-selected", this).each(function() {
                             // Get the id of the selected element
-                            var id = $("#selectable li").attr('id');
-                            getDfd("Controller.php/" + id);
+                            getDfd("Controller.php/" + this.id);
                         });
                         
                         $(this).dialog("close");
