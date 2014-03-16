@@ -407,74 +407,16 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             if (!canvas.getId()) {
                 // Save new DFD
                 data.type = "DataFlowDiagram";
-                // TODO: Get label from GUI
                 data.label = "Some Label";
-                /*data.nodeList = [];
-                data.linkList = [];
-                data.DiaNodeList = [];*/
-                
-                // Node definition
-                /*canvas.getElements().forEach(function (entry) {
-                    data.nodeList.push({
-                        type: entry.getType().name,
-                        label: entry.getText(),
-                        x: entry.getPosition().x,
-                        y: entry.getPosition().y
-                    });
-                });*/
-                
-                // Link definition
-                /*canvas.getDataflows().forEach(function (entry) {
-                    data.linkList.push({
-                        id: "",
-                        type: "CHANGEME",
-                        genericType: "CHANGEME",
-                        label: entry.getText(),
-                        originator: entry.getOriginator(),
-                        originNode: entry.getSource().getId(), // Not implemented
-                        destinationNode: entry.getTarget().getId(), // Not implemented
-                        x: entry.getPosition().x,
-                        y: entry.getPosition().y
-                    });
-                });*/  
-                
-                // DiaNodeList definition
-                /*canvas.getElements().forEach(function (entry) {
-                    data.DiaNodeList.push({
-                        id: "",
-                        type: entry.getType().name,
-                        genericType: "CHANGEME",
-                        label: entry.getText(),
-                        x: entry.getPosition().x,
-                        y: entry.getPosition().y,
-                        originator: canvas.getOriginator(),
-                        diagramId: "",
-                        linkList: []
-                    });
-                });*/
-
 
             } else {
                 // Update an existing DFD with new elements
-                data.id = canvas.getData().id;
+                data.id = canvas.getId();
                 data.type = "DataFlowDiagram";
                 // TODO: Get label from canvas
-                data.label = "Some Label";
-                data.nodeList = [];
-                data.linkList = [];
-                data.DiaNodeList = [];
-                
-                // Node definition
-                canvas.getElements().forEach(function (entry) {
-                    data.nodeList.push({
-                        type: entry.getType().name,
-                        label: entry.getText(),
-                        x: entry.getPosition().x,
-                        y: entry.getPosition().y
-                    });
-                });            
+                data.label = "Some Other Label";    
             }
-            
+                        
             // Execute the request
             Connector.put("Controller.php", data, onSuccess, onFail);
         };
