@@ -57,7 +57,7 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
        // Datamodel
        var myOriginator = "",
            myLabel = "",
-           myId = null;
+           myId = "";
 
        // Element and Dataflow arrays
        var elements = [];

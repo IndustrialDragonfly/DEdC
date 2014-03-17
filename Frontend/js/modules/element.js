@@ -11,9 +11,9 @@ define(function () {
             set = null,
             textBox, 
             hasMoved = false,
-            myId = null,
-            myType = null,
-            myOriginator = null;
+            myId = "",
+            myType = "",
+            myOriginator = "";
         
         /**
          * Get the internal Raphael.Set

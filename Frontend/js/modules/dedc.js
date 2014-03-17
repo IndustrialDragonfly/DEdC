@@ -362,6 +362,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                     };
                     
                     var data = {
+                        id: entry.getId(),
                         diagramId: canvas.getId(),
                         type: entry.getType().name,
                         label: entry.getText(),
@@ -369,7 +370,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                         y: entry.getPosition().y
                     };
 
-                    Connector.put("Controller.php", data, onSuccess, onFail, false);
+                    Connector.put("Controller.php/" + entry.getId(), data, onSuccess, onFail, false);
                 });
                 
                 // Save dataflows, needs to be executed after all of the elements are saved
@@ -383,6 +384,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                     };
                     
                     var data = {
+                        id: entry.getId(),
                         diagramId: canvas.getId(),
                         genericType: "Link",
                         type: "DataFlow",
@@ -394,7 +396,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                         }
                     };
                     
-                    Connector.put("Controller.php", data, onSuccess, onFail);
+                    Connector.put("Controller.php/" + entry.getId(), data, onSuccess, onFail);
                 });
             };
             
@@ -402,23 +404,14 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                 console.log("Request to save DFD failed. " + response.getError() + " " + response.getData());
             };
             
-            var data = {};
-            // Check if the Canvas has its data set
-            if (!canvas.getId()) {
-                // Save new DFD
-                data.type = "DataFlowDiagram";
-                data.label = "Some Label";
-
-            } else {
-                // Update an existing DFD with new elements
-                data.id = canvas.getId();
-                data.type = "DataFlowDiagram";
-                // TODO: Get label from canvas
-                data.label = "Some Other Label";    
-            }
-                        
+            var data = {
+                id: canvas.getId(),
+                type: "DataFlowDiagram",
+                label: "Label 1" // TODO: Get from UI
+            };
+            
             // Execute the request
-            Connector.put("Controller.php", data, onSuccess, onFail);
+            Connector.put("Controller.php/" + canvas.getId(), data, onSuccess, onFail);
         };
         
         // Expose methods to be public
