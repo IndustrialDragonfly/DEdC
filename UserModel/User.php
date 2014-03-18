@@ -9,30 +9,45 @@ class User
 {
 
     //<editor-fold desc="Attributes" defaultstate="collapsed">
-    private $userName;
     private $id;
+    private $userName;
     private $organization;
     private $hash;
 
     //</editor-fold>
     //<editor-fold desc="Constructor" defaultstate="collapsed">
+    
     /**
-     * Pass the contructor the username and organization name to create
-     * a regular User object.
-     * @param String $useruserName
-     * @param String $Org
-     * @throws InvalidArgumentException if empty string passed for name or organization
+     * Create a new User object with userName and organization
+     * @param String $id (optional)
+     * @param String $userName
+     * @param String $organization
+     * @param String $password Password if no id is given, otherwise this is the hash
+     * @throws InvalidArgumentException
      */
-    public function __construct($useruserName, $Org)
+    public function __construct()
     {
-        if ($useruserName == "" || $Org == "")
+        if (func_num_args() == 3)
         {
-            throw new InvalidArgumentException("Constructor requires a value for name and organization");
+            // Given userName, organization, and password
+            // New User, will get generated id
+            $this->id = $this->generateId();
+            $this->userName = func_get_arg(0);
+            $this->organization = func_get_arg(1);
+            $this->setPassword(func_get_arg(2));
         }
-        $this->userName = $useruserName;
-        $this->organization = $Org;
-        // Generate random id
-        $this->id = $this->generateId();
+        else if (func_num_args() == 4)
+        {
+            // Given id, userName, organization, and hash
+            $this->id = func_get_arg(0);
+            $this->userName = func_get_arg(1);
+            $this->organization = func_get_arg(2);
+            $this->hash = func_get_arg(3);
+        }
+        else
+        {
+            throw new InvalidArgumentException("constuctor requires either an id, userName, organization, and hash or userName, organization, and hash.");
+        }
     }
 
     //</editor-fold>
@@ -42,11 +57,11 @@ class User
      * @param String $newuserName
      * @throw InvalidArgumentException thrown when newuserName is an empty string
      */
-    public function setuserName($newuserName)
+    public function setUserName($newuserName)
     {
         if ($newuserName == "")
         {
-            throw new InvalidArgumentException("setuserName requires a value for name");
+            throw new InvalidArgumentException("setUserName requires a value for name");
         } else
         {
             $this->userName = $newuserName;
@@ -57,7 +72,7 @@ class User
      * Returns the user name
      * @return String
      */
-    public function getuserName()
+    public function getUserName()
     {
         return $this->userName;
     }
@@ -76,11 +91,11 @@ class User
      * @param String $newOrg
      * @throws InvalidArgumentException when newOrg is empty string
      */
-    public function setorganization($newOrg)
+    public function setOrganization($newOrg)
     {
         if ($newOrg == "")
         {
-            throw new InvalidArgumentException("setorganization requires a value for organization");
+            throw new InvalidArgumentException("setOrganization requires a value for organization");
         } else
         {
             $this->organization = $newOrg;
@@ -91,7 +106,7 @@ class User
      * Returns the string of the organization name
      * @return String
      */
-    public function getorganization()
+    public function getOrganization()
     {
         return $this->organization;
     }
@@ -117,6 +132,24 @@ class User
         $numberOfBytes = $length / 8;
         // Replaces all instances of +, = or / in the Base64 string with x
         return str_replace(array("+", "=", "/"), array("x", "x", "x"), base64_encode(openssl_random_pseudo_bytes($numberOfBytes)));
+    }
+    
+    /**
+     * Get the User's hash
+     * @return String
+     */
+    public function getHash()
+    {
+        return $this->hash;
+    }
+    
+    /**
+     * Set User's hash
+     * @param String $hash
+     */
+    public function setHash($hash)
+    {
+        $this->hash = $hash;
     }
     
     /**

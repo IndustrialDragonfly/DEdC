@@ -85,8 +85,9 @@ interface WriteStorable
      * @param String $id
      * @param String $organization
      * @param String $hash
+     * @param Bool $admin
      */
-    public function saveUser($userName, $id, $organization, $hash);
+    public function saveUser($userName, $id, $organization, $hash, $admin);
     //</editor-fold>
 
 }

@@ -747,14 +747,15 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * @param String $id
      * @param String $organization
      * @param String $hash
+     * @param Bool $admin
      */
-    public function saveUser($id, $userName, $organization, $hash)
+    public function saveUser($id, $userName, $organization, $hash, $admin)
     {
         // Prepare the insert statement
         $insert_stmt = $this->dbh->prepare(
                 "INSERT
-                INTO user (id, userName, organization, hash)
-                VALUES(?,?,?,?)"
+                INTO users (id, userName, organization, hash, admin)
+                VALUES(?,?,?,?,?)"
                 );
         
         // Bind the parameters
@@ -762,6 +763,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $insert_stmt->bindParam(2, $userName);
         $insert_stmt->bindParam(3, $organization);
         $insert_stmt->bindParam(4, $hash);
+        $insert_stmt->bindParam(5, $admin);
 
         $insert_stmt->execute();
     }
@@ -771,16 +773,19 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * id
      * @param String userName
      * @param String organization
+     * 
+     * or
+     * 
      * @param String id
      */
     public function loadUser()
     {
         if (func_num_args() == 2)
         {
-            // Handle name and organization as arguments
+            // Given userName and organization
             $loadUser = $this->dbh->prepare("
                     SELECT * 
-                    FROM user 
+                    FROM users
                     WHERE userName=? AND organization=?"
                     );
             $loadUser->bindParam(0, func_get_arg(0));
@@ -794,10 +799,10 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         }
         else if (func_num_args() == 1)
         {
-            // Handle just id as arguments
+            // Given id
             $loadUser = $this->dbh->prepare(
                     "SELECT *
-                    FROM  user
+                    FROM  users
                     WHERE id=?"
                     );
             $loadUser->bindParam(1, func_get_arg(0));
