@@ -23,26 +23,27 @@ class User
      * @param String $userName
      * @param String $organization
      * @param String $password Password if no id is given, otherwise this is the hash
+     * @param {ReadStorable,WriteStorable} $datastore 
      * @throws InvalidArgumentException
      */
     public function __construct()
     {
-        if (func_num_args() == 3)
+        $this->storage = func_get_arg(0);
+        // New User, will get generated id
+        if (func_num_args() == 4)
         {
             // Given userName, organization, and password
-            // New User, will get generated id
             $this->id = $this->generateId();
-            $this->userName = func_get_arg(0);
-            $this->organization = func_get_arg(1);
-            $this->setPassword(func_get_arg(2));
-        }
-        else if (func_num_args() == 4)
-        {
-            // Given id, userName, organization, and hash
-            $this->id = func_get_arg(0);
             $this->userName = func_get_arg(1);
             $this->organization = func_get_arg(2);
-            $this->hash = func_get_arg(3);
+            $this->setPassword(func_get_arg(3));
+        }
+        // Load user from id
+        else if (func_num_arg() == 2)
+        {
+            // Given id
+            $associativeArray = $this->load(func_get_arg(1));
+            $this->loadAssociativeArray($associativeArray);
         }
         else
         {
@@ -135,24 +136,6 @@ class User
     }
     
     /**
-     * Get the User's hash
-     * @return String
-     */
-    public function getHash()
-    {
-        return $this->hash;
-    }
-    
-    /**
-     * Set User's hash
-     * @param String $hash
-     */
-    public function setHash($hash)
-    {
-        $this->hash = $hash;
-    }
-    
-    /**
      * Hashes password and sets it
      * @param String $password
      */
@@ -180,6 +163,50 @@ class User
         
         // Verify the password
         return password_verify($password, $this->hash);
+    }
+    
+    /**
+     * Takes an assocative array representing an object and loads it into this
+     * object.
+     * @param Mixed[] $assocativeArray
+     */
+    protected function loadAssociativeArray($associativeArray)
+    {
+        if (!is_array($associativeArray))
+        {
+            throw new InvalidArgumentException("loadAssociativeArray was called without an associative array");
+        }
+        
+        // TODO: Check types
+        $this->id = $associativeArray["id"];
+        $this->userName = $associativeArray["userName"];
+        $this->organization = $associativeArray["organization"];
+        $this->hash = $associativeArray["hash"];
+    }
+    
+    /**
+     * Save the User to the database
+     */
+    public function save()
+    {
+        $this->storage->saveUser($this->getId(), $this->getUserName(), $this->getOrganization(), $this->getHash(), $this->isAdmin());
+    }
+    
+    /**
+     * Load the associative array from the database. If id is not set, userName 
+     * and organization will be used, else the id is used.
+     * @return type
+     */
+    public function load()
+    {
+        if ($this->id == NULL)
+        {
+            return $this->storage->loadUser($this->userName, $this->organization);
+        }
+        else
+        {
+            return $this->storage->loadUser($this->id);
+        } 
     }
 }
 
