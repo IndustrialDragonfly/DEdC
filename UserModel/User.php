@@ -9,47 +9,47 @@ class User
 {
 
     //<editor-fold desc="Attributes" defaultstate="collapsed">
-    private $Name;
-    private $ID;
-    private $Organization;
-    private $Hash;
+    private $userName;
+    private $id;
+    private $organization;
+    private $hash;
 
     //</editor-fold>
     //<editor-fold desc="Constructor" defaultstate="collapsed">
     /**
      * Pass the contructor the username and organization name to create
      * a regular User object.
-     * @param String $Name
+     * @param String $useruserName
      * @param String $Org
      * @throws InvalidArgumentException if empty string passed for name or organization
      */
-    public function __construct($Name, $Org)
+    public function __construct($useruserName, $Org)
     {
-        if ($Name == "" || $Org == "")
+        if ($useruserName == "" || $Org == "")
         {
             throw new InvalidArgumentException("Constructor requires a value for name and organization");
         }
-        $this->Name = $Name;
-        $this->Organization = $Org;
-        // Generate random ID
-        $this->ID = $this->generateId();
+        $this->userName = $useruserName;
+        $this->organization = $Org;
+        // Generate random id
+        $this->id = $this->generateId();
     }
 
     //</editor-fold>
     //<editor-fold desc="Accessor functions" defaultstate="collapsed">
     /**
      * Sets the name of the user
-     * @param String $newName
-     * @throw InvalidArgumentException thrown when newName is an empty string
+     * @param String $newuserName
+     * @throw InvalidArgumentException thrown when newuserName is an empty string
      */
-    public function setName($newName)
+    public function setuserName($newuserName)
     {
-        if ($newName == "")
+        if ($newuserName == "")
         {
-            throw new InvalidArgumentException("setName requires a value for name");
+            throw new InvalidArgumentException("setuserName requires a value for name");
         } else
         {
-            $this->Name = $newName;
+            $this->userName = $newuserName;
         }
     }
 
@@ -57,18 +57,18 @@ class User
      * Returns the user name
      * @return String
      */
-    public function getName()
+    public function getuserName()
     {
-        return $this->Name;
+        return $this->userName;
     }
 
     /**
-     * Returns the randomly generated ID string
+     * Returns the randomly generated id string
      * @return String
      */
     public function getId()
     {
-        return $this->ID;
+        return $this->id;
     }
 
     /**
@@ -76,14 +76,14 @@ class User
      * @param String $newOrg
      * @throws InvalidArgumentException when newOrg is empty string
      */
-    public function setOrganization($newOrg)
+    public function setorganization($newOrg)
     {
         if ($newOrg == "")
         {
-            throw new InvalidArgumentException("setOrganization requires a value for organization");
+            throw new InvalidArgumentException("setorganization requires a value for organization");
         } else
         {
-            $this->Organization = $newOrg;
+            $this->organization = $newOrg;
         }
     }
 
@@ -91,9 +91,9 @@ class User
      * Returns the string of the organization name
      * @return String
      */
-    public function getOrganization()
+    public function getorganization()
     {
-        return $this->Organization;
+        return $this->organization;
     }
 
     /**
@@ -108,7 +108,7 @@ class User
 
 //</editor-fold>
     /**
-     * This is a function that generates a UUID String with a length of 265 bits
+     * This is a function that generates a UUid String with a length of 265 bits
      * @return String
      */
     private function generateId()

@@ -81,12 +81,12 @@ interface WriteStorable
     //<editor-fold desc="User Model" defaultstate="collapsed">
     /**
      * Save a User to the database
-     * @param String $name
+     * @param String $userName
      * @param String $id
      * @param String $organization
      * @param String $hash
      */
-    public function saveUser($name, $id, $organization, $hash);
+    public function saveUser($userName, $id, $organization, $hash);
     //</editor-fold>
 
 }
