@@ -818,6 +818,15 @@ class DatabaseStorage implements ReadStorable, WriteStorable
                 throw new BadFunctionCallException("No user with given id found in the database.");
             }
             
+            if (ord($results["admin"]))
+            {
+                $results["admin"] = true;
+            }
+            else
+            {
+                $results["admin"] = false;
+            }
+            
             return $results;
         }
         else
