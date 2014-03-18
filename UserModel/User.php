@@ -12,6 +12,7 @@ class User
     private $Name;
     private $ID;
     private $Organization;
+    private $Hash;
 
     //</editor-fold>
     //<editor-fold desc="Constructor" defaultstate="collapsed">
@@ -116,7 +117,36 @@ class User
         $numberOfBytes = $length / 8;
         return strtr(base64_encode(openssl_random_pseudo_bytes($numberOfBytes)), "+/=", "xxx");
     }
-
+    
+    /**
+     * Hashes password and sets it
+     * @param String $password
+     */
+    public function setPassword($password)
+    {
+        if (!is_string($password))
+        {
+            throw new InvalidArgumentException("setPassword requires a String for password.");
+        }
+        // Create a hash using bcrypt, cost is 10 (default)
+        $this->hash = password_hash($password, PASSWORD_DEFAULT);
+    }
+    
+    /**
+     * Verify that $password's hash matches the stored hash
+     * @param String $password
+     * @return boolean
+     */
+    public function authenticate($password)
+    {
+        if (!is_string($password))
+        {
+            throw new InvalidArgumentException("authenticate requires a String for password.");
+        }
+        
+        // Verify the password
+        return password_verify($password, $this->hash);
+    }
 }
 
 ?>
