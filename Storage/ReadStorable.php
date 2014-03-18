@@ -11,6 +11,7 @@
  */
 interface ReadStorable
 {
+    //<editor-fold desc="DFD Model" defaultstate="collapsed">
     /**
      * Returns the type of element from the data store based on the given resource
      * UUID
@@ -62,6 +63,21 @@ interface ReadStorable
      * @return String
      */
     public function loadDiaNode($id);
+    //</editor-fold>
+    
+    //<editor-fold desc="User Model" defaultstate="collapsed">
+
+    /**
+     * Load a User from the database using either userName and origanization or 
+     * id
+     * @param String userName
+     * @param String organization
+     * @param String id
+     */
+    public function loadUser();
+
+    //</editor-fold>
+
 }
 
 ?>

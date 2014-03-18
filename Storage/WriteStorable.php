@@ -10,6 +10,8 @@
  */
 interface WriteStorable
 {
+        
+    //<editor-fold desc="DFD Model" defaultstate="collapsed">
     /**
      * Saves a given node object into the data store
      * 
@@ -74,6 +76,19 @@ interface WriteStorable
      * Deletes the DFD from the database
      */
     public function deleteDiagram($id);
+    //</editor-fold>
+    
+    //<editor-fold desc="User Model" defaultstate="collapsed">
+    /**
+     * Save a User to the database
+     * @param String $name
+     * @param String $id
+     * @param String $organization
+     * @param String $hash
+     */
+    public function saveUser($name, $id, $organization, $hash);
+    //</editor-fold>
+
 }
 
 ?>

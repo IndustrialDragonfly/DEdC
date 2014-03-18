@@ -45,6 +45,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
     
+    //<editor-fold desc="DFD Model" defaultstate="collapsed">
     /**
      * Given a resource UUID, returns its type (or throws an exception if that
      * id doesn't exist). Uses PDO to access many different SQL type databases.
@@ -735,6 +736,94 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $delete->bindParam(1, $id);
         $delete->execute();
     }
+    
+        //</editor-fold>
+
+    //<editor-fold desc="User Model" defaultstate="collapsed">
+    
+    /**
+     * Save a User to the database
+     * @param String $name
+     * @param String $id
+     * @param String $organization
+     * @param String $hash
+     */
+    public function saveUser($id, $name, $organization, $hash)
+    {
+        // Prepare the insert statement
+        $insert_stmt = $this->dbh->prepare(
+                "INSERT
+                INTO user (id, name, organization, hash)
+                VALUES(?,?,?,?)"
+                );
+        
+        // Bind the parameters
+        $insert_stmt->bindParam(1, $id);
+        $insert_stmt->bindParam(2, $name);
+        $insert_stmt->bindParam(3, $organization);
+        $insert_stmt->bindParam(4, $hash);
+
+        $insert_stmt->execute();
+    }
+    
+    /**
+     * Load a User from the database using either name and origanization or 
+     * id
+     * @param String name
+     * @param String organization
+     * @param String id
+     */
+    public function loadUser()
+    {
+        if (func_num_args() == 2)
+        {
+            // Handle name and organization as arguments
+            $loadUser = $this->dbh->prepare("
+                    SELECT * 
+                    FROM user 
+                    WHERE name=? AND organization=?"
+                    );
+            $loadUser->bindParam(0, func_get_arg(0));
+            $loadUser->bindParam(1, func_get_arg(1));
+
+            $loadUser->execute();
+
+            $results = $loadUser->fetch(PDO::FETCH_ASSOC);
+            
+            return $results;
+        }
+        else if (func_num_args() == 1)
+        {
+            // Handle just id as arguments
+            $loadUser = $this->dbh->prepare(
+                    "SELECT *
+                    FROM  user
+                    WHERE id=?"
+                    );
+            $loadUser->bindParam(1, func_get_arg(0));
+            
+            $loadUser->execute();
+            
+            // Get results
+            $results =  $loadUser->fetch(PDO::FETCH_ASSOC);
+        
+            // If there was no matching id, thrown an exception
+            if($results === FALSE )
+            {
+                throw new BadFunctionCallException("No user with given id found in the database.");
+            }
+            
+            return $results;
+        }
+        else
+        {
+            throw new InvalidArgumentException("loadUser requires either a "
+                    . "userName and organization or an id.");
+        }
+    }
+    
+    //</editor-fold>
+
 }
 
 ?>
