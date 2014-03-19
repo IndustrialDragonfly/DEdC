@@ -46,7 +46,9 @@ class HttpBasicAuthenticationTest implements Authenticatable
         } 
         else 
         {
-            if ($this->username == "Malcolm" && $this->password == "IndustrialDragonfly")
+            // Load user, hardcode organization
+            $user = new User($this->storage, $this->username, "InD");
+            if ($user->authenticate($this->password))
             {
                 return true;
             }

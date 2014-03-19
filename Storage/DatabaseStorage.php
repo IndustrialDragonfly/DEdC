@@ -788,8 +788,8 @@ class DatabaseStorage implements ReadStorable, WriteStorable
                     FROM users
                     WHERE userName=? AND organization=?"
                     );
-            $loadUser->bindParam(0, func_get_arg(0));
-            $loadUser->bindParam(1, func_get_arg(1));
+            $loadUser->bindParam(1, func_get_arg(0));
+            $loadUser->bindParam(2, func_get_arg(1));
 
             $loadUser->execute();
 

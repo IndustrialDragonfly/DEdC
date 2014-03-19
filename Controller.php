@@ -53,6 +53,10 @@ function __autoload($classname)
     {
         require_once "Authentication_Modules/" . $classname . ".php";
     }
+    elseif (file_exists("UserModel/" . $classname . ".php"))
+    {
+        require_once "UserModel/" . $classname . ".php";
+    }
     else
     {
         // TODO: Make throw an exception later

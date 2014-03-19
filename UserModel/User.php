@@ -19,11 +19,10 @@ class User
     
     /**
      * Create a new User object with userName and organization
-     * @param String $id (optional)
+     * @param {ReadStorable,WriteStorable} $datastore 
      * @param String $userName
      * @param String $organization
      * @param String $password Password if no id is given, otherwise this is the hash
-     * @param {ReadStorable,WriteStorable} $datastore 
      * @throws InvalidArgumentException
      */
     public function __construct()
@@ -38,16 +37,42 @@ class User
             $this->organization = func_get_arg(2);
             $this->setPassword(func_get_arg(3));
         }
-        // Load user from id
-        else if (func_num_arg() == 2)
+        // Load user from id or associative array
+        else if (func_num_args() == 2)
         {
             // Given id
-            $associativeArray = $this->load(func_get_arg(1));
+            if (is_string(func_get_arg(1)))
+            {
+                $this->id = func_get_arg(1);
+                $associativeArray = $this->load();
+                $this->loadAssociativeArray($associativeArray);
+            }
+            // Given array
+            elseif (is_array(func_get_arg(1)))
+            {
+                // TODO: Check array's values
+                $this->loadAssociativeArray(func_get_arg(1));
+                $this->id = $this->generateId();
+            }
+            else
+            {
+                // TODO: Throw BadConstructorCallException
+                throw new BadFunctionCallException("User consturctor requires either a string or an associative array");
+            }
+        }
+        // Given userName and organization
+        else if (func_num_args() == 3)
+        {
+            // Given userName and organization
+            $this->userName = func_get_arg(1);
+            $this->organization = func_get_arg(2);
+            $associativeArray = $this->load();
             $this->loadAssociativeArray($associativeArray);
+            $this->id = $associativeArray["id"];
         }
         else
         {
-            throw new InvalidArgumentException("constuctor requires either an id, userName, organization, and hash or userName, organization, and hash.");
+            throw new InvalidArgumentException("User constuctor requires either an id, userName, organization, and hash or userName, organization, and hash.");
         }
     }
 
@@ -178,7 +203,6 @@ class User
         }
         
         // TODO: Check types
-        $this->id = $associativeArray["id"];
         $this->userName = $associativeArray["userName"];
         $this->organization = $associativeArray["organization"];
         $this->hash = $associativeArray["hash"];
@@ -189,7 +213,7 @@ class User
      */
     public function save()
     {
-        $this->storage->saveUser($this->getId(), $this->getUserName(), $this->getOrganization(), $this->getHash(), $this->isAdmin());
+        $this->storage->saveUser($this->id, $this->userName, $this->organization, $this->hash, $this->isAdmin());
     }
     
     /**
