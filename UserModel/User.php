@@ -63,10 +63,16 @@ class User
         // Given userName and organization
         else if (func_num_args() == 3)
         {
-            // Given userName and organization
             $this->userName = func_get_arg(1);
             $this->organization = func_get_arg(2);
+            
+            if (!is_string($this->userName) || !is_string($this->organization))
+            {
+                throw new InvalidArgumentException("User constructor requires userName and organization to be Strings.");
+            }
+            
             $associativeArray = $this->load();
+
             $this->loadAssociativeArray($associativeArray);
             $this->id = $associativeArray["id"];
         }

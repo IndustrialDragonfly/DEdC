@@ -9,6 +9,8 @@
 require_once 'ReadStorable.php';
 require_once 'WriteStorable.php';
 
+// TODO: Catch PDO errors and rethrow exceptions
+
 class DatabaseStorage implements ReadStorable, WriteStorable
 {
     protected $dbh;
