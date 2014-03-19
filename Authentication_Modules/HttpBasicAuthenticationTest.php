@@ -47,8 +47,20 @@ class HttpBasicAuthenticationTest implements Authenticatable
         else 
         {
             // Load user, hardcode organization
-            $user = new User($this->storage, $this->username, "InD");
-            if ($user->authenticate($this->password))
+            $user;
+            try
+            {
+                // Try to load the User
+                $user = new User($this->storage, $this->username, "InD");
+            }
+            catch (Exception $e)
+            {
+                // Error while attempting to load a user
+                $this->unauthorized();
+                return false;
+            }
+            
+            if (isset($user) && $user->authenticate($this->password))
             {
                 return true;
             }
