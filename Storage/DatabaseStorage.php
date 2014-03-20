@@ -786,7 +786,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         {
             // Given userName and organization
             $loadUser = $this->dbh->prepare("
-                    SELECT * 
+                    SELECT id, userName, organization, admin
                     FROM users
                     WHERE userName=? AND organization=?"
                     );
@@ -803,7 +803,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         {
             // Given id
             $loadUser = $this->dbh->prepare(
-                    "SELECT *
+                    "SELECT userName, organization, admin
                     FROM  users
                     WHERE id=?"
                     );
@@ -820,6 +820,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
                 throw new BadFunctionCallException("No user with given id found in the database.");
             }
             
+            // Convert string BIT to boolean
             if (ord($results["admin"]))
             {
                 $results["admin"] = true;
