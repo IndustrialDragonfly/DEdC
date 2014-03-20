@@ -154,6 +154,7 @@ abstract class Element extends Entity
     //<editor-fold desc="Parent Accessors" defaultstate="collapsed">
     /**
      * function that changest the parent DFD of this element
+     * TODO - do some parameter checking to ensure that the parameter passed was an ID of a Diagram
      * @param String $newParent
      */
     public function setParent($newParent)

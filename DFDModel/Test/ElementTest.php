@@ -127,6 +127,127 @@ class ElementTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->object->getParent(), $this->testDiagram->getId());
     }
     
+    /**
+     * @covers Element::setParent
+     * @covers Element::getParent
+     */
+    public function testSetParent_null()
+    {
+        $this->object->setParent(null);
+        $this->assertNull($this->object->getParent());
+    }
+    
+    /**
+     * @covers Element::setParent
+     * @covers Element::getParent
+     */
+    public function testSetParent_smoke()
+    {
+        $someDiagram = new DataFlowDiagram($this->storage);
+        $this->object->setParent($someDiagram->getId());
+        $this->assertEquals($this->object->getParent(), $someDiagram->getId());
+    }
+    
+    
+    
     //TODO - add tests for setParent, and AssociativeArray
+    
+    /**
+     * @covers Element::loadAssocitiveArray
+     * @covers Element::getAssocitiveArray
+     */
+    public function testLoadAssocitiveArray_empty()
+    {
+        $newElement = new Process($this->storage, $this->testDiagram->getId());
+        $newElement->loadAssociativeArray($this->object->getAssociativeArray());
+        //Variables from Entity
+        $this->assertEquals($this->object->getAssociativeArray()['label'], $newElement->getAssociativeArray()['label']);
+        $this->assertEquals($this->object->getAssociativeArray()['originator'], $newElement->getAssociativeArray()['originator']);
+        $this->assertEquals($this->object->getAssociativeArray()['organization'], $newElement->getAssociativeArray()['organization']);
+        $this->assertFalse($this->object->getAssociativeArray()['id'] == $newElement->getAssociativeArray()['id']);
+        
+        //variables from Element
+        $this->assertTrue($this->object->getAssociativeArray()['x'] == $newElement->getAssociativeArray()['x']);
+        $this->assertTrue($this->object->getAssociativeArray()['y'] == $newElement->getAssociativeArray()['y']);
+        $this->assertTrue($this->object->getAssociativeArray()['diagramId'] == $newElement->getAssociativeArray()['diagramId']);
+        
+    }
+    
+    /**
+     * @covers Entity::loadAssocitiveArray
+     * @covers Entity::getAssocitiveArray
+     */
+    public function testLoadAssocitiveArray_smoke()
+    {
+        $this->object->setLabel("newLabel");
+        $this->object->setOrganization("InD");
+        $this->object->setOriginator("Josh");
+        
+        $this->object->setX(50);
+        $this->object->setY(150);
+        //$newElement = new Process($this->storage, $this->testDiagram->getId());
+        //$newElement->loadAssociativeArray($this->object->getAssociativeArray());
+        
+        $newElement = new Process($this->storage, $this->object->getAssociativeArray());
+        
+        $this->assertEquals($this->object->getAssociativeArray()['label'], $newElement->getAssociativeArray()['label']);
+        $this->assertEquals($this->object->getAssociativeArray()['originator'], $newElement->getAssociativeArray()['originator']);
+        $this->assertEquals($this->object->getAssociativeArray()['organization'], $newElement->getAssociativeArray()['organization']);
+        $this->assertFalse($this->object->getAssociativeArray()['id'] == $newElement->getAssociativeArray()['id']);
+        
+        $this->assertEquals($this->object->getAssociativeArray()['x'], $newElement->getAssociativeArray()['x']);
+        $this->assertEquals($this->object->getAssociativeArray()['y'], $newElement->getAssociativeArray()['y']);
+        $this->assertEquals($this->object->getAssociativeArray()['diagramId'], $newElement->getAssociativeArray()['diagramId']);
+    }
+    
+    
+    /**
+     * @covers Element::loadAssocitiveArray
+     * @covers Element::getAssocitiveArray
+     */
+    public function testLoadAssociativeArray_missingParameter()
+    {
+        $testLabel = "thingy";
+        $testOrginator = "Josh";
+        $testOrganization = "InD";
+        
+        $testX = 50;
+        $testY = 150;
+        $someDiagram = new DataFlowDiagram($this->storage);
+        $testParentID = $someDiagram->getId();
+        //missing parent
+        $assocArray1 = Array();
+        $assocArray1['x'] = $testX;
+        $assocArray1['y'] = $testY;
+        //$assocArray1['diagramId'] = $testParentID;
+        $this->object->loadAssociativeArray($assocArray1);
+        $this->assertTrue($this->object->getAssociativeArray()['x'] == $testX);
+        $this->assertTrue($this->object->getAssociativeArray()['y'] == $testY);
+        $this->assertFalse($this->object->getAssociativeArray()['diagramId'] == $testParentID);
+        $this->assertTrue($this->object->getAssociativeArray()['diagramId'] == NULL);
+        
+        //missing y
+        $assocArray2 = Array();
+        $assocArray2['x'] = $testX;
+        //$assocArray2['y'] = $testY;
+        $assocArray2['diagramId'] = $testParentID;
+        $this->object->loadAssociativeArray($assocArray2);
+        $this->assertTrue($this->object->getAssociativeArray()['x'] == $testX);
+        $this->assertFalse($this->object->getAssociativeArray()['y'] == $testY);
+        $this->assertTrue($this->object->getAssociativeArray()['diagramId'] == $testParentID);
+        $this->assertTrue($this->object->getAssociativeArray()['y'] == 0);
+        
+        
+        //missing x
+        $assocArray3 = Array();
+        //$assocArray3['x'] = $testX;
+        $assocArray3['y'] = $testY;
+        $assocArray3['diagramId'] = $testParentID;
+        $this->object->loadAssociativeArray($assocArray3);
+        $this->assertFalse($this->object->getAssociativeArray()['x'] == $testX);
+        $this->assertTrue($this->object->getAssociativeArray()['y'] == $testY);
+        $this->assertTrue($this->object->getAssociativeArray()['diagramId'] == $testParentID);
+        $this->assertTrue($this->object->getAssociativeArray()['x'] == 0);
+    }
 
 }
