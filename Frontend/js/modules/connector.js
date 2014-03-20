@@ -21,6 +21,7 @@ define(["modules/response", "jquery"], function (Response, $) {
            async: async
        }).done(function (data, textStatus) {
            // Request was successful
+           console.log("Received data: " + data);
            var jsonData = false;
            var exception = false;
            try {
@@ -77,7 +78,7 @@ define(["modules/response", "jquery"], function (Response, $) {
            dataType: "text"
        }).done(function (data, textStatus) {
            // Request was successful
-           console.log(data);
+           console.log("Received data: " + data);
            var jsonData = false;
            var exception = false;
            try {
@@ -144,6 +145,7 @@ define(["modules/response", "jquery"], function (Response, $) {
            async: async
        }).done(function (data, textStatus) {
            // Request was successful
+           console.log("Received data: " + data);
            var jsonData = false;
            var exception = false;
            try {
