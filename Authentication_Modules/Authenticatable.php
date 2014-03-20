@@ -6,9 +6,14 @@
 interface Authenticatable
 {
     /**
-     * Authenticates the client, and returns true if the client successfully 
-     * authenticated, or false otherwise.
-     * @return Bool
+     * Verify that the given password matches the hash in the database
+     * @return Boolean
      */
-    public function authenticateClient();
+    public function authenticate();
+    
+    /**
+     * Return an authentication token
+     * @return String
+     */
+    public function getToken();
 }

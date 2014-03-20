@@ -13,6 +13,8 @@ class User
     private $userName;
     private $organization;
     private $hash;
+    
+    private $authModule;
 
     //</editor-fold>
     //<editor-fold desc="Constructor" defaultstate="collapsed">
@@ -171,29 +173,18 @@ class User
      * @param String $password
      */
     public function setPassword($password)
-    {
-        if (!is_string($password))
-        {
-            throw new InvalidArgumentException("setPassword requires a String for password.");
-        }
-        // Create a hash using bcrypt, cost is 10 (default)
-        $this->hash = password_hash($password, PASSWORD_DEFAULT);
+    {   
+        // Get the hash from the auth module
+        $this->hash = $this->authModule->getToken();
     }
     
     /**
      * Verify that $password's hash matches the stored hash
-     * @param String $password
      * @return boolean
      */
-    public function authenticate($password)
+    public function authenticate()
     {
-        if (!is_string($password))
-        {
-            throw new InvalidArgumentException("authenticate requires a String for password.");
-        }
-        
-        // Verify the password
-        return password_verify($password, $this->hash);
+        $this->authModule->authenticate();
     }
     
     /**
@@ -211,7 +202,6 @@ class User
         // TODO: Check types
         $this->userName = $associativeArray["userName"];
         $this->organization = $associativeArray["organization"];
-        $this->hash = $associativeArray["hash"];
     }
     
     /**

@@ -76,7 +76,7 @@ require_once "conf.php";
     $authenticator = new $authenModule($storage);    
     
     // Pass authentication information from client
-    if (!$authenticator->authenticateClient())
+    if (!$authenticator->authenticate())
     {
         // TODO - handle authentication
         exit;

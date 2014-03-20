@@ -8,85 +8,55 @@
  *
  * @author eugene
  */
-class HttpBasicAuthenticationTest implements Authenticatable
+class HttpBasicAuthentication implements Authenticatable
 {
-    /**
-     *
-     * @var String Username user supplied
-     */
-    protected $username;
-    /**
-     *
-     * @var String Password user supplied
-     */
-    protected $password;
-    /**
-     *
-     * @var ReadStorable Allows Datastore access
-     */
     protected $storage;
+    protected $id;
+    protected $organization;
+    protected $password;
     
-    
-    public function __construct($storage)
+    /**
+     * 
+     * @param type $storage
+     * @param type $id
+     * @param type $password
+     */
+    public function __construct($storage, $id, $password)
     {
-        // TODO: Use filtering functions on Globals
-        $this->username = $_SERVER['PHP_AUTH_USER'];
-        $this->password = $_SERVER['PHP_AUTH_PW'];
         $this->storage = $storage;
+        $this->id = $id;
+        $this->password = $password;
     }
     
-   public function authenticateClient()
-   {
-        if (!isset($this->username) ||  ($_POST['SeenBefore'] == 1 && $_POST['OldAuth'] == $this->username)) 
+    /**
+     * Verify that the given password matches the hash in the database
+     * @return Boolean
+     */
+    public function authenticate()
+    {
+        // Get the user's hash from the database
+        $hash = $this->storage->getHash($this->id);
+        
+        // Verify the password
+        return password_verify($this->password, $hash);
+    }
+    
+    /**
+     * Get the salted hash of the password
+     * @return String
+     */
+    public function getToken()
+    {
+        // Just a basic check for the password
+        if (isset($this->password))
         {
-            header('WWW-Authenticate: Basic realm="DEdC"');
-            // If user hits cancel, goes to this next line
-            $this->unauthorized();
-            return false;
-        } 
-        else 
-        {
-            // Load user, hardcode organization
-            $user;
-            try
-            {
-                // Try to load the User
-                $user = new User($this->storage, $this->username, "InD");
-            }
-            catch (Exception $e)
-            {
-                // Error while attempting to load a user
-                $this->unauthorized();
-                return false;
-            }
-            
-            if (isset($user) && $user->authenticate($this->password))
-            {
-                return true;
-            }
-            else
-            {
-                $this->unauthorized();
-                return false;
-            }
+            // Create a hash using bcrypt, cost is 10 (default)
+            return password_hash($this->password, PASSWORD_DEFAULT);
         }
-   }
+        else
+        {
+            throw new BadFunctionCallException("Password must be set to generate a hash.");
+        }
+    }
    
-   // TODO: Make the reply more generic so that controller can handle it
-   private function unauthorized()
-   {
-        header('HTTP/1.0 401 Unauthorized');
-        echo "Unable to log you in.\n";
-        
-        echo "<form name=\"htmlform\" method=\"post\" action=\"Controller.php\">";
-        
-        echo "<input type='hidden' name='SeenBefore' value='1' />\n";
-        if (isset($this->username))
-        {
-            echo "<input type='hidden' name='OldAuth' value=\"" . htmlspecialchars($this->username) . "\" />\n";
-        }
-        echo "<input type=\"submit\" value=\"Reauthenticate\">";
-        
-        echo "</form>";
-   }
 }

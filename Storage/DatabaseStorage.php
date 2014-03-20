@@ -838,6 +838,35 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         }
     }
     
+    /**
+       $hash = $this->storage->getHash($this->id);
+     * @param String $id
+     * @return String Hash
+     * @throws BadFunctionCallException
+     */
+    public function getHash($id)
+    {
+        // Load a hash using a user's id
+        $loadHash = $this->dbh->prepare(
+                "SELECT hash "
+                . "FROM users "
+                . "WHERE id=?"
+                );
+        $loadHash->bindParam(1, $id);
+        
+        $loadHash->execute();
+        
+        // Only one row should be returned
+        if ($loadHash->rowCount() != 1) 
+        {
+            throw new BadConstructorCallException("Multiple hashes should not be fetched.");
+        }
+
+        $result = $loadHash->fetch();        
+        return $result[0];
+    }
+
+    
     //</editor-fold>
 
 }
