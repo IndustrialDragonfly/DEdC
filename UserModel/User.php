@@ -86,19 +86,20 @@ class User
 
     //</editor-fold>
     //<editor-fold desc="Accessor functions" defaultstate="collapsed">
+    
     /**
      * Sets the name of the user
-     * @param String $newuserName
+     * @param String $newUserName
      * @throw InvalidArgumentException thrown when newuserName is an empty string
      */
-    public function setUserName($newuserName)
+    public function setUserName($newUserName)
     {
-        if ($newuserName == "")
+        if ($newUserName == "")
         {
             throw new InvalidArgumentException("setUserName requires a value for name");
         } else
         {
-            $this->userName = $newuserName;
+            $this->userName = $newUserName;
         }
     }
 
@@ -175,6 +176,7 @@ class User
     public function setPassword($password)
     {   
         // Get the hash from the auth module
+        // TODO: Update to create a new authModule or update the password within it.
         $this->hash = $this->authModule->getToken();
     }
     
