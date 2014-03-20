@@ -77,6 +77,7 @@ define(["modules/response", "jquery"], function (Response, $) {
            dataType: "text"
        }).done(function (data, textStatus) {
            // Request was successful
+           console.log(data);
            var jsonData = false;
            var exception = false;
            try {
@@ -142,7 +143,6 @@ define(["modules/response", "jquery"], function (Response, $) {
            dataType: "text",
            async: async
        }).done(function (data, textStatus) {
-           console.log("Success from jQuery");
            // Request was successful
            var jsonData = false;
            var exception = false;
@@ -175,7 +175,6 @@ define(["modules/response", "jquery"], function (Response, $) {
                 failCallback(response);
            }
        }).fail(function (jqXHR, textStatus, errorThrown) {
-           console.log("Failure from jQuery");
            // Request failed for some reason
            var response = new Response();
            
