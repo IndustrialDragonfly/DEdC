@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of ID
+ * ID can either be newly generated, or instantiated using an existing ID
  *
  * @author Jacob Swanson/Eugene Davis
  */
