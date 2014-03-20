@@ -6,7 +6,14 @@
  * @author Jacob Swanson/Eugene Davis
  */
 class ID {
+    /**
+     * @var String 
+     */
     private $id;
+    
+    /**
+     * @var String 
+     */
     private $uuidTag = "_id";
     
     /**
