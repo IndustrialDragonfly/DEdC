@@ -66,7 +66,7 @@ class ID {
      */
     public function getTaggedId()
     {
-        return $this->$id + $this->$uuidTag;
+        return $this->$id . $this->$uuidTag;
     }
     
     /**
