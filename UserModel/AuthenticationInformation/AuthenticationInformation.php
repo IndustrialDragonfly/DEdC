@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Description of AuthenticationInformation
+ * Generic class which will hold authentication information, including username,
+ * organization, and credentials (of any type).
  *
  * @author Eugene Davis
  */
