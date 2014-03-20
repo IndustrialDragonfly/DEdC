@@ -96,6 +96,7 @@ require_once "conf.php";
     */
    $web_client_location = "Frontend/";
    $browser_accept = '*/*';
+   // TODO: Filter $_SERVER
    if (FALSE !== stripos($_SERVER['HTTP_ACCEPT'], $browser_accept))
    {
        require_once $web_client_location."/index.php";
