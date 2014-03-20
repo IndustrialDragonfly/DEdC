@@ -14,20 +14,6 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
             canvas.setId(response.getData().id);
             canvas.setLabel(response.getData().lable);
             canvas.setOriginator(response.getData().originator);
-            //canvas.setDiaNode(response.getData().diaNode);
-
-            /*response.getData().nodeList.forEach(function (entry) {
-                publicLoadElement(canvas, entry);
-            });
-
-            response.getData().DiaNodeList.forEach(function (entry) {
-                // TODO: Handle subDFDNodes
-                publicLoadElement(canvas, entry);
-            });
-
-            response.getData().linkList.forEach(function (entry) {
-                publicLoadDataflow(canvas, entry);
-            });*/
         };
 
     /**
