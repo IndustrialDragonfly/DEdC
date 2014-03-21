@@ -1,14 +1,11 @@
 <?php
 
 /**
- * Uses Http Basic Authentication to verify the connecting client.
- * Unlike most classes for DEdC, this class currently can directly
- * communicate with the client in order to handle failed authentication (i.e.
- * allow multiple authentication attempts)
+ * Uses a password to verify the connecting client.
  *
- * @author eugene
+ * @author Eugene Davis
  */
-class HttpBasicAuthentication implements Authenticatable
+class PasswordAuthenticationModule implements Authenticatable
 {
     protected $storage;
     protected $id;
@@ -19,13 +16,13 @@ class HttpBasicAuthentication implements Authenticatable
      * 
      * @param type $storage
      * @param type $id
-     * @param type $password
+     * @param type $authenticationInfo (AuthenticationInformation object)
      */
-    public function __construct($storage, $id, $password)
+    public function __construct($storage, $id, $authenticationInfo)
     {
         $this->storage = $storage;
         $this->id = $id;
-        $this->password = $password;
+        $this->password = $authenticationInfo->getCredentials();
     }
     
     /**
@@ -59,4 +56,8 @@ class HttpBasicAuthentication implements Authenticatable
         }
     }
    
+    public function saveNew()
+    {
+        $this->storage->saveHash($this->id, $this->getToken());
+    }
 }
