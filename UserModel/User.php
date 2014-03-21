@@ -160,7 +160,8 @@ class User
     public function save()
     {
         // TODO: Update
-        $this->storage->saveUser($this->id->getId(), $this->userName, $this->organization, $this->authModule->getCredentials(), $this->isAdmin());
+        $this->storage->saveUser($this->id->getId(), $this->userName, $this->organization, $this->isAdmin());
+        $this->authModule->saveNew();
     }
 }
 
