@@ -50,8 +50,8 @@ abstract class AuthenticationInformation
             throw new BadMethodCallException("Constructor not passed a properly formatted string for organization/user.");
         }
         
-        $this->userName = $orgUserExplodedArray[0];
-        $this->organization = $orgUserExplodedArray[1];
+        $this->organization = $orgUserExplodedArray[0];
+        $this->userName = $orgUserExplodedArray[1];
         
         // Set the credentials variable
         $this->credentials = $credentials;
