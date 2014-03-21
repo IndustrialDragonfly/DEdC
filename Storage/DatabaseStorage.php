@@ -823,6 +823,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         return $results;
     }
     
+    // TODO: Look at moving the hash related programs to a separate DB access class
     /**
        $hash = $this->storage->getHash($this->id);
      * @param String $id
@@ -850,7 +851,58 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $result = $loadHash->fetch();        
         return $result[0];
     }
+  
+    /**
+     * Update or save the hash
+     * @param String $id
+     * @param String hash
+     */
+    public function saveHash($id, $hash)
+    {
+       $checkHash = $this->dbh->prepare(
+               "SELECT id "
+               . "FROM hash "
+               . "WHERE id=?"
+               );
+       $checkHash->bindParam(1, $id);
+       $checkHash->execute();
+       
+       // If it exists
+       if ($checkHash->rowCount() == 1)
+       {
+            $saveHash = $this->dbh->prepare(
+                    "UPDATE hash "
+                    . "SET hash=?"
+                    . "WHERE id=?"
+                    );
+            $saveHash->bindParam(1, $hash);
+            $saveHash->bindParam(2, $id);
 
+            // TODO: Wrap with catch statement to convert PDO exception to storage
+            $saveHash->execute();        
+       }
+       
+       // If it doesn't exist yet'
+       elseif ($checkHash->rowCount() == 0)
+       {
+           $saveHash = $this->dbh->prepare(
+                   "INSERT "
+                   . "INTO hash (id, hash) "
+                   . "VALUES (?, ?)");
+           $saveHash->bindParam(1, $id);
+           $saveHash->bindParam(2, $hash);
+           
+           // TODO: Wrap with catch statement to convert any PDO exception to a storage one
+           $saveHash->execute();
+       }
+       
+       // Something very wrong in the DB
+       else
+       {
+           // TDOO: Throw exception
+       }
+           
+    }
     
     //</editor-fold>
 
