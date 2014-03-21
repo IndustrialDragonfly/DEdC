@@ -29,7 +29,7 @@ class ID {
             $this->id = $this->generateId();
         }
         // Given an id with or without a uuid tag
-        else if (func_num_args() == 1)
+        else if (func_num_args() == 1 && is_string(func_get_arg(0)))
         {
             // Get the location of the uuid tag
             $tagPos = stripos(func_get_arg(0), $this->uuidTag);
