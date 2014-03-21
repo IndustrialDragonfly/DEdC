@@ -771,72 +771,56 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     }
     
     /**
-     * Load a User from the database using either name and origanization or 
-     * id
+     * Get a User's id
      * @param String userName
      * @param String organization
-     * 
-     * or
-     * 
-     * @param String id
+     * @return String
      */
-    public function loadUser()
+    public function getUserId($userName, $organization)
     {
-        if (func_num_args() == 2)
-        {
-            // Given userName and organization
-            $loadUser = $this->dbh->prepare("
-                    SELECT id, userName, organization, admin
-                    FROM users
-                    WHERE userName=? AND organization=?"
-                    );
-            $loadUser->bindParam(1, func_get_arg(0));
-            $loadUser->bindParam(2, func_get_arg(1));
+        // Given userName and organization
+        $loadUser = $this->dbh->prepare("
+                SELECT id
+                FROM users
+                WHERE userName=? AND organization=?"
+                );
+        $loadUser->bindParam(1, $userName);
+        $loadUser->bindParam(2, $organization);
 
-            $loadUser->execute();
+        $loadUser->execute();
 
-            $results = $loadUser->fetch(PDO::FETCH_ASSOC);
-            
-            return $results;
-        }
-        else if (func_num_args() == 1)
+        $results = $loadUser->fetch(PDO::FETCH_ASSOC);
+
+        return $results["id"];
+    }
+    
+    /**
+     * Load a User from the database using id
+     * @param String id
+     * @return String[] userName and organization
+     */
+    public function loadUser($id)
+    {
+        // Given id
+        $loadUser = $this->dbh->prepare(
+                "SELECT userName, organization
+                FROM  users
+                WHERE id=?"
+                );
+        $loadUser->bindParam(1, $id);
+
+        $loadUser->execute();
+
+        // Get results
+        $results =  $loadUser->fetch(PDO::FETCH_ASSOC);
+
+        // If there was no matching id, thrown an exception
+        if($results === FALSE )
         {
-            // Given id
-            $loadUser = $this->dbh->prepare(
-                    "SELECT userName, organization, admin
-                    FROM  users
-                    WHERE id=?"
-                    );
-            $loadUser->bindParam(1, func_get_arg(0));
-            
-            $loadUser->execute();
-            
-            // Get results
-            $results =  $loadUser->fetch(PDO::FETCH_ASSOC);
-        
-            // If there was no matching id, thrown an exception
-            if($results === FALSE )
-            {
-                throw new BadFunctionCallException("No user with given id found in the database.");
-            }
-            
-            // Convert string BIT to boolean
-            if (ord($results["admin"]))
-            {
-                $results["admin"] = true;
-            }
-            else
-            {
-                $results["admin"] = false;
-            }
-            
-            return $results;
+            throw new BadFunctionCallException("No user with given id found in the database.");
         }
-        else
-        {
-            throw new InvalidArgumentException("loadUser requires either a "
-                    . "userName and organization or an id.");
-        }
+
+        return $results;
     }
     
     /**
