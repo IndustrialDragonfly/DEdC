@@ -12,96 +12,108 @@ class User
     private $id;
     private $userName;
     private $organization;
-    private $hash;
-    
+   
     private $authModule;
 
     //</editor-fold>
     //<editor-fold desc="Constructor" defaultstate="collapsed">
     
     /**
-     * Create a new User object with userName and organization
-     * @param {ReadStorable,WriteStorable} $datastore 
-     * @param String $userName
-     * @param String $organization
-     * @param String $password Password if no id is given, otherwise this is the hash
-     * @throws InvalidArgumentException
+     * Create a new User object
+     * Create an existing User.
+     * @param {ReadStorable,WriteStorable} $datastore
+     * @param AuthenticationInformation $authInfo
+     * 
+     * Or Admin instantiation of an existing User. This will not authenticate 
+     * the User object.
+     * @param {ReadStorable,WriteStorable} $datastore
+     * @param Admin $admin
+     * @param ID $id
+     * 
+     * Or Admin creation of a User.
+     * @param {ReadStorable,WriteStorable} $datastore
+     * @param Admin $admin
+     * @param AuthenticationInformation $authInfo
      */
     public function __construct()
     {
+        // Checking storage object
         $this->storage = func_get_arg(0);
-        // New User, will get generated id
-        if (func_num_args() == 4)
+        if (!is_subclass_of($this->storage, "ReadStorable"))
         {
-            // Given userName, organization, and password
-            $this->id = $this->generateId();
-            $this->userName = func_get_arg(1);
-            $this->organization = func_get_arg(2);
-            $this->setPassword(func_get_arg(3));
+            throw new BadConstructorCallException("Passed storage object does not implement ReadStorable.");
         }
-        // Load user from id or associative array
-        else if (func_num_args() == 2)
+        if (!is_subclass_of($this->storage, "WriteStorable"))
         {
-            // Given id
-            if (is_string(func_get_arg(1)))
+            throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
+        }
+        
+        // Existing User
+        // Args: storage, Auth Info (Object)
+        if (func_num_args() == 2 && is_subclass_of(func_get_arg(1), "AuthenticationInformation"))
+        {
+            $authInfo = func_get_arg(1);
+            // Get username and org from the AuthenticationInformation Object
+            $this->userName = $authInfo->getUserName();
+            $this->organization = $authInfo->getOrganization();
+            
+            // Load id
+            $this->id = new ID($this->storage->loadUser($this->userName, $this->organization));
+            
+            // Create the authentication module
+            $authMethod = $authInfo->getAuthenticationMethod();
+            $this->authModule = new $authMethod($this->storage, $this->id, $authInfo);
+            if (!$this->authModule->authenticate())
             {
-                $this->id = func_get_arg(1);
-                $associativeArray = $this->load();
-                $this->loadAssociativeArray($associativeArray);
+                // TODO: Make an authentication exception
+                throw new BadConstructorCallException("User failed to authenticate.");
             }
-            // Given array
-            elseif (is_array(func_get_arg(1)))
+            
+        }
+        // Check to make sure given User is Admin
+        else if (func_num_args() == 3 && is_a(func_get_arg(1), "Admin"))
+        {
+            // Admin instantiation of any User
+            // Args: storage, Admin (User Object), ID (Object)
+            if (is_a(func_get_arg(2), "ID"))
             {
-                // TODO: Check array's values
-                $this->loadAssociativeArray(func_get_arg(1));
-                $this->id = $this->generateId();
+                // Set User id, userName, and organization
+                $this->id = new ID(func_get_arg(2));
+                $assocArray = $this->storage->loadUser($this->id->getId());
+                $this->userName = $assocArray["userName"];
+                $this->organization = $assocArray["organization"];
+                
+                // There is no authentication module in this case
+            }
+            // New User creation
+            // Args: storage, Admin (User Object), Auth Info (Object)
+            else if (is_subclass_of(func_get_arg(2), "AuthenticationInformation"))
+            {
+                $authInfo = func_get_arg(2);
+                // Generate a new id
+                $this->id = new ID();
+                
+                // Handle username, and organization
+                $this->username = $authInfo->getUserName();
+                $this->organization = $authInfo->getOrganization();
+                
+                // Handle the password
+                $authMethod = $authInfo->getAuthenticationMethod();
+                $this->authModule = new $authMethod($this->storage, $this->id, $authInfo);
             }
             else
             {
-                // TODO: Throw BadConstructorCallException
-                throw new BadFunctionCallException("User consturctor requires either a string or an associative array");
+                throw new BadConstructorCallException("Third argument was not an ID nor AuthenticationInformation.");
             }
-        }
-        // Given userName and organization
-        else if (func_num_args() == 3)
-        {
-            $this->userName = func_get_arg(1);
-            $this->organization = func_get_arg(2);
-            
-            if (!is_string($this->userName) || !is_string($this->organization))
-            {
-                throw new InvalidArgumentException("User constructor requires userName and organization to be Strings.");
-            }
-            
-            $associativeArray = $this->load();
-
-            $this->loadAssociativeArray($associativeArray);
-            $this->id = $associativeArray["id"];
         }
         else
         {
-            throw new InvalidArgumentException("User constuctor requires either an id, userName, organization, and hash or userName, organization, and hash.");
+            throw new BadConstructorCallException("Second argument was not an Admin User.");
         }
     }
-
+    
     //</editor-fold>
     //<editor-fold desc="Accessor functions" defaultstate="collapsed">
-    
-    /**
-     * Sets the name of the user
-     * @param String $newUserName
-     * @throw InvalidArgumentException thrown when newuserName is an empty string
-     */
-    public function setUserName($newUserName)
-    {
-        if ($newUserName == "")
-        {
-            throw new InvalidArgumentException("setUserName requires a value for name");
-        } else
-        {
-            $this->userName = $newUserName;
-        }
-    }
 
     /**
      * Returns the user name
@@ -114,27 +126,11 @@ class User
 
     /**
      * Returns the randomly generated id string
-     * @return String
+     * @return ID
      */
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Sets a new organization for the user
-     * @param String $newOrg
-     * @throws InvalidArgumentException when newOrg is empty string
-     */
-    public function setOrganization($newOrg)
-    {
-        if ($newOrg == "")
-        {
-            throw new InvalidArgumentException("setOrganization requires a value for organization");
-        } else
-        {
-            $this->organization = $newOrg;
-        }
     }
 
     /**
@@ -157,78 +153,14 @@ class User
     }
 
 //</editor-fold>
-    /**
-     * This is a function that generates a UUid String with a length of 265 bits
-     * @return String
-     */
-    private function generateId()
-    {
-        $length = 256;
-        $numberOfBytes = $length / 8;
-        // Replaces all instances of +, = or / in the Base64 string with x
-        return str_replace(array("+", "=", "/"), array("x", "x", "x"), base64_encode(openssl_random_pseudo_bytes($numberOfBytes)));
-    }
-    
-    /**
-     * Hashes password and sets it
-     * @param String $password
-     */
-    public function setPassword($password)
-    {   
-        // Get the hash from the auth module
-        // TODO: Update to create a new authModule or update the password within it.
-        $this->hash = $this->authModule->getToken();
-    }
-    
-    /**
-     * Verify that $password's hash matches the stored hash
-     * @return boolean
-     */
-    public function authenticate()
-    {
-        $this->authModule->authenticate();
-    }
-    
-    /**
-     * Takes an assocative array representing an object and loads it into this
-     * object.
-     * @param Mixed[] $assocativeArray
-     */
-    protected function loadAssociativeArray($associativeArray)
-    {
-        if (!is_array($associativeArray))
-        {
-            throw new InvalidArgumentException("loadAssociativeArray was called without an associative array");
-        }
-        
-        // TODO: Check types
-        $this->userName = $associativeArray["userName"];
-        $this->organization = $associativeArray["organization"];
-    }
     
     /**
      * Save the User to the database
      */
     public function save()
     {
-        $this->storage->saveUser($this->id, $this->userName, $this->organization, $this->hash, $this->isAdmin());
-    }
-    
-    /**
-     * Load the associative array from the database. If id is not set, userName 
-     * and organization will be used, else the id is used.
-     * @return type
-     */
-    public function load()
-    {
-        if ($this->id == NULL)
-        {
-            return $this->storage->loadUser($this->userName, $this->organization);
-        }
-        else
-        {
-            return $this->storage->loadUser($this->id);
-        } 
+        // TODO: Update
+        $this->storage->saveUser($this->id->getId(), $this->userName, $this->organization, $this->authModule->getCredentials(), $this->isAdmin());
     }
 }
 
