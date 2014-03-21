@@ -16,4 +16,11 @@ interface Authenticatable
      * @return String
      */
     public function getToken();
+    
+    /**
+     * Save a new user in or update an existing one
+     * May throw an exception for certain types if they must be added other ways
+     * (such as LDAP)
+     */
+    public function saveNew();
 }

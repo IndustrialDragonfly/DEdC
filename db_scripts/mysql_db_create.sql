@@ -101,9 +101,18 @@ CREATE TABLE users
 id CHAR(44) NOT NULL,
 userName CHAR(100) NOT NULL,
 organization CHAR(100) NOT NULL,
-hash CHAR(255) NOT NULL,
 admin BIT NOT NULL,
 PRIMARY KEY (id)
+) Engine InnoDB;
+
+CREATE TABLE hash
+(
+id CHAR(44) NOT NULL,
+hash CHAR(255) NOT NULL,
+FOREIGN KEY (id)
+REFERENCES user(id)
+ON DELETE CASCADE
+ON UPDATE CASCADE
 ) Engine InnoDB;
 
 #Grant proper privileges
