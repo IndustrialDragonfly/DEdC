@@ -1,4 +1,5 @@
 <?php
+require_once 'BadConstructorCallException.php';
 
 /**
  * The User class models regular users, without admin rights.
@@ -159,7 +160,6 @@ class User
      */
     public function save()
     {
-        // TODO: Update
         $this->storage->saveUser($this->id->getId(), $this->userName, $this->organization, $this->isAdmin());
         $this->authModule->saveNew();
     }
