@@ -9,7 +9,7 @@ class ID {
     /**
      * @var String 
      */
-    private $id;
+    private $id = "";
     
     /**
      * @var String 
@@ -64,7 +64,7 @@ class ID {
      */
     public function getId()
     {
-        return $this->$id;
+        return $this->id;
     }
     
     /**
@@ -73,7 +73,7 @@ class ID {
      */
     public function getTaggedId()
     {
-        return $this->$id . $this->$uuidTag;
+        return $this->id . $this->uuidTag;
     }
     
     /**
