@@ -748,15 +748,14 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * @param String $userName
      * @param String $id
      * @param String $organization
-     * @param String $hash
      * @param Bool $admin
      */
-    public function saveUser($id, $userName, $organization, $hash, $admin)
+    public function saveUser($id, $userName, $organization, $admin)
     {
         // Prepare the insert statement
         $insert_stmt = $this->dbh->prepare(
                 "INSERT
-                INTO users (id, userName, organization, hash, admin)
+                INTO users (id, userName, organization, admin)
                 VALUES(?,?,?,?,?)"
                 );
         
@@ -764,8 +763,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $insert_stmt->bindParam(1, $id);
         $insert_stmt->bindParam(2, $userName);
         $insert_stmt->bindParam(3, $organization);
-        $insert_stmt->bindParam(4, $hash);
-        $insert_stmt->bindParam(5, $admin);
+        $insert_stmt->bindParam(4, $admin);
 
         $insert_stmt->execute();
     }

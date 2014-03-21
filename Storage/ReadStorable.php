@@ -68,16 +68,20 @@ interface ReadStorable
     //<editor-fold desc="User Model" defaultstate="collapsed">
 
     /**
-     * Load a User from the database using either name and origanization or 
-     * id
+     * Get a User's id String
      * @param String userName
      * @param String organization
-     * 
-     * or
-     * 
-     * @param String id
+     * @return String
      */
-    public function loadUser();
+    public function getUserId($userName, $organization);
+
+    
+    /**
+     * Load a User using the id
+     * @param String id
+     * @return String[] userName and organization
+     */
+    public function loadUser($id);
     
     /**
      * Get a User's password hash from the database
