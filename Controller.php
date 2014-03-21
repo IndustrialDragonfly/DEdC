@@ -66,7 +66,6 @@ function __autoload($classname)
 }
 
 require_once "MethodsEnum.php";
-require_once "AuthorizeUser.php";
 require_once "conf.php";
 
     // Initialize a storage object
@@ -79,14 +78,6 @@ require_once "conf.php";
     if (!$authenticator->authenticate())
     {
         // TODO - handle authentication
-        exit;
-    }
-        
-    // Determine if user has correct permissions to perform the action
-    if (!authorizeUser())
-    {
-        // Return authorization error to client
-        // TODO - handle authorization
         exit;
     }
     
