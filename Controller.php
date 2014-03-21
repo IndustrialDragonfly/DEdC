@@ -59,8 +59,7 @@ function __autoload($classname)
     }
     else
     {
-        // TODO: Make throw an exception later
-        echo "Problem loading class";
+        echo "Problem loading class " . $classname . " definition does not appear to exist.";
         exit;
     }
 }
