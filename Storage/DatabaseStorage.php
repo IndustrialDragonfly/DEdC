@@ -750,7 +750,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * @param String $organization
      * @param Bool $admin
      */
-    public function saveUser($id, $userName, $organization, $hash, $admin)
+    public function saveUser($id, $userName, $organization, $admin)
     {
         // Prepare the insert statement
         $insert_stmt = $this->dbh->prepare(
