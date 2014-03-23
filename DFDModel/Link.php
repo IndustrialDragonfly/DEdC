@@ -13,13 +13,23 @@ abstract class Link extends Element
 //<editor-fold desc="Attributes" defaultstate="collapsed">
     /**
      * UUID of a node object
-     * @var String
+     * @var []
+     * format:
+     * ['id'] id of the origin node
+     * ['label'] the label of the origin node
+     * ['x'] the x coordinate of the origin node
+     * ['y'] the y coordinate of the origin node
      */
     protected $originNode;
 
     /**
      * UUID of a node object
-     * @var String
+     * @var []
+     * format:
+     * ['id'] id of the destination node
+     * ['label'] the label of the destination node
+     * ['x'] the x coordinate of the destination node
+     * ['y'] the y coordinate of the destination node
      */
     protected $destinationNode;
 
@@ -64,13 +74,20 @@ abstract class Link extends Element
                     $assocativeArray = $this->storage->loadLink(func_get_arg(1));
                     $this->loadAssociativeArray($assocativeArray);
                 }
-                //second parameter was an id but not of a link type so create an empty object (should be a Diagram object)
-                else
+                //second parameter was an id of a Diagram object
+                else if (is_subclass_of($type, "Diagram"))
                 {
                     //call the parent constructor and set the linkList to be an empty list
                     parent::__construct(func_get_arg(0), func_get_arg(1));
                     $this->originNode = NULL;
                     $this->destinationNode = NULL;
+                    //add this new Link to the Diagram's list of links
+                    $theDiagram = new $type($this->storage, func_get_arg(1));
+                    $theDiagram->addLink($this);
+                }
+                else
+                {
+                    throw new BadConstructorCallException("The id passed to the Link Constructor was neither a valid Link or Diagram decended object");
                 }
             }
             //second parameter should be an associative array so pass it along to Element's constructor
@@ -112,7 +129,11 @@ abstract class Link extends Element
             if ($this->originNode == NULL)
             {
                 //set the origin node and add this DataFlow to its list of Links
-                $this->originNode = $aNode->getId();
+                $this->originNode['id'] = $aNode->getId();
+                $this->originNode['label'] = $aNode->getLabel();
+                $this->originNode['x'] = $aNode->getX();
+                $this->originNode['y'] = $aNode->getX();
+                
                 $aNode->addLink($this);
                 $aNode->update();
             }
@@ -127,7 +148,10 @@ abstract class Link extends Element
                 $node->removeLink($this);
                 $node->update();
 
-                $this->originNode = $aNode->getId();
+                $this->originNode['id'] = $aNode->getId();
+                $this->originNode['label'] = $aNode->getLabel();
+                $this->originNode['x'] = $aNode->getX();
+                $this->originNode['y'] = $aNode->getX();
                 $aNode->addLink($this);
                 $aNode->update();
             }
@@ -145,8 +169,8 @@ abstract class Link extends Element
     {
         if ($this->originNode != NULL)
         {
-            $type = $this->storage->getTypeFromUUID($this->originNode);
-            $node = new $type($this->storage, $this->originNode);
+            $type = $this->storage->getTypeFromUUID($this->originNode['id']);
+            $node = new $type($this->storage, $this->originNode['id']);
             $node->removeLink($this);
             $this->originNode = NULL;
             $node->update();
@@ -179,7 +203,11 @@ abstract class Link extends Element
             if ($this->destinationNode == NULL)
             {
                 //set the destination node and add this DataFlow to its list of Links
-                $this->destinationNode = $aNode->getId();
+                $this->destinationNode['id'] = $aNode->getId();
+                $this->destinationNode['label'] = $aNode->getLabel();
+                $this->destinationNode['x'] = $aNode->getX();
+                $this->destinationNode['y'] = $aNode->getX();
+                
                 $aNode->addLink($this);
                 $aNode->update();
             }
@@ -194,7 +222,10 @@ abstract class Link extends Element
                 $node->removeLink($this);
                 $node->update();
 
-                $this->destinationNode = $aNode->getId();
+                $this->destinationNode['id'] = $aNode->getId();
+                $this->destinationNode['label'] = $aNode->getLabel();
+                $this->destinationNode['x'] = $aNode->getX();
+                $this->destinationNode['y'] = $aNode->getX();
                 $aNode->addLink($this);
                 $node->update();
             }
@@ -221,7 +252,7 @@ abstract class Link extends Element
     }
 
     //</editor-fold>
-
+//<editor-fold desc="generic Node functions" defaultstate="collapsed">
     /**
      * Removes the specified node
      * Follows a Link-centric breaking approach - that is the link removes
@@ -232,7 +263,7 @@ abstract class Link extends Element
      */
     public function removeNode($node)
     {
-        if ($node->getId() == $this->getOriginNode())
+        if ($node->getId() == $this->getOriginNode()['id'])
         {
             $this->clearOriginNode();
             // Actually call back the node that just called and remove the node
@@ -240,7 +271,7 @@ abstract class Link extends Element
             //$node->removeLink($this);
             //$node->update();
         }
-        elseif ($node->getId() == $this->getDestinationNode())
+        elseif ($node->getId() == $this->getDestinationNode()['id'])
         {
             $this->clearDestinationNode();
             //$node->removeLink($this);
@@ -249,7 +280,7 @@ abstract class Link extends Element
         else
         {
             // Throw exception
-            throw new BadFunctionCallException('passed a node that is not connected to a ');
+            throw new BadFunctionCallException('passed a Node that is not connected to this Link');
         }
     }
 
@@ -261,7 +292,8 @@ abstract class Link extends Element
         $this->clearOriginNode();
         $this->clearDestinationNode();
     }
-
+    //</editor-fold>
+//<editor-fold desc="AssociativeArray functions" defaultstate="collapsed">
     /**
      * Returns an assocative array representing the link object. This 
      * assocative array has the following elements and types:
@@ -319,7 +351,8 @@ abstract class Link extends Element
     }
 
     //</editor-fold>
-//<editor-fold desc="Data Store Actions" defaultstate="collapsed">
+//</editor-fold>
+//<editor-fold desc="Storage Functions" defaultstate="collapsed">
     /**
      * function that will save this object to the database
      * @param WriteStorable $datastore this is the data store to write to

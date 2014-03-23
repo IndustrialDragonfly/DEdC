@@ -107,6 +107,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     }
     
 //<editor-fold desc="Node Related Functions" defaultstate="collapsed">
+    
     public function saveNode($id, $label, $type, $originator, $x, $y, $links, $numLinks, $parentId)
     {
         //<editor-fold desc="save to Entity table" defaultstate="collapsed">
@@ -141,7 +142,9 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         {
             // Bind the parameters of the prepared statement
             $insert_stmt->bindParam(1, $id);
-            $insert_stmt->bindParam(2, $links[$i]);
+            //TODO - links should only be passing id
+            //$insert_stmt->bindParam(2, $links[$i]);
+            $insert_stmt->bindParam(2, $links[$i]['id']);
             // Execute, catch any errors resulting
             $insert_stmt->execute();
         }
@@ -411,12 +414,16 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $select_stmt->execute();
         $originNode =  $select_stmt->fetch(PDO::FETCH_ASSOC);
         
+        //if the orgin is set set it otherwise set that field to null
         if($originNode === FALSE )
          {
-            throw new BadFunctionCallException("No matching id found in link");
+            //throw new BadFunctionCallException("No matching id found in link");
+            $results['originNode'] = NULL;
          }
-        
-        $results['originNode'] = $originNode;
+         else
+         {
+            $results['originNode'] = $originNode;
+         }
         
         
         // Setup select statement to grab destination node info
@@ -429,12 +436,16 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $select_stmt->execute();
         $destNode =  $select_stmt->fetch(PDO::FETCH_ASSOC);
         
+        //if there is no destination node set it to null otherwise set it
         if($destNode === FALSE )
          {
-            throw new BadFunctionCallException("No matching id found in link");
+            //throw new BadFunctionCallException("No matching id found in link");
+            $results['destinationNode'] = NULL;
          }
-        
-        $results['destinationNode'] = $destNode;
+         else
+         {
+            $results['destinationNode'] = $destNode;
+         }
          
          // Return the assocative array
          return $results;

@@ -544,12 +544,46 @@ abstract class Diagram extends Entity
         // on the array and reflection on the current node to determine
         // what it should store locally
         parent::loadAssociativeArray($associativeArray);
-        
-        $this->nodeList = $associativeArray['nodeList'];
-        $this->linkList = $associativeArray['linkList'];
-        $this->diaNodeList = $associativeArray['DiaNodeList'];
-        $this->parentDiaNode = $associativeArray['diaNode'];
-        $this->ancestry = $associativeArray['ancestry'];
+        if(isset($associativeArray['nodeList']))
+        {
+            $this->nodeList = $associativeArray['nodeList'];
+        }
+        else
+        {
+            $this->nodeList = Array();
+        }
+        if(isset($associativeArray['linkList']))
+        {
+            $this->linkList = $associativeArray['linkList'];
+        }
+        else
+        {
+            $this->linkList = Array();
+        }
+        if(isset($associativeArray['DiaNodeList']))
+        {
+            $this->diaNodeList = $associativeArray['DiaNodeList'];
+        }
+        else
+        {
+            $this->diaNodeList = Array();
+        }
+        if(isset($associativeArray['diaNode']))
+        {
+            $this->parentDiaNode = $associativeArray['diaNode'];
+        }
+        else
+        {
+            $this->parentDiaNode = Array();
+        }
+        if(isset($associativeArray['ancestry']))
+        {
+            $this->ancestry = $associativeArray['ancestry'];
+        }
+        else
+        {
+            $this->ancestry = Array();
+        }
     }
     //</editor-fold>
     //</editor-fold>

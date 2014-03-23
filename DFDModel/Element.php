@@ -182,7 +182,7 @@ abstract class Element extends Entity
      * type String 
      * x Int
      * y Int
-     * parent String
+     * diagramId String
      * 
      * @return Mixed[]
      */
