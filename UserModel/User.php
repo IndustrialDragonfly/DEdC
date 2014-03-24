@@ -1,5 +1,4 @@
 <?php
-require_once 'BadConstructorCallException.php';
 
 /**
  * The User class models regular users, without admin rights.
