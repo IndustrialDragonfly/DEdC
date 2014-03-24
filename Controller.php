@@ -265,15 +265,21 @@ set_exception_handler("ExceptionHandler");
 
 
         case MethodsEnum::UPDATE:
-            sendHeader(sucessful);
-            // should be no need to send data since it is idemnipotentent
+            // TODO: Allow configuring of the response type
+            $response = new SimpleErrorResponse();
+            $response->setError("Invalid HTTP Method. UPDATE is not supported.");
+            $response->setHeader(405);
+            header($response->getHeader());           
+            echo $response->getRepresentation();  
             break;
 
 
         default:
-            echo "ERROR  - Bad method";
-            //sendHeader(serverError);
-            // Send server error here, because if this point has been hit
-            // then something was wrong in the validation code (though this could
-            // be a client error depending on how you look at it)            
+            // TODO: Allow configuring of the response type
+            $response = new SimpleErrorResponse();
+            $response->setError("Invalid HTTP Method.");
+            $response->setHeader(405);
+            header($response->getHeader());           
+            echo $response->getRepresentation();
+            break;
     }
