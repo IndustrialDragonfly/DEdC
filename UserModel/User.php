@@ -59,7 +59,7 @@ class User
             $this->organization = $authInfo->getOrganization();
             
             // Load id
-            $this->id = new ID($this->storage->loadUser($this->userName, $this->organization));
+            $this->id = new ID($this->storage->getUserId($this->userName, $this->organization));
             
             // Create the authentication module
             $authMethod = $authInfo->getAuthenticationMethod();
