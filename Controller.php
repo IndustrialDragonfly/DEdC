@@ -63,218 +63,224 @@ set_exception_handler("ExceptionHandler");
         $response->setHeader(401);
         header($response->getHeader());           
         echo $response->getRepresentation();
+        exit;
     }
-    if ($user)
+    
+    switch ($request->getMethod())
     {
-        switch ($request->getMethod())
-        {
-            case MethodsEnum::GET:
-                // Response to return at the end of this block
-                $response;
+        case MethodsEnum::GET:
+            // Response to return at the end of this block
+            $response;
 
-                // If it is a request to a resource
-                if (NULL != $request->getResource())
-                {  
-                    if ("elements" == $request->getResource())
+            // If it is a request to a resource
+            if (NULL != $request->getResource())
+            {  
+                if ("elements" == $request->getResource())
+                {
+                    // List of all elements
+                    $elementArray = $storage->getListByType("*");
+
+                    if ($elementArray)
                     {
-                        // List of all elements
-                        $elementArray = $storage->getListByType("*");
-
-                        if ($elementArray)
-                        {
-                            // Success response
-                            $response = new SimpleResponse();
-                            $response->setRawData($elementArray);
-                            $response->setHeader(200);
-                        }
-                        else
-                        {
-                            // Fail response
-                            $response = new SimpleResponse();
-                            $response->setRawData("Could not complete request for \"elements\"");
-                            $response->setHeader(400);
-                        }
+                        // Success response
+                        $response = new SimpleResponse();
+                        $response->setRawData($elementArray);
+                        $response->setHeader(200);
                     }
                     else
                     {
-                        // Get elements based on type such as DataFlowDiagram
-                        // TODO: Check to see if the type is valid
-                        try
-                        {
-                            $elementArray = $storage->getListByType($request->getResource());
-                        } 
-                        catch (Exception $ex) 
-                        {
-                            // Fail response
-                            $response = new SimpleResponse();
-                            $response->setRawData($e->getMessage());
-                            $response->setHeader(400);
-                        }
-
-                        if ($elementArray)
-                        {
-                            // Success response
-                            $response = new SimpleResponse();
-                            $response->setRawData($elementArray);
-                            $response->setHeader(200);
-                        }
+                        // Fail response
+                        $response = new SimpleResponse();
+                        $response->setRawData("Could not complete request for \"elements\"");
+                        $response->setHeader(400);
                     }
                 }
-                else if ($request->getId() != NULL)
+                else
                 {
-                    // Get an Entity
-                    $element;
+                    // Get elements based on type such as DataFlowDiagram
+                    // TODO: Check to see if the type is valid
                     try
                     {
-                        $element = existingElementFactory($request->getId(), $storage);
-                    }
-                    catch (Exception $e) // TODO: Make more specific catch cases
+                        $elementArray = $storage->getListByType($request->getResource());
+                    } 
+                    catch (Exception $ex) 
                     {
-                        // Error response
+                        // Fail response
                         $response = new SimpleResponse();
                         $response->setRawData($e->getMessage());
-                        $response->setHeader(404);
+                        $response->setHeader(400);
                     }
 
-                    // Successful Response
-                    if (!isset($response))
+                    if ($elementArray)
                     {
-                        $response = new SimpleResponse($element->getAssociativeArray());
-                        // TODO - handle fail cases
+                        // Success response
+                        $response = new SimpleResponse();
+                        $response->setRawData($elementArray);
                         $response->setHeader(200);
                     }
                 }
-                else
+            }
+            else if ($request->getId() != NULL)
+            {
+                // Get an Entity
+                $element;
+                try
                 {
-                    // No other action was choosen
-                    $response = new SimpleResponse();
-                    $response->setRawData("Request had no resource or id.");
-                    $response->setHeader(400);
+                    $element = existingElementFactory($request->getId(), $storage);
                 }
-                header($response->getHeader());
-                echo $response->getRepresentation();
-                break;
-
-
-            case MethodsEnum::POST:
-                sendHeader(successful);
-                // If needed
-                sendData(result);
-                break;
-
-
-            case MethodsEnum::PUT:
-                // If there is an ID attached, then we are being asked to update
-                // an existing element
-                $element = NULL;
-                if (NULL != $request->getId())
+                catch (Exception $e) // TODO: Make more specific catch cases
                 {
-                    // Start by loading then deleting the element
-                    try 
-                    {
-                        // TODO: Check that element types are the same before deleting
-                        $element = existingElementFactory($request->getId(), $storage);
-                    } 
-                    catch (Exception $e) 
-                    {
-                        // TODO: Handle error exception
-                    }
-
-                    // Delete element if it was found
-                    if ($element)
-                    {
-                        $element->delete();
-                    }
-                }
-
-                if (NULL === $request->getData())
-                {
-                    // TODO: More specific exception handling
                     // Error response
                     $response = new SimpleResponse();
-                    $response->setRawData('No data, bad request.');
-                    $response->setHeader(400);
+                    $response->setRawData($e->getMessage());
+                    $response->setHeader(404);
                 }
-                else
+
+                // Successful Response
+                if (!isset($response))
                 {
-                    $elementArray = $request->getData();
-                    // TODO: Get actual list from database instead of hardcoding
-                    $validTypesArray = array('Process', 'Multiprocess', 'ExternalInteractor', 'DataStore', 'DataFlowDiagram', 'DataFlow');
-                    if (!in_array($elementArray['type'], $validTypesArray))
+                    $response = new SimpleResponse($element->getAssociativeArray());
+                    // TODO - handle fail cases
+                    $response->setHeader(200);
+                }
+            }
+            else
+            {
+                // No other action was choosen
+                $response = new SimpleResponse();
+                $response->setRawData("Request had no resource or id.");
+                $response->setHeader(400);
+            }
+            header($response->getHeader());
+            echo $response->getRepresentation();
+            break;
+
+
+        case MethodsEnum::POST:
+            sendHeader(successful);
+            // If needed
+            sendData(result);
+            break;
+
+        
+        case MethodsEnum::PUT:
+            // If there is an ID attached, then we are being asked to update
+            // an existing element
+            $element = NULL;
+            if (NULL != $request->getId())
+            {
+                // Start by loading then deleting the element
+                try 
+                {
+                    // TODO: Check that element types are the same before deleting
+                    $element = existingElementFactory($request->getId(), $storage);
+                } 
+                catch (Exception $e) 
+                {
+                    // TODO: Handle error exception
+                }
+
+                // Delete element if it was found
+                if ($element)
+                {
+                    $element->delete();
+                }
+            }
+
+            if (NULL === $request->getData())
+            {
+                // TODO: More specific exception handling
+                // Error response
+                $response = new SimpleResponse();
+                $response->setRawData('No data, bad request.');
+                $response->setHeader(400);
+            }
+            else
+            {
+                $elementArray = $request->getData();
+                // TODO: Get actual list from database instead of hardcoding
+                $validTypesArray = array('Process', 'Multiprocess', 'ExternalInteractor', 'DataStore', 'DataFlowDiagram', 'DataFlow');
+                if (!in_array($elementArray['type'], $validTypesArray))
+                {
+                    // Error response
+                    $response = new SimpleResponse();
+                    $response->setRawData('Element type: "' . $elementArray['type'] . '" was invalid');
+                    $response->setHeader(400);
+                } 
+                else 
+                {
+
+                    // The only time this should be null is for Diagram types
+                    $parentDia = $elementArray['diagramId'];
+
+                    // Create a new element using the associative array
+                    if ($parentDia == NULL && $elementArray['genericType'] != 'Diagram')
                     {
+                        // TODO - send an unhappy header saying it was an element with no parent
+                    }
+
+                    // Create a new element, loading it from the element array
+                    $element = NULL;
+                    try
+                    {
+                        $element = new $elementArray['type']($storage, $elementArray);
+                    }
+                    catch (Exception $e)
+                    {
+                        // TODO: More specific exception handling
                         // Error response
                         $response = new SimpleResponse();
-                        $response->setRawData('Element type: "' . $elementArray['type'] . '" was invalid');
+                        $response->setRawData($e->getMessage());
                         $response->setHeader(400);
-                    } 
-                    else 
-                    {
 
-                        // The only time this should be null is for Diagram types
-                        $parentDia = $elementArray['diagramId'];
-
-                        // Create a new element using the associative array
-                        if ($parentDia == NULL && $elementArray['genericType'] != 'Diagram')
-                        {
-                            // TODO - send an unhappy header saying it was an element with no parent
-                        }
-
-                        // Create a new element, loading it from the element array
-                        $element;
-                        try
-                        {
-                            $element = new $elementArray['type']($storage, $elementArray);
-                        }
-                        catch (Exception $e)
-                        {
-                            // TODO: More specific exception handling
-                            // Error response
-                            $response = new SimpleResponse();
-                            $response->setRawData($e->getMessage());
-                            $response->setHeader(400);
-                        }
-
-                        // If the element was created, save it
-                        if ($element)
-                        {
-                            $element->save();
-                        }
-
-                        // Setup a response object with just a header
-                        $response = new SimpleResponse($element->getAssociativeArray());
-                        $response->setHeader(201);
                     }
+
+                    // If the element was created, save it
+                    if ($element)
+                    {
+                        $element->save();
+                    }
+
+                    // Setup a response object with just a header
+                    $response = new SimpleResponse($element->getAssociativeArray());
+                    $response->setHeader(201);
                 }
+            }
 
-                // Return the header
-                header($response->getHeader());           
-                echo $response->getRepresentation();
+            // Return the header
+            header($response->getHeader());           
+            echo $response->getRepresentation();
 
-                break;
-
-
-            case MethodsEnum::DELETE:
-                // Delete needs to send no data other than a header
-                $element = existingElementFactory($request->getId(), $storage);
-                $element->delete();
-                // TODO - Handle fail cases
-                $response = new SimpleResponse();
-                $response->setHeader(404);
-                header($response->getHeader());
-                break;
+            break;
 
 
-            case MethodsEnum::UPDATE:
-                sendHeader(sucessful);
-                // should be no need to send data since it is idemnipotentent
-                break;
+        case MethodsEnum::DELETE:
+            // Delete needs to send no data other than a header
+            $element = existingElementFactory($request->getId(), $storage);
+            $element->delete();
+            // TODO - Handle fail cases
+            $response = new SimpleResponse();
+            $response->setHeader(404);
+            header($response->getHeader());
+            break;
 
 
-            default:
-                echo "ERROR  - Bad method";
-                //sendHeader(serverError);
-                // Send server error here, because if this point has been hit
-                // then something was wrong in the validation code (though this could
-                // be a client error depending on how you look at it)            
-        }
+        case MethodsEnum::UPDATE:
+            // TODO: Allow configuring of the response type
+            $response = new SimpleErrorResponse();
+            $response->setError("Invalid HTTP Method. UPDATE is not supported.");
+            $response->setHeader(405);
+            header($response->getHeader());           
+            echo $response->getRepresentation();  
+            break;
+
+
+        default:
+            // TODO: Allow configuring of the response type
+            $response = new SimpleErrorResponse();
+            $response->setError("Invalid HTTP Method.");
+            $response->setHeader(405);
+            header($response->getHeader());           
+            echo $response->getRepresentation();
+            break;
     }
