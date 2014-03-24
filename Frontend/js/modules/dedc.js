@@ -200,6 +200,26 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                     Connector.get("Controller.php/DataFlowDiagram", onSuccess, onFail, false);
                 }
             });
+            
+            // Show the login dialog
+            $("#login-dialog").dialog({
+                modal: true,
+                buttons: {
+                    "Login": function () {
+                        var onSuccess = function (response) {
+                            $("#login-dialog").dialog("close");
+                        };
+                        
+                        var onFail = function (response) {
+                            console.log(response.getError());
+                            $("#login-dialog").addClass("ui-state-error");
+                        };
+                        
+                        Connector.setCredentials($("#organization").val(), $("#username").val(), $("#password").val())
+                        Connector.get("Controller.php/DataFlowDiagram", onSuccess, onFail);
+                    },
+                },
+            });
 
             // New tab button
             $(newTab).button().click(function () {

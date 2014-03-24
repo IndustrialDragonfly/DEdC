@@ -16,6 +16,21 @@ echo <<<EOF
             <div id ="dialog-modal" title="DataFlowDiagram Chooser">
                 <ol id="selectable"></ol>
             </div>
+            
+            <div id ="login-dialog" title="Login">
+                <p>All form fields are required.</p>
+                <form>
+                    <fieldset>
+                        <label for="organization">Organization</label>
+                        <input type="text" name="organization" id="organization" class="text ui-widget-content ui-corner-all">
+                        <label for="username">Username</label>
+                        <input type="text" name="username" id="username" class="text ui-widget-content ui-corner-all">
+                        <label for="password">Password</label>
+                        <input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all">
+                    </fieldset>
+                </form>
+            </div>
+
             <div id="header" class="ui-layout-north"><a href="#"><img src="${web_client_location}images/logo.png" width="144" height="57"/></a></div>
 
             <!-- sidebar1Container is required by layout plugin for sidebar1 resizing -->

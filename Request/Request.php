@@ -58,7 +58,7 @@ abstract class Request implements Requestable {
         
         // Decode the query string from the url
         $assocArray = parse_url($decodedUri);
-        if ($assocArray['query'] !== NULL)
+        if (isset($assocArray['query']))
         {
             // Convert queryString to an associative array
             $queryArray = NULL;

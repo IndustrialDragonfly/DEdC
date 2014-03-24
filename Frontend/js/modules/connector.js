@@ -3,6 +3,11 @@
 */
 define(["modules/response", "jquery"], function (Response, $) {
     
+    var myOrganization = "",
+        myUsername = "",
+        myPassword = "",
+        queryStringFormat = "?orgUser=#{org}/#{username}&password=#{password}&authType=StandardUsernamePassword";
+
    /**
     * Ajax GET method
     * @param {String} url Url of resource
@@ -11,12 +16,18 @@ define(["modules/response", "jquery"], function (Response, $) {
     * @param {Bool} async (Optional) If true, the request will be sent asynchronously, false otherwise. Defaults to true.
     */
    var publicGet = function (url, successCallback, failCallback, async) {
-       // Handle optional argument, defaults to true
-       async = (typeof async === "undefined") ? true : async;
+        // Handle optional argument, defaults to true
+        async = (typeof async === "undefined") ? true : async;
+       
+       // Create authentication query string
+        var queryString = queryStringFormat
+            .replace(/#\{org\}/g, myOrganization)
+            .replace(/#\{username\}/g, myUsername)
+            .replace(/#\{password\}/g, myPassword);
 
        $.ajax({
            accepts: "application/json",
-           url: url,
+           url: url + queryString,
            dataType: "text",
            async: async
        }).done(function (data, textStatus) {
@@ -70,10 +81,16 @@ define(["modules/response", "jquery"], function (Response, $) {
     * @param {type} failCallback Callback to execute on failure
     */
    var publicDelete = function (url, successCallback, failCallback) {
+        // Create authentication query string
+        var queryString = queryStringFormat
+            .replace(/#\{org\}/g, myOrganization)
+            .replace(/#\{username\}/g, myUsername)
+            .replace(/#\{password\}/g, myPassword);
+
        $.ajax({
            type: "DELETE",
            accepts: "application/json",
-           url: url,
+           url: url + queryString,
            dataType: "text"
        }).done(function (data, textStatus) {
            // Request was successful
@@ -130,12 +147,17 @@ define(["modules/response", "jquery"], function (Response, $) {
    var publicPut = function(url, data, successCallback, failCallback, async) {
        // Handle optional argument, defaults to true
        async = (typeof async === "undefined") ? true : async;
-       
+          // Create authentication query string
+        var queryString = queryStringFormat
+            .replace(/#\{org\}/g, myOrganization)
+            .replace(/#\{username\}/g, myUsername)
+            .replace(/#\{password\}/g, myPassword);
+     
        var dataString = JSON.stringify(data);
        console.log("Sending data: " + dataString);
        $.ajax({
            type: "PUT",
-           url: url,
+           url: url + queryString,
            data: dataString,
            processData: false, // Send in body, not as a query string
            accepts: "application/json",
@@ -189,10 +211,17 @@ define(["modules/response", "jquery"], function (Response, $) {
            failCallback(response);
        });
    };
+   
+   var publicSetCredentials = function (organization, username, password) {
+       myOrganization = organization;
+       myUsername = username;
+       myPassword = password;
+   };
 
    return {
        get: publicGet,
        delete: publicDelete,
-       put: publicPut
+       put: publicPut,
+       setCredentials: publicSetCredentials
    };
 });
