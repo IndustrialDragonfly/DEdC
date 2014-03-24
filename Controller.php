@@ -40,22 +40,12 @@ require_once "conf.php";
 
     // Initialize a storage object
     $storage = new DatabaseStorage(); 
-
-     // Instantiate a new authentication module as named by conf.php
-    $authenticator = new $authenModule($storage);    
-    
-    // Pass authentication information from client
-    if (!$authenticator->authenticate())
-    {
-        // TODO - handle authentication
-        exit;
-    }
      
     // Retrieve information about request and put it in a request object
     $body = file_get_contents('php://input'); // Get the body of the request
     $request = new SimpleRequest($_SERVER['HTTP_ACCEPT'], 
             $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], $body);
-    
+        
     switch ($request->getMethod())
     {
         case MethodsEnum::GET:
