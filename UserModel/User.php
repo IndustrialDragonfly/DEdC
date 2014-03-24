@@ -35,6 +35,8 @@ class User
      * @param {ReadStorable,WriteStorable} $datastore
      * @param Admin $admin
      * @param AuthenticationInformation $authInfo
+     * 
+     * @throws BadConstructorCallException
      */
     public function __construct()
     {
