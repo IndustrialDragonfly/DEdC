@@ -27,18 +27,15 @@ class StandardUsernamePassword implements AuthenticationHandleable
     
     /**
      * Retrieve ORG/USER, and construct an AuthenticationInformation object.
-     * @param String $queryString
+     * @param Mixed[] $queryArray
      */
-    public function __construct($queryString) 
-    {
-        // Convert queryString to an associative array
-        $assocArray = parse_str($queryString);
-        
+    public function __construct($queryArray) 
+    {        
         // Set the organization and username
-        $this->orgUser = $assocArray['orgUser'];
+        $this->orgUser = $queryArray['orgUser'];
         
         // Set the password
-        $this->password = $assocArray['password'];
+        $this->password = $queryArray['password'];
         
         // Create the AuthenticationInformation object
         $this->authInfo = new PasswordAuthentication($this->orgUser, $this->password);
