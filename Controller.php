@@ -46,7 +46,21 @@ require_once "conf.php";
     $request = new SimpleRequest($_SERVER['HTTP_ACCEPT'], 
             $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], $body);
     
-    $user = new User($storage, $request->getAuthenticationInfo());
+    // Try to create a new User
+    $user;
+    try
+    {
+        $user = new User($storage, $request->getAuthenticationInfo());
+
+    } catch (Exception $ex) {
+        // If the User threw an exception, return the exception message.
+        $response = new SimpleResponse();
+        $response->setRawData($ex->getMessage());
+        $response->setHeader(401);
+        header($response->getHeader());           
+        echo $response->getRepresentation();
+
+    }
     if ($user)
     {
         switch ($request->getMethod())
@@ -260,13 +274,4 @@ require_once "conf.php";
                 // then something was wrong in the validation code (though this could
                 // be a client error depending on how you look at it)            
         }
-    }
-    else
-    {
-        $response = new SimpleResponse();
-        $response->setRawData("User could not authenticate.");
-        $response->setHeader(401);
-        header($response->getHeader());           
-        echo $response->getRepresentation();
-
     }
