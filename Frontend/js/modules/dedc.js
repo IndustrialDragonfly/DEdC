@@ -402,6 +402,8 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             var data = {
                 id: canvas.getId(),
                 type: "DataFlowDiagram",
+                genericType: "Diagram",
+                diagramId: "",
                 label: "Label 1" // TODO: Get from UI
             };
             
