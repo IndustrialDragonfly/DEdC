@@ -21,8 +21,11 @@ function existingElementFactory($id, $storage)
 }
 
 require_once 'ClassLoader.php';
+require_once 'ExceptionHandler.php';
 require_once "MethodsEnum.php";
 require_once "conf.php";
+
+set_exception_handler("ExceptionHandler");
 
     /*
     * Checks to see if the incoming request has the proper user agent product,
@@ -45,7 +48,6 @@ require_once "conf.php";
     $body = file_get_contents('php://input'); // Get the body of the request
     $request = new SimpleRequest($_SERVER['HTTP_ACCEPT'], 
             $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], $body);
-    
     // Try to create a new User
     $user;
     try
@@ -54,12 +56,13 @@ require_once "conf.php";
 
     } catch (Exception $ex) {
         // If the User threw an exception, return the exception message.
-        $response = new SimpleResponse();
-        $response->setRawData($ex->getMessage());
+        // TODO: Allow configuring of the response type
+        // TODO: Make authentication error message extending from error
+        $response = new SimpleErrorResponse();
+        $response->setError($ex->getMessage());
         $response->setHeader(401);
         header($response->getHeader());           
         echo $response->getRepresentation();
-
     }
     if ($user)
     {
