@@ -149,9 +149,6 @@ class ElementTest extends PHPUnit_Framework_TestCase
     }
     
     
-    
-    //TODO - add tests for setParent, and AssociativeArray
-    
     /**
      * @covers Element::loadAssocitiveArray
      * @covers Element::getAssocitiveArray

@@ -17,8 +17,6 @@ abstract class Link extends Element
      * format:
      * ['id'] id of the origin node
      * ['label'] the label of the origin node
-     * ['x'] the x coordinate of the origin node
-     * ['y'] the y coordinate of the origin node
      */
     protected $originNode;
 
@@ -28,8 +26,6 @@ abstract class Link extends Element
      * format:
      * ['id'] id of the destination node
      * ['label'] the label of the destination node
-     * ['x'] the x coordinate of the destination node
-     * ['y'] the y coordinate of the destination node
      */
     protected $destinationNode;
 
@@ -131,8 +127,6 @@ abstract class Link extends Element
                 //set the origin node and add this DataFlow to its list of Links
                 $this->originNode['id'] = $aNode->getId();
                 $this->originNode['label'] = $aNode->getLabel();
-                $this->originNode['x'] = $aNode->getX();
-                $this->originNode['y'] = $aNode->getX();
                 
                 $aNode->addLink($this);
                 $aNode->update();
@@ -150,8 +144,6 @@ abstract class Link extends Element
 
                 $this->originNode['id'] = $aNode->getId();
                 $this->originNode['label'] = $aNode->getLabel();
-                $this->originNode['x'] = $aNode->getX();
-                $this->originNode['y'] = $aNode->getX();
                 $aNode->addLink($this);
                 $aNode->update();
             }
@@ -205,8 +197,6 @@ abstract class Link extends Element
                 //set the destination node and add this DataFlow to its list of Links
                 $this->destinationNode['id'] = $aNode->getId();
                 $this->destinationNode['label'] = $aNode->getLabel();
-                $this->destinationNode['x'] = $aNode->getX();
-                $this->destinationNode['y'] = $aNode->getX();
                 
                 $aNode->addLink($this);
                 $aNode->update();
@@ -224,8 +214,6 @@ abstract class Link extends Element
 
                 $this->destinationNode['id'] = $aNode->getId();
                 $this->destinationNode['label'] = $aNode->getLabel();
-                $this->destinationNode['x'] = $aNode->getX();
-                $this->destinationNode['y'] = $aNode->getX();
                 $aNode->addLink($this);
                 $node->update();
             }
@@ -243,8 +231,8 @@ abstract class Link extends Element
     {
         if ($this->destinationNode != NULL)
         {
-            $type = $this->storage->getTypeFromUUID($this->destinationNode);
-            $node = new $type($this->storage, $this->destinationNode);
+            $type = $this->storage->getTypeFromUUID($this->destinationNode['id']);
+            $node = new $type($this->storage, $this->destinationNode['id']);
             $node->removeLink($this);
             $node->update();
             $this->destinationNode = NULL;
@@ -305,7 +293,7 @@ abstract class Link extends Element
      * genericType String
      * x Int
      * y Int
-     * parent String
+     * diagramId String this is the ID of the parent
      * originNode String
      * destinationNode String
      * 
