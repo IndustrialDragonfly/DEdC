@@ -102,13 +102,15 @@ id CHAR(44) NOT NULL,
 userName CHAR(100) NOT NULL,
 organization CHAR(100) NOT NULL,
 admin BIT NOT NULL,
-PRIMARY KEY (id)
+PRIMARY KEY (id),
+UNIQUE userOrg (userName, organization)
 ) Engine InnoDB;
 
 CREATE TABLE hash
 (
 id CHAR(44) NOT NULL,
 hash CHAR(255) NOT NULL,
+PRIMARY KEY(id),
 FOREIGN KEY (id)
 REFERENCES users(id)
 ON DELETE CASCADE
@@ -131,3 +133,8 @@ GRANT DELETE ON dedc.entity TO 'dedc_user'@'localhost';
 #Grant proper privileges - don't use these on anything but testing DB
 CREATE USER 'tester'@'localhost' IDENTIFIED BY 'test';
 GRANT ALL ON dedc.* TO 'tester'@'localhost';
+
+#Insert a user
+INSERT INTO users (id, userName, organization) VALUES ('RlyxJ3ZxPsdOr9rFTb9UrTrGKRBUQxWbclf9Gv0Fz1Mx', 'Geoff', 'InD');
+#password is password1
+INSERT INTO hash (id, hash) VALUES ('RlyxJ3ZxPsdOr9rFTb9UrTrGKRBUQxWbclf9Gv0Fz1Mx ', '$2y$10$RMwCqfIrwxTmnzQoEw8B4ePQcH3TmVIQ35xQcTbltOdtXbPvT.3pi');
