@@ -43,9 +43,8 @@ class DiaNodeTest extends PHPUnit_Framework_TestCase
         }
         
         $this->testDiagram = new DataFlowDiagram($this->storage);
-        $this->testDiagram->save();
         $this->object = new Multiprocess($this->storage, $this->testDiagram->getId());
-        //$this->object->save();
+        $this->testDiagram->refresh();
     }
 
     /**
@@ -55,6 +54,7 @@ class DiaNodeTest extends PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         //clear the DB
+        $this->testDiagram->refresh();
         $this->testDiagram->delete();
     }
 
@@ -115,7 +115,6 @@ class DiaNodeTest extends PHPUnit_Framework_TestCase
         $this->object->update();
         
         $testSubDiagram = new DataFlowDiagram($this->storage, $this->object->getId());
-        $testSubDiagram->save();
         $this->object->setSubDiagram($testSubDiagram->getId());
         $this->assertEquals($this->object->getAssociativeArray()['childDiagramId'], $testSubDiagram->getId());
         

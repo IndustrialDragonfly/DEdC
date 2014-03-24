@@ -37,7 +37,6 @@ class DiagramTest extends PHPUnit_Framework_TestCase
             $this->storage = new DatabaseStorage();
         }
         $this->object = new DataFlowDiagram($this->storage);
-        $this->object->save();
     }
 
     /**
@@ -448,14 +447,22 @@ class DiagramTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers Diagram::getNumberOfAncestors
+     */
+    public function testGetNumberOfAncestors_null()
+    {
+        $this->assertEquals(0, $this->object->getNumberOfAncestors());
+    }
+    
+    /**
+     * @covers Diagram::getNumberOfAncestors
      * @todo   Implement testGetNumberOfAncestors().
      */
-    public function testGetNumberOfAncestors()
+    public function testGetNumberOfAncestors_smoke()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $mp = new Multiprocess($this->storage, $this->object->getId());
+        $dfd = new DataFlowDiagram($this->storage, $mp->getId());
+        $this->object->refresh();
+        $this->assertEquals(1, $this->object->getNumberOfAncestors());
     }
 
     /**
@@ -547,42 +554,6 @@ class DiagramTest extends PHPUnit_Framework_TestCase
      * @todo   Implement testLoadAssociativeArray().
      */
     public function testLoadAssociativeArray()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @covers Diagram::save
-     * @todo   Implement testSave().
-     */
-    public function testSave()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @covers Diagram::update
-     * @todo   Implement testUpdate().
-     */
-    public function testUpdate()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @covers Diagram::delete
-     * @todo   Implement testDelete().
-     */
-    public function testDelete()
     {
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete(

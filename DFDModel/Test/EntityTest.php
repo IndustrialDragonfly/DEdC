@@ -39,7 +39,6 @@ class EntityTest extends PHPUnit_Framework_TestCase
         }
         
         $this->testDiagram = new DataFlowDiagram($this->storage);
-        $this->testDiagram->save();
         $this->object = new Process($this->storage, $this->testDiagram->getId());
         $this->testDiagram->refresh();
     }
@@ -50,6 +49,7 @@ class EntityTest extends PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
+        $this->testDiagram->refresh();
         $this->testDiagram->delete();
     }
 

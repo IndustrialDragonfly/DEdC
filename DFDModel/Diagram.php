@@ -72,6 +72,7 @@ abstract class Diagram extends Entity
             $this->diaNodeList = array();
             $this->linkList = array();
             $this->nodeList = array();
+            $this->save();
                     
         }
         //if 2 things were passed we are either loading a Diagram from storage, 
@@ -121,7 +122,8 @@ abstract class Diagram extends Entity
                     $parentDiagram = new $type(func_get_arg(0), $parentDiagramId);
                     //set this Diagram's ancestry to the parentDiagrams, then add it to the list
                     $this->ancestry = $parentDiagram->getAncestry();
-                    array_push($this->ancestry, $parentDiagram->getId()); 
+                    array_push($this->ancestry, $parentDiagram->getId());
+                    $this->save();
                 }
                 else
                 {

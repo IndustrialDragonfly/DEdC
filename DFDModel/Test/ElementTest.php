@@ -38,10 +38,7 @@ class ElementTest extends PHPUnit_Framework_TestCase
         }
 
         $this->testDiagram = new DataFlowDiagram($this->storage);
-        $this->testDiagram->save();
         $this->object = new Process($this->storage, $this->testDiagram->getId());
-        //$this->testDiagram->addNode($this->object);
-        //$this->object->save();
         $this->testDiagram->refresh();
     }
 
@@ -51,6 +48,7 @@ class ElementTest extends PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
+        $this->testDiagram->refresh();
         $this->testDiagram->delete();
     }
 
