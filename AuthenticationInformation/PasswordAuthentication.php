@@ -33,6 +33,6 @@ class PasswordAuthentication extends AuthenticationInformation
      */
     public function getAuthenticationMethod()
     {
-        return "PasswordAuthentication";
+        return "PasswordAuthenticationModule";
     }
 }
