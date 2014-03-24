@@ -32,7 +32,7 @@ class PasswordAuthenticationModule implements Authenticatable
     public function authenticate()
     {
         // Get the user's hash from the database
-        $hash = $this->storage->getHash($this->id);
+        $hash = $this->storage->getHash($this->id->getId());
         
         // Verify the password
         return password_verify($this->password, $hash);
