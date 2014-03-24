@@ -3,7 +3,7 @@
 /**
  * The User class models regular users, without admin rights.
  *
- * @author Eugene Davis
+ * @author Eugene Davis/Jacob Swanson
  */
 class User
 {
