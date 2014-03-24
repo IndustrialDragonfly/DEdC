@@ -123,6 +123,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.link TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.dianode TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.dfd_ancestry TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.users TO 'dedc_user'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.hash TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.element_list TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.node TO 'dedc_user'@'localhost';
 GRANT DELETE ON dedc.entity TO 'dedc_user'@'localhost';

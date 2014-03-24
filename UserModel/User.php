@@ -96,7 +96,7 @@ class User
                 $this->id = new ID();
                 
                 // Handle username, and organization
-                $this->username = $authInfo->getUserName();
+                $this->userName = $authInfo->getUserName();
                 $this->organization = $authInfo->getOrganization();
                 
                 // Handle the password

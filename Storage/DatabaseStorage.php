@@ -771,7 +771,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $insert_stmt = $this->dbh->prepare(
                 "INSERT
                 INTO users (id, userName, organization, admin)
-                VALUES(?,?,?,?,?)"
+                VALUES(?,?,?,?)"
                 );
         
         // Bind the parameters

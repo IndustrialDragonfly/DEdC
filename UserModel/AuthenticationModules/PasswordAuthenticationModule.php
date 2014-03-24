@@ -58,6 +58,6 @@ class PasswordAuthenticationModule implements Authenticatable
    
     public function saveNew()
     {
-        $this->storage->saveHash($this->id, $this->getToken());
+        $this->storage->saveHash($this->id->getId(), $this->getToken());
     }
 }
