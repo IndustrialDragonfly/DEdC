@@ -196,6 +196,8 @@ abstract class Diagram extends Entity
             $link['id'] = $newLink->getId();
             $link['label'] = $newLink->getLabel();
             array_push($this->linkList, $link);
+            //TODO - remove this vardump
+            var_dump($this->linkList);
         }
         else
         {
@@ -578,7 +580,7 @@ abstract class Diagram extends Entity
         }
         else
         {
-            $this->parentDiaNode = Array();
+            $this->parentDiaNode = null;
         }
         if(isset($associativeArray['ancestry']))
         {
@@ -637,6 +639,12 @@ abstract class Diagram extends Entity
         // Note that this will NOT delete the children DFDs but leave them
         // orphaned instead
         $this->storage->deleteDiagram($this->id);
+    }
+    
+    public function refresh()
+    {
+        $associativeArray = $this->storage->loadDiagram($this->id);
+        $this->loadAssociativeArray($associativeArray);
     }
 
     //</editor-fold>

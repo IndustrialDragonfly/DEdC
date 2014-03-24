@@ -71,9 +71,11 @@ abstract class Node extends Element
                     //call the parent constructor and set the linkList to be an empty list
                     parent::__construct(func_get_arg(0), func_get_arg(1));
                     $this->linkList = array();
+                    $this->save();
                     //add this node to the parent diagram's node list
                     $theDiagram = new $type($this->storage, func_get_arg(1));
                     $theDiagram->addNode($this);
+                    $theDiagram->update();
                 }
                 //the second parameter did not decend from a Node or a Diagram object
                 else

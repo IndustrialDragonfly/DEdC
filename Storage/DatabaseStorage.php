@@ -555,7 +555,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          // filtering out all diaNodes and links from the list with a
          // a subquery
          $loadDiagram = $this->dbh->prepare("
-            SELECT id, label, type 
+            SELECT id, label, type, x, y
             FROM entity id
                     JOIN element_list elementId ON elementId=id
                     NATURAL JOIN element
