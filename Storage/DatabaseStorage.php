@@ -833,7 +833,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         // Load a hash using a user's id
         $loadHash = $this->dbh->prepare(
                 "SELECT hash "
-                . "FROM users "
+                . "FROM hash "
                 . "WHERE id=?"
                 );
         $loadHash->bindParam(1, $id);
