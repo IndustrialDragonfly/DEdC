@@ -195,6 +195,10 @@ abstract class Diagram extends Entity
             //add it to the list
             $link['id'] = $newLink->getId();
             $link['label'] = $newLink->getLabel();
+            $link['originNode'] = $newLink->getOriginNode()['id'];
+            $link['destinationNode'] = $newLink->getDestinationNode()['id'];
+            $link['type'] = $newLink->getClass();
+            
             array_push($this->linkList, $link);
         }
         else
@@ -291,6 +295,7 @@ abstract class Diagram extends Entity
             $node['label'] = $newNode->getLabel();
             $node['x'] = $newNode->getX();
             $node['y'] = $newNode->getY();
+            $node['type'] = $newNode->getClass();
             
             array_push($this->nodeList, $node);
         }

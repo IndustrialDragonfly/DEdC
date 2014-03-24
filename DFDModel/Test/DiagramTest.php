@@ -53,7 +53,7 @@ class DiagramTest extends PHPUnit_Framework_TestCase
     /**
      * @covers Diagram::getNumberOfLinks
      */
-    public function testGetNumberOfLinks_empty()
+    public function testGetNumberOfLinks_null()
     {
         $this->assertEquals($this->object->getNumberOfLinks(), 0);
     }
@@ -107,7 +107,7 @@ class DiagramTest extends PHPUnit_Framework_TestCase
      * @covers Diagram::getLinks
      * @covers Diagram::addLink
      */
-    public function testGetLinks_singlesmoke()
+    public function testGetLinks_singleSmoke()
     {
         $df = new DataFlow($this->storage, $this->object->getId());
         $this->object->refresh();
@@ -133,6 +133,7 @@ class DiagramTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers Diagram::getLink
+     * @covers Diagram::addLink
      */
     public function testGetLink_smoke()
     {
@@ -144,6 +145,10 @@ class DiagramTest extends PHPUnit_Framework_TestCase
         for($i = 10; $i >= 0; $i--)
         {
             $this->assertEquals($this->object->getLinks()[$i]['id'], $this->object->getLink($i)['id']);
+            $this->assertEquals($this->object->getLinks()[$i]['label'], $this->object->getLink($i)['label']);
+            $this->assertEquals($this->object->getLinks()[$i]['originNode'], $this->object->getLink($i)['originNode']);
+            $this->assertEquals($this->object->getLinks()[$i]['destinationNode'], $this->object->getLink($i)['destinationNode']);
+            $this->assertEquals($this->object->getLinks()[$i]['type'], $this->object->getLink($i)['type']);
         }
     }
     
@@ -158,9 +163,22 @@ class DiagramTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers Diagram::removeLink
-     * @todo   Implement testRemoveLink().
+     * @expectedException BadFunctionCallException
      */
     public function testRemoveLink_smoke()
+    {
+        $df = new DataFlow($this->storage, $this->object->getId());
+        $this->object->refresh();
+        $this->assertEquals(1, $this->object->getNumberOfLinks());
+        $this->assertTrue($this->object->removeLink($df->getId()));
+        $this->assertEquals(0, $this->object->getNumberOfLinks());
+        $this->assertTrue($this->object->removeLink($df->getId()));
+    }
+    
+    /**
+     * @covers Diagram::removeLink
+     */
+    public function testRemoveLink_invalidID()
     {
         $df = new DataFlow($this->storage, $this->object->getId());
         for($i = 10; $i > 0; $i--)
@@ -175,62 +193,126 @@ class DiagramTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers Diagram::getNumberOfNodes
-     * @todo   Implement testGetNumberOfNodes().
      */
-    public function testGetNumberOfNodes()
+    public function testGetNumberOfNodes_null()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->assertEquals($this->object->getNumberOfNodes(), 0);
+    }
+    
+    /**
+     * @covers Diagram::getNumberOfNodes
+     * @covers Diagram::addNode
+     */
+    public function testGetNumberOfNodes_smoke()
+    {
+        $node = new Process($this->storage, $this->object->getId());
+        
+        //refresh from the DB
+        //$this->object = new DataFlowDiagram($this->storage, $this->object->getId());
+        $this->object->refresh();
+        $this->assertEquals($this->object->getNumberOfNodes(), 1);
     }
 
     /**
      * @covers Diagram::getNodes
-     * @todo   Implement testGetNodes().
      */
-    public function testGetNodes()
+    public function testGetNodes_empty()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $array = $this->object->getNodes();
+        $this->assertEquals(count($array), 0);
+    }
+    
+    /**
+     * @covers Diagram::getNodes
+     * @covers Diagram::addNode
+     */
+    public function testGetNodes_singleSmoke()
+    {
+        $node = new Process($this->storage, $this->object->getId());
+        $this->object->refresh();
+        $retrievedNode = $this->object->getNodes()[0];
+        $this->assertEquals($node->getId(), $retrievedNode['id']);
+        $this->assertEquals($node->getLabel(), $retrievedNode['label']);
+        $this->assertEquals($node->getX(), $retrievedNode['x']);
+        $this->assertEquals($node->getY(), $retrievedNode['y']);
+    }
+    
+    /**
+     * @covers Diagram::getNodes
+     * @covers Diagram::addNode
+     */
+    public function testGetNodes_smoke()
+    {
+        for($i = 10; $i > 0; $i--)
+        {
+            $node = new Process($this->storage, $this->object->getId());
+        }
+        $this->object->refresh();
+        $this->assertEquals(10, count($this->object->getNodes()));
     }
 
     /**
      * @covers Diagram::getNode
-     * @todo   Implement testGetNode().
-     */
-    public function testGetNode()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
-
-    /**
      * @covers Diagram::addNode
-     * @todo   Implement testAddNode().
      */
-    public function testAddNode()
+    public function testGetNode_smoke()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        for($i = 10; $i >= 0; $i--)
+        {
+            $node = new Process($this->storage, $this->object->getId());
+        }
+        $this->object->refresh();
+        for($i = 10; $i >= 0; $i--)
+        {
+            $this->assertEquals($this->object->getNodes()[$i]['id'], $this->object->getNode($i)['id']);
+            $this->assertEquals($this->object->getNodes()[$i]['label'], $this->object->getNode($i)['label']);
+            $this->assertEquals($this->object->getNodes()[$i]['x'], $this->object->getNode($i)['x']);
+            $this->assertEquals($this->object->getNodes()[$i]['y'], $this->object->getNode($i)['y']);
+            $this->assertEquals($this->object->getNodes()[$i]['type'], $this->object->getNode($i)['type']);
+        }
+    }
+    
+    /**
+     * @covers Diagram::getNode
+     * @expectedException BadFunctionCallException
+     */
+    public function testGetNode_outOfBounds()
+    {
+        $node = $this->object->getNode(0);
     }
 
     /**
      * @covers Diagram::removeNode
-     * @todo   Implement testRemoveNode().
+     * @covers Diagram::addNode
+     * @covers Diagram::getNumberOfNodes
      */
-    public function testRemoveNode()
+    public function testRemoveNode_smoke()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $Node = new Process($this->storage, $this->object->getId());
+        for($i = 10; $i > 0; $i--)
+        {
+            $someNode = new Process($this->storage, $this->object->getId());
+        }
+        $this->object->refresh();
+        $this->assertEquals(11, $this->object->getNumberOfNodes());
+        $this->assertTrue($this->object->removeNode($Node->getId()));
+        $this->assertEquals(10, $this->object->getNumberOfNodes());
+    }
+    
+    /**
+     * @covers Diagram::removeNode
+     * @covers Diagram::addNode
+     * @covers Diagram::getNumberOfNodes
+     * @expectedException BadFunctionCallException
+     */
+    public function testRemoveNode_invalidID()
+    {
+        $Node = new Process($this->storage, $this->object->getId());
+        $this->object->refresh();
+        $this->assertEquals(1, $this->object->getNumberOfNodes());
+        $this->assertTrue($this->object->removeNode($Node->getId()));
+        $this->assertEquals(0, $this->object->getNumberOfNodes());
+        $this->assertFalse($this->object->removeNode($Node->getId()));
     }
 
     /**
