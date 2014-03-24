@@ -57,6 +57,12 @@ function __autoload($classname)
         require_once "AuthenticationInformation/" . $classname . ".php";
     }
     
+    // Models
+    elseif (file_exists("Models/" . $classname . ".php"))
+    {
+        require_once "Models/" . $classname . ".php";
+    }
+    
     else
     {
         echo "Problem loading class " . $classname . " definition does not appear to exist.";
