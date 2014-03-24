@@ -609,7 +609,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
                 ");*/
          // Scarier looking work around version
          $loadDiagram = $this->dbh->prepare("
-             SELECT id, label, type, childDiagramId
+             SELECT id, label, type, childDiagramId, x, y
                 FROM entity id
                         NATURAL JOIN element
                         JOIN dianode diaNodeId ON diaNodeId=id

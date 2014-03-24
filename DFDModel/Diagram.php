@@ -387,13 +387,20 @@ abstract class Diagram extends Entity
      * @param DiaNode $node the diaNode whose id is to be added
      * @throws BadFunctionCallException if you pass a variable that does not inherit from DiaNode
      */
-    public function addDiaNode($node)
+    public function addDiaNode($newNode)
     {
         //ensure that a valid Node child was passed
-        if (is_subclass_of($node, 'DiaNode')  )
+        if (is_subclass_of($newNode, 'DiaNode')  )
         {
             //add it to the list
-            array_push($this->diaNodeList, $node->getId());
+            $node['id'] = $newNode->getId();
+            $node['label'] = $newNode->getLabel();
+            $node['x'] = $newNode->getX();
+            $node['y'] = $newNode->getY();
+            $node['type'] = $newNode->getClass();
+            $node['childDiagramId'] = $newNode->getSubDiagram();
+            
+            array_push($this->diaNodeList, $node);
         }
         else
         {
@@ -412,7 +419,16 @@ abstract class Diagram extends Entity
         $type = $this->storage->getTypeFromUUID($DiaNodeId);
         $subDFDNode = new $type($this->storage, $DiaNodeId);
         $subDFDNode->delete();
-        $loc = array_search($DiaNodeId, $this->diaNodeList);
+        //$loc = array_search($DiaNodeId, $this->diaNodeList);
+        $loc = FALSE;
+        for ($i = 0; $i < count($this->diaNodeList); $i++)
+        {
+            $current = $this->diaNodeList[$i];
+            if( $current['id'] == $DiaNodeId)
+            {
+                $loc = $i;
+            }
+        }
         if ($loc !== FALSE)
         {
 
@@ -638,7 +654,7 @@ abstract class Diagram extends Entity
         // Remove its diaNodes
         foreach ($this->diaNodeList as $diaNode)
         {
-            $this->deleteDiaNode(diaNode);
+            $this->removeDiaNode($diaNode['id']);
         }
 
         // Remove the remaining portions of the DFD from the database.

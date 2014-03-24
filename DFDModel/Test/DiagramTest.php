@@ -113,6 +113,10 @@ class DiagramTest extends PHPUnit_Framework_TestCase
         $this->object->refresh();
         $retrievedLink = $this->object->getLinks()[0];
         $this->assertEquals($df->getId(), $retrievedLink['id']);
+        $this->assertEquals($df->getLabel(), $retrievedLink['label']);
+        $this->assertEquals(get_class($df), $retrievedLink['type']);
+        $this->assertEquals($df->getOriginNode(), $retrievedLink['originNode']);
+        $this->assertEquals($df->getDestinationNode(), $retrievedLink['destinationNode']);
         
     }
     
@@ -235,6 +239,7 @@ class DiagramTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($node->getLabel(), $retrievedNode['label']);
         $this->assertEquals($node->getX(), $retrievedNode['x']);
         $this->assertEquals($node->getY(), $retrievedNode['y']);
+        $this->assertEquals(get_class($node), $retrievedNode['type']);
     }
     
     /**
@@ -317,62 +322,128 @@ class DiagramTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers Diagram::getNumberOfDiaNodes
-     * @todo   Implement testGetNumberOfDiaNodes().
      */
-    public function testGetNumberOfDiaNodes()
+    public function testGetNumberOfDiaNodes_null()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->assertEquals($this->object->getNumberOfDiaNodes(), 0);
+    }
+    
+    /**
+     * @covers Diagram::getNumberOfDiaNodes
+     * @covers Diagram::addDiaNode
+     */
+    public function testGetNumberOfDiaNodes_smoke()
+    {
+        $node = new Multiprocess($this->storage, $this->object->getId());
+        
+        //refresh from the DB
+        $this->object->refresh();
+        $this->assertEquals($this->object->getNumberOfDiaNodes(), 1);
     }
 
     /**
      * @covers Diagram::getDiaNodes
-     * @todo   Implement testGetDiaNodes().
+     * @covers Diagram::addDiaNode
      */
-    public function testGetDiaNodes()
+    public function testGetDiaNodes_empty()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $array = $this->object->getDiaNodes();
+        $this->assertEquals(count($array), 0);
+    }
+    
+    /**
+     * @covers Diagram::getDiaNodes
+     * @covers Diagram::addDiaNode
+     */
+    public function testGetDiaNodes_single()
+    {
+        $node = new Multiprocess($this->storage, $this->object->getId());
+        $this->object->refresh();
+        $retrievedNode = $this->object->getDiaNodes()[0];
+        $this->assertEquals($node->getId(), $retrievedNode['id']);
+        $this->assertEquals($node->getLabel(), $retrievedNode['label']);
+        $this->assertEquals($node->getX(), $retrievedNode['x']);
+        $this->assertEquals($node->getY(), $retrievedNode['y']);
+        $this->assertEquals($node->getSubDiagram(), $retrievedNode['childDiagramId']);
+        $this->assertEquals(get_class($node), $retrievedNode['type']);
+    }
+    
+    /**
+     * @covers Diagram::getDiaNodes
+     * @covers Diagram::addDiaNode
+     */
+    public function testGetDiaNodes_smoke()
+    {
+        for($i = 10; $i > 0; $i--)
+        {
+            $node = new Multiprocess($this->storage, $this->object->getId());
+        }
+        $this->object->refresh();
+        $this->assertEquals(10, count($this->object->getDiaNodes()));
     }
 
     /**
      * @covers Diagram::getDiaNode
-     * @todo   Implement testGetDiaNode().
-     */
-    public function testGetDiaNode()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
-
-    /**
      * @covers Diagram::addDiaNode
-     * @todo   Implement testAddDiaNode().
      */
-    public function testAddDiaNode()
+    public function testGetDiaNode_smoke()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        for($i = 10; $i >= 0; $i--)
+        {
+            $node = new Multiprocess($this->storage, $this->object->getId());
+        }
+        $this->object->refresh();
+        for($i = 10; $i >= 0; $i--)
+        {
+            $this->assertEquals($this->object->getDiaNodes()[$i]['id'], $this->object->getDiaNode($i)['id']);
+            $this->assertEquals($this->object->getDiaNodes()[$i]['label'], $this->object->getDiaNode($i)['label']);
+            $this->assertEquals($this->object->getDiaNodes()[$i]['x'], $this->object->getDiaNode($i)['x']);
+            $this->assertEquals($this->object->getDiaNodes()[$i]['y'], $this->object->getDiaNode($i)['y']);
+            $this->assertEquals($this->object->getDiaNodes()[$i]['type'], $this->object->getDiaNode($i)['type']);
+            $this->assertEquals($this->object->getDiaNodes()[$i]['childDiagramId'], $this->object->getDiaNode($i)['childDiagramId']);
+        }
+    }
+    
+    /**
+     * @covers Diagram::getDiaNode
+     * @expectedException BadFunctionCallException
+     */
+    public function testGetDiaNode_outOfBounds()
+    {
+        $node = $this->object->getDiaNode(0);
     }
 
     /**
      * @covers Diagram::removeDiaNode
-     * @todo   Implement testRemoveDiaNode().
+     * @covers Diagram::addDiaNode
      */
-    public function testRemoveDiaNode()
+    public function testRemoveDiaNode_smoke()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $Node = new Multiprocess($this->storage, $this->object->getId());
+        for($i = 10; $i > 0; $i--)
+        {
+            $someNode = new Multiprocess($this->storage, $this->object->getId());
+        }
+        $this->object->refresh();
+        $this->assertEquals(11, $this->object->getNumberOfDiaNodes());
+        $this->assertTrue($this->object->removeDiaNode($Node->getId()));
+        $this->assertEquals(10, $this->object->getNumberOfDiaNodes());
+    }
+    
+    /**
+     * @covers Diagram::removeDiaNode
+     * @covers Diagram::addDiaNode
+     * @covers Diagram::getNoumberOfDiaNodes
+     * @expectedException BadFunctionCallException
+     */
+    public function testRemoveDiaNode_invalidID()
+    {
+        $Node = new Multiprocess($this->storage, $this->object->getId());
+        $this->object->refresh();
+        $this->assertEquals(1, $this->object->getNumberOfDiaNodes());
+        $this->assertTrue($this->object->removeDiaNode($Node->getId()));
+        $this->assertEquals(0, $this->object->getNumberOfDiaNodes());
+        $this->assertFalse($this->object->removeDiaNode($Node->getId()));
     }
 
     /**
