@@ -204,6 +204,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             // Show the login dialog
             $("#login-dialog").dialog({
                 modal: true,
+                closeOnEscape: false,
                 buttons: {
                     "Login": function () {
                         var onSuccess = function (response) {
@@ -309,44 +310,18 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                 
                 // Load nodes
                 response.getData().nodeList.forEach(function (entry) {
-                    var onSuccess = function (response) {
-                        ElementFactory.loadElement(canvas, response.getData());
-                    };
-                    
-                    var onFail = function (response) {
-                        console.log("Error loading element into DFD. " + response.getError());
-                    };
-                    
-                    Connector.get("Controller.php/" + entry.id, onSuccess, onFail, false);
+                    ElementFactory.loadElement(canvas, entry);
                 });
                 
                 // Load DiaNodes
                 response.getData().DiaNodeList.forEach(function (entry) {
-                    var onSuccess = function (response) {
-                        ElementFactory.loadElement(canvas, response.getData());
-                    };
-                    
-                    var onFail = function (response) {
-                        console.log("Error loading element into DFD. " + response.getError());
-                    };
-                    
-                    Connector.get("Controller.php/" + entry.id, onSuccess, onFail, false);
+                    ElementFactory.loadElement(canvas, entry);
                 });
                 
                 // Load links
                 response.getData().linkList.forEach(function (entry) {
-                    var onSuccess = function (response) {
-                        ElementFactory.loadDataflow(canvas, response.getData());
-                    };
-                    
-                    var onFail = function (response) {
-                        console.log("Error loading element into DFD. " + response.getError());
-                    };
-                    
-                    Connector.get("Controller.php/" + entry.id, onSuccess, onFail);
-                });
-                
-                
+                    ElementFactory.loadDataflow(canvas, entry);
+                }); 
             };
 
             // If GET is not successful
