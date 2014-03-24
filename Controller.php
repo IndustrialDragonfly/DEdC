@@ -166,7 +166,7 @@ set_exception_handler("ExceptionHandler");
             case MethodsEnum::PUT:
                 // If there is an ID attached, then we are being asked to update
                 // an existing element
-                $element;
+                $element = NULL;
                 if (NULL != $request->getId())
                 {
                     // Start by loading then deleting the element
@@ -211,7 +211,7 @@ set_exception_handler("ExceptionHandler");
                     {
 
                         // The only time this should be null is for Diagram types
-                        $parentDia = $elementArray['parent'];
+                        $parentDia = $elementArray['diagramId'];
 
                         // Create a new element using the associative array
                         if ($parentDia == NULL && $elementArray['genericType'] != 'Diagram')
