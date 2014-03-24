@@ -192,11 +192,11 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                         
                         // Create the selectable
                         $("#selectable").selectable();
-                    }
+                    };
                     
                     var onFail = function (response) {
                         console.log("Error getting DataFlowDiagrams. " + response.getError());
-                    }
+                    };
                     Connector.get("Controller.php/DataFlowDiagram", onSuccess, onFail, false);
                 }
             });
@@ -216,10 +216,10 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                             $("#login-dialog").addClass("ui-state-error");
                         };
                         
-                        Connector.setCredentials($("#organization").val(), $("#username").val(), $("#password").val())
+                        Connector.setCredentials($("#organization").val(), $("#username").val(), $("#password").val());
                         Connector.get("Controller.php/DataFlowDiagram", onSuccess, onFail);
-                    },
-                },
+                    }
+                }
             });
 
             // New tab button
