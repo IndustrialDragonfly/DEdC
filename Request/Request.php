@@ -21,19 +21,80 @@ abstract class Request implements Requestable {
      */
     protected $id; 
     protected $resource; // Path to resource
-    protected $query; // Query data from the URL (optional)
     private $uuidTag = "_id"; // Tag that identifies a UUID
     protected $rawData; // Data from the client
     protected $associativeArray; // Data after being processed into default form
-        //<editor-fold desc="Header Attributes" defaultstate="expanded">
-        /**
-         * Array of the acceptable content types according to the client.
-         * @var String Array
-         */
-        protected $accept; 
-        
-        //</editor-fold>
+    
+    /**
+     * Array of the acceptable content types according to the client.
+     * @var String Array
+     */
+    protected $accept;
+    
+    protected $authenticationHandler;
+    
     //</editor-fold>
+    
+    /**
+     * Creates a new request object from data from the HTTP reuest, and puts
+     * it into a convient form for use by the controller.
+     * 
+     * @param String $accept
+     * @param String $method
+     */
+    public function __construct($accept, $method, $uri, $rawData)
+    {
+        // Save method type used to access (from enum)
+        $this->setMethod($method);
+        // Save the acceptable types
+        $delim = ", "; // Delimiter between acceptable content types
+        $this->accept = explode($delim, $accept);
+        
+        // Save the body data
+        $this->setData($rawData);
+        
+        // Decodes the special characters in the URI
+        $decodedUri = urldecode($uri);
+        
+        // Decode the query string from the url
+        $assocArray = parse_url($decodedUri);
+        if ($assocArray['query'] !== NULL)
+        {
+            // Convert queryString to an associative array
+            $queryArray = NULL;
+            parse_str($assocArray['query'], $queryArray);
+            $authType = $queryArray["authType"];
+            
+            // TODO: Pass Controller error information
+            if (is_subclass_of($authType, "AuthenticationHandleable"))
+            {
+                $this->authenticationHandler = new $authType($queryArray);
+            }
+        }
+
+        // Figure out if URI is UUID or resource
+        // If it is a UUID, it should have the uuidTag on it
+        $tagPos = stripos($decodedUri, $this->uuidTag);
+        if (FALSE !== $tagPos)
+        {
+            // Get the position of the beginning of the id
+            $idPos = strrpos($assocArray['path'], "/");
+                        
+            // Get the last / in the URI, and return everything after it
+            $uriId = substr($assocArray['path'], $idPos + 1);
+            $this->setId($uriId);
+            $this->setResource(NULL);
+        }
+        // If it is a resource, e.g. elements
+        else 
+        {
+            $resourcePos = strrpos($assocArray['path'], "/");
+            
+            $resource = substr($assocArray['path'], $resourcePos + 1);
+            $this->setResource($resource);
+            $this->setId(NULL);
+        }
+    }
     
     //<editor-fold desc="Setter functions" defaultstate="collapsed">
     protected function setMethod($method)
@@ -105,41 +166,14 @@ abstract class Request implements Requestable {
     {
         return $this->associativeArray;
     }
-    //</editor-fold>
+    
     /**
-     * Creates a new request object from data from the HTTP reuest, and puts
-     * it into a convient form for use by the controller.
-     * 
-     * @param String $accept
-     * @param String $method
+     * Get the AuthenticationInformation object
+     * @return AuthenticationInformation
      */
-    public function __construct($accept, $method, $uri, $rawData)
+    public function getAuthenticationInfo()
     {
-        // Save method type used to access (from enum)
-        $this->setMethod($method);
-        // Save the acceptable types
-        $delim = ", "; // Delimiter between acceptable content types
-        $this->accept = explode($delim, $accept);
-        
-        // Save the body data
-        $this->setData($rawData);
-        
-        // Figure out if URI is UUID or resource
-        
-        // If it is a UUID, it should have the uuidTag on it
-        if (FALSE !== stripos($uri, $this->uuidTag))
-        {
-            // Get the last / in the URI, and return everything after it
-            $uriId = substr($uri, strrpos($uri, "/") + 1);
-            $this->setId($uriId);
-            $this->setResource(NULL);
-        }
-        // If it is a resource, e.g. elements
-        else 
-        {
-            $resource = substr($uri, strrpos($uri, "/") + 1);
-            $this->setResource($resource);
-            $this->setId(NULL);
-        }
+        return $this->authenticationHandler->getAuthenticationInfo();
     }
+    //</editor-fold>
 }
