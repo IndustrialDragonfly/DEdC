@@ -46,16 +46,17 @@ class DiagramTest extends PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        //$this->object->delete();
+        $this->object->refresh();
+        $this->object->delete();
     }
 
     /**
      * @covers Diagram::getNumberOfLinks
      */
-//    public function testGetNumberOfLinks_empty()
-//    {
-//        $this->assertEquals($this->object->getNumberOfLinks(), 0);
-//    }
+    public function testGetNumberOfLinks_empty()
+    {
+        $this->assertEquals($this->object->getNumberOfLinks(), 0);
+    }
     
     /**
      * @covers Diagram::getNumberOfLinks
@@ -63,14 +64,11 @@ class DiagramTest extends PHPUnit_Framework_TestCase
      */
     public function testGetNumberOfLinks_smoke()
     {
-        //var_dump($this->object);
         $df = new DataFlow($this->storage, $this->object->getId());
-        //$df->save();
         
         //refresh from the DB
-        $this->object = new DataFlowDiagram($this->storage, $this->object->getId());
-        //$this->object->refresh();
-        var_dump($this->object);
+        //$this->object = new DataFlowDiagram($this->storage, $this->object->getId());
+        $this->object->refresh();
         $this->assertEquals($this->object->getNumberOfLinks(), 1);
     }
     
@@ -80,343 +78,363 @@ class DiagramTest extends PHPUnit_Framework_TestCase
      * @covers Diagram::addNode
      * @covers Diagram::getNumberOfNodes
      */
-//    public function testGetNumberOfLinks_othertypes()
-//    {
-//        /*$ds = new DataStore($this->storage, $this->object->getId());
-//        $proc = new Process($this->storage, $this->object->getId());
-//        $df = new DataFlow($this->storage, $this->object->getId());
-//        $df->save();
-//        $ds->save();
-//        $proc->save();
-//        $df->setDestinationNode($ds);
-//        $df->setOriginNode($proc);
-//        $df->update();
-//        $ds->update();
-//        $proc->update();
-//        $this->object->addLink($df);
-//        $this->object->addNode($ds);
-//        $this->object->addNode($proc);
-//        $this->assertEquals($this->object->getNumberOfLinks(), 1);
-//        $this->assertEquals($this->object->getNumberOfNodes(), 2);*/
-//    }
-//
-//    /**
-//     * @covers Diagram::getLinks
-//     */
-//    public function testGetLinks_empty()
-//    {
-//        $array = $this->object->getLinks();
-//        $this->assertEquals(count($array), 0);
-//    }
-//    
-//    /**
-//     * @covers Diagram::getLinks
-//     * @todo   Implement testGetLinks().
-//     */
-//    public function testGetLinks_smoke()
-//    {
-//        //$df = new DataFlow($this->storage, $this->object->getId());
-//        
-//    }
-//
-//    /**
-//     * @covers Diagram::getLink
-//     * @todo   Implement testGetLink().
-//     */
-//    public function testGetLink()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::addLink
-//     * @todo   Implement testAddLink().
-//     */
-//    public function testAddLink()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::removeLink
-//     * @todo   Implement testRemoveLink().
-//     */
-//    public function testRemoveLink()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::getNumberOfNodes
-//     * @todo   Implement testGetNumberOfNodes().
-//     */
-//    public function testGetNumberOfNodes()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::getNodes
-//     * @todo   Implement testGetNodes().
-//     */
-//    public function testGetNodes()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::getNode
-//     * @todo   Implement testGetNode().
-//     */
-//    public function testGetNode()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::addNode
-//     * @todo   Implement testAddNode().
-//     */
-//    public function testAddNode()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::removeNode
-//     * @todo   Implement testRemoveNode().
-//     */
-//    public function testRemoveNode()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::getNumberOfDiaNodes
-//     * @todo   Implement testGetNumberOfDiaNodes().
-//     */
-//    public function testGetNumberOfDiaNodes()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::getDiaNodes
-//     * @todo   Implement testGetDiaNodes().
-//     */
-//    public function testGetDiaNodes()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::getDiaNode
-//     * @todo   Implement testGetDiaNode().
-//     */
-//    public function testGetDiaNode()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::addDiaNode
-//     * @todo   Implement testAddDiaNode().
-//     */
-//    public function testAddDiaNode()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::removeDiaNode
-//     * @todo   Implement testRemoveDiaNode().
-//     */
-//    public function testRemoveDiaNode()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::getNumberOfAncestors
-//     * @todo   Implement testGetNumberOfAncestors().
-//     */
-//    public function testGetNumberOfAncestors()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::getParent
-//     * @todo   Implement testGetParent().
-//     */
-//    public function testGetParent()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::getEldestParent
-//     * @todo   Implement testGetEldestParent().
-//     */
-//    public function testGetEldestParent()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::getNthAncestor
-//     * @todo   Implement testGetNthAncestor().
-//     */
-//    public function testGetNthAncestor()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::getAncestry
-//     * @todo   Implement testGetAncestry().
-//     */
-//    public function testGetAncestry()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::getParentDiaNode
-//     * @todo   Implement testGetParentDiaNode().
-//     */
-//    public function testGetParentDiaNode()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::setParentDiaNode
-//     * @todo   Implement testSetParentDiaNode().
-//     */
-//    public function testSetParentDiaNode()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::getAssociativeArray
-//     * @todo   Implement testGetAssociativeArray().
-//     */
-//    public function testGetAssociativeArray()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::loadAssociativeArray
-//     * @todo   Implement testLoadAssociativeArray().
-//     */
-//    public function testLoadAssociativeArray()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::save
-//     * @todo   Implement testSave().
-//     */
-//    public function testSave()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::update
-//     * @todo   Implement testUpdate().
-//     */
-//    public function testUpdate()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Diagram::delete
-//     * @todo   Implement testDelete().
-//     */
-//    public function testDelete()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//                'This test has not been implemented yet.'
-//        );
-//    }
+    public function testGetNumberOfLinks_othertypes()
+    {
+        $ds = new DataStore($this->storage, $this->object->getId());
+        $proc = new Process($this->storage, $this->object->getId());
+        $df = new DataFlow($this->storage, $this->object->getId());
+        $df->setDestinationNode($ds);
+        $df->setOriginNode($proc);
+        $df->update();
+        $ds->update();
+        $proc->update();
+        $this->object->refresh();
+        $this->assertEquals($this->object->getNumberOfLinks(), 1);
+        $this->assertEquals($this->object->getNumberOfNodes(), 2);
+    }
+
+    /**
+     * @covers Diagram::getLinks
+     * @covers Diagram::addLink
+     */
+    public function testGetLinks_empty()
+    {
+        $array = $this->object->getLinks();
+        $this->assertEquals(count($array), 0);
+    }
+    
+    /**
+     * @covers Diagram::getLinks
+     * @covers Diagram::addLink
+     */
+    public function testGetLinks_singlesmoke()
+    {
+        $df = new DataFlow($this->storage, $this->object->getId());
+        $this->object->refresh();
+        $retrievedLink = $this->object->getLinks()[0];
+        $this->assertEquals($df->getId(), $retrievedLink['id']);
+        
+    }
+    
+    /**
+     * @covers Diagram::getLinks
+     * @covers Diagram::addLink
+     */
+    public function testGetLinks_smoke()
+    {
+        for($i = 10; $i > 0; $i--)
+        {
+            $df = new DataFlow($this->storage, $this->object->getId());
+        }
+        $this->object->refresh();
+        $this->assertEquals(10, count($this->object->getLinks()));
+        
+    }
+
+    /**
+     * @covers Diagram::getLink
+     */
+    public function testGetLink_smoke()
+    {
+        for($i = 10; $i >= 0; $i--)
+        {
+            $df = new DataFlow($this->storage, $this->object->getId());
+        }
+        $this->object->refresh();
+        for($i = 10; $i >= 0; $i--)
+        {
+            $this->assertEquals($this->object->getLinks()[$i]['id'], $this->object->getLink($i)['id']);
+        }
+    }
+    
+    /**
+     * @covers Diagram::getLink
+     * @expectedException BadFunctionCallException
+     */
+    public function testGetLink_outOfBounds()
+    {
+        $df = $this->object->getLink(0);
+    }
+
+    /**
+     * @covers Diagram::removeLink
+     * @todo   Implement testRemoveLink().
+     */
+    public function testRemoveLink_smoke()
+    {
+        $df = new DataFlow($this->storage, $this->object->getId());
+        for($i = 10; $i > 0; $i--)
+        {
+            $someDF = new DataFlow($this->storage, $this->object->getId());
+        }
+        $this->object->refresh();
+        $this->assertEquals(11, $this->object->getNumberOfLinks());
+        $this->assertTrue($this->object->removeLink($df->getId()));
+        $this->assertEquals(10, $this->object->getNumberOfLinks());
+    }
+
+    /**
+     * @covers Diagram::getNumberOfNodes
+     * @todo   Implement testGetNumberOfNodes().
+     */
+    public function testGetNumberOfNodes()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::getNodes
+     * @todo   Implement testGetNodes().
+     */
+    public function testGetNodes()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::getNode
+     * @todo   Implement testGetNode().
+     */
+    public function testGetNode()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::addNode
+     * @todo   Implement testAddNode().
+     */
+    public function testAddNode()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::removeNode
+     * @todo   Implement testRemoveNode().
+     */
+    public function testRemoveNode()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::getNumberOfDiaNodes
+     * @todo   Implement testGetNumberOfDiaNodes().
+     */
+    public function testGetNumberOfDiaNodes()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::getDiaNodes
+     * @todo   Implement testGetDiaNodes().
+     */
+    public function testGetDiaNodes()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::getDiaNode
+     * @todo   Implement testGetDiaNode().
+     */
+    public function testGetDiaNode()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::addDiaNode
+     * @todo   Implement testAddDiaNode().
+     */
+    public function testAddDiaNode()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::removeDiaNode
+     * @todo   Implement testRemoveDiaNode().
+     */
+    public function testRemoveDiaNode()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::getNumberOfAncestors
+     * @todo   Implement testGetNumberOfAncestors().
+     */
+    public function testGetNumberOfAncestors()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::getParent
+     * @todo   Implement testGetParent().
+     */
+    public function testGetParent()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::getEldestParent
+     * @todo   Implement testGetEldestParent().
+     */
+    public function testGetEldestParent()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::getNthAncestor
+     * @todo   Implement testGetNthAncestor().
+     */
+    public function testGetNthAncestor()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::getAncestry
+     * @todo   Implement testGetAncestry().
+     */
+    public function testGetAncestry()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::getParentDiaNode
+     * @todo   Implement testGetParentDiaNode().
+     */
+    public function testGetParentDiaNode()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::setParentDiaNode
+     * @todo   Implement testSetParentDiaNode().
+     */
+    public function testSetParentDiaNode()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::getAssociativeArray
+     * @todo   Implement testGetAssociativeArray().
+     */
+    public function testGetAssociativeArray()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::loadAssociativeArray
+     * @todo   Implement testLoadAssociativeArray().
+     */
+    public function testLoadAssociativeArray()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::save
+     * @todo   Implement testSave().
+     */
+    public function testSave()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::update
+     * @todo   Implement testUpdate().
+     */
+    public function testUpdate()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
+
+    /**
+     * @covers Diagram::delete
+     * @todo   Implement testDelete().
+     */
+    public function testDelete()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
 
 }

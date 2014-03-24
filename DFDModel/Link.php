@@ -78,14 +78,6 @@ abstract class Link extends Element
                     $this->originNode = NULL;
                     $this->destinationNode = NULL;
                     $this->save();
-                    //var_dump($this);
-                    //add this new Link to the Diagram's list of links
-                    //$theDiagram = new $type($this->storage, func_get_arg(1));
-                    //$theDiagram->addLink($this);
-                    //$theDiagram->setLabel("i did get modified");
-                    //TODO - vardump need to be removed
-                    //var_dump($theDiagram);
-                    //$theDiagram->update();
                 }
                 else
                 {

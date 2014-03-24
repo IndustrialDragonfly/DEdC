@@ -543,7 +543,6 @@ abstract class Diagram extends Entity
      */
     public function loadAssociativeArray($associativeArray)
     {
-        // TODO - error handling for missing elements/invalid elements
         // Potentially this section could be rewritten using a foreach loop
         // on the array and reflection on the current node to determine
         // what it should store locally
