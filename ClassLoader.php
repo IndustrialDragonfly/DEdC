@@ -50,9 +50,11 @@ function __autoload($classname)
     {
         require_once "UserModel/AuthenticationModules/" . $classname . ".php";
     }
-    elseif (file_exists("UserModel/AuthenticationInformation/" . $classname . ".php"))
+    
+    // Auth Info
+    elseif (file_exists("AuthenticationInformation/" . $classname . ".php"))
     {
-        require_once "UserModel/AuthenticationInformation/" . $classname . ".php";
+        require_once "AuthenticationInformation/" . $classname . ".php";
     }
     
     else
