@@ -14,16 +14,22 @@ require_once 'Storage/DatabaseStorage.php';
  */
 class DataStoreTest extends PHPUnit_Framework_TestCase
 {
-
     /**
-     * @var DataStore
+     * @var Node
      */
     protected $object;
 
     /**
-     * @var PDO
+     *
+     * @var DatabaseStorage
      */
-    protected $pdo;
+    protected $storage;
+    
+    /**
+     *
+     * @var DataFlowDiagram
+     */
+    protected $testDiagram;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -31,13 +37,16 @@ class DataStoreTest extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->storage = new DatabaseStorage();
-        $this->object = new DataStore($this->storage);
-
-        if ($this->pdo == null)
+        if ($this->storage == null)
         {
-            $this->pdo = testDB_functions::getConnection();
+            $this->storage = new DatabaseStorage();
         }
+        
+        $this->testDiagram = new DataFlowDiagram($this->storage);
+        $this->testDiagram->save();
+        $this->object = new DataStore($this->storage, $this->testDiagram->getId());
+        //$this->testDiagram->addNode($this->object);
+        $this->object->save();
     }
 
     /**
@@ -46,7 +55,8 @@ class DataStoreTest extends PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        testDB_functions::resetDB($this->pdo);
+        //clear the DB
+        $this->testDiagram->delete();
     }
 
     /**
@@ -57,92 +67,5 @@ class DataStoreTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->object->getId() != NULL);
     }
 
-    /**
-     * @covers Process::save
-     */
-    public function testSave_smoke()
-    {
-        $this->object->setLabel('name');
-        $this->object->setOriginator('Josh');
-        $this->object->setLocation(50, 60);
-        $this->object->save();
-
-        $df1 = new DataFlow($this->storage);
-        $df1->setDestinationNode($this->object);
-        $df1->save();
-
-        $df2 = new DataFlow($this->storage);
-        $df2->setOriginNode($this->object);
-        $df2->save();
-
-        $row = $this->pdo->query("SELECT * FROM entity WHERE id = '" . $this->object->getId() . "'")->fetch();
-        $this->assertEquals($this->object->getId(), $row['id']);
-        $this->assertEquals($this->object->getLabel(), $row['label']);
-        $this->assertEquals($this->object->getOriginator(), $row['originator']);
-        $this->assertEquals(get_class($this->object), $row['type']);
-
-        $row = $this->pdo->query("SELECT * FROM element WHERE id = '" . $this->object->getId() . "'")->fetch();
-        $this->assertEquals($this->object->getX(), $row['x']);
-        $this->assertEquals($this->object->getY(), $row['y']);
-
-        $rows = $this->pdo->query("SELECT * FROM node WHERE id = '" . $this->object->getId() . "'");
-        for ($i = 0; $i < $this->object->getNumberOfLinks(); $i++)
-        {
-            $row = $rows->fetch();
-            $this->assertEquals($this->object->getLinkbyPosition($i), $row['df_id']);
-        }
-    }
     
-    /**
-     * @covers __construct (loading)
-     */
-    public function testLoad_smoke()
-        {
-            // Items to store in DB and then compare too
-            $id = 'a';
-            $label = 'testlabel';
-            $originator = 'The Eugene';
-            $x = 2;
-            $y = 6;
-            // No links included for the time being as link loading not yet supported
-            // in process only when loading DFD...
-            // Manually insert values into the database
-            //<editor-fold desc="save to Entity table" defaultstate="collapsed">
-            // Prepare the statement
-            $insert_stmt = $this->pdo->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
-
-            // Bind the parameters of the prepared statement
-            $type = Types::DataStore;
-            $insert_stmt->bindParam(1, $id);
-            $insert_stmt->bindParam(2, $label);
-            $insert_stmt->bindParam(3, $type);
-            $insert_stmt->bindParam(4, $originator);
-
-            // Execute, catch any errors resulting
-            $insert_stmt->execute();
-            //</editor-fold>
-            //<editor-fold desc="save to Element table" defaultstate="collapsed">
-            // Prepare the statement
-            $insert_stmt = $this->pdo->prepare("INSERT INTO element (id, x, y) VALUES(?,?,?)");
-
-            // Bind the parameters of the prepared statement
-            $insert_stmt->bindParam(1, $id);
-            $insert_stmt->bindParam(2, $x);
-            $insert_stmt->bindParam(3, $y);
-
-            // Execute, catch any errors resulting
-            $insert_stmt->execute();
-            //</editor-fold>
-
-            // Setup storage object for process object to use
-            $dfd = new DataFlowDiagram();
-
-            // Make comparisons
-            $proc = new DataStore($this->storage, $id, $dfd);
-            $this->assertEquals($id, $proc->getId());
-            $this->assertEquals($label, $proc->getLabel());
-            $this->assertEquals($originator, $proc->getOriginator());
-            $this->assertEquals($x, $proc->getX());
-            $this->assertEquals($y, $proc->getY());
-        }
 }

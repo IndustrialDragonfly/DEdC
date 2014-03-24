@@ -12,16 +12,21 @@ require_once 'testDB_functions.php';
  */
 class DataFlowTest extends PHPUnit_Framework_TestCase
 {
-
     /**
      * @var DataFlow
      */
     protected $object;
 
     /**
-     * @var PDO
+     *
+     * @var DatabaseStorage
      */
-    protected $pdo;
+    protected $storage;
+    /**
+     *
+     * @var DataFlowDiagram
+     */
+    protected $testDiagram;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -29,13 +34,16 @@ class DataFlowTest extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        if ($this->pdo == null)
+        if ($this->storage == null)
         {
-            $this->pdo = testDB_functions::getConnection();
+            $this->storage = new DatabaseStorage();
         }
         
-        $this->storage = new DatabaseStorage();
-        $this->object = new DataFlow($this->storage);
+        $this->testDiagram = new DataFlowDiagram($this->storage);
+        $this->testDiagram->save();
+        $this->object = new DataFlow($this->storage, $this->testDiagram->getId());
+        //$this->testDiagram->addNode($this->object);
+        $this->object->save();
     }
 
     /**
@@ -44,305 +52,16 @@ class DataFlowTest extends PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        testDB_functions::resetDB($this->pdo);
+        //clear the DB
+        $this->testDiagram->delete();
     }
-
+    
     /**
-     * @covers DataFlow::getOriginNode
+     * @covers DataStore::__construct
      */
-    public function testGetOriginNode_null()
+    public function testDidIBuild()
     {
-        $this->assertNull($this->object->getOriginNode());
+        $this->assertTrue($this->object->getId() != NULL);
     }
 
-    /**
-     * @covers DataFlow::getOriginNode
-     * @covers DataFlow::setOriginNode
-     */
-    public function testGetOriginNodeSetOriginNode_smoke()
-    {
-        $aNode = new Process($this->storage);
-        $this->object->setOriginNode($aNode);
-        $this->assertEquals($aNode->getId(), $this->object->getOriginNode());
-        $this->assertEquals($this->object->getId(), $aNode->getLinkbyId($this->object->getId()));
-    }
-
-    /**
-     * @covers DataFlow::setOriginNode
-     * @expectedException BadFunctionCallException
-     */
-    public function testSetOriginNode_null()
-    {
-        $this->object->setOriginNode(null);
-    }
-
-    /**
-     * @covers DataFlow::setOriginNode
-     * @expectedException BadFunctionCallException
-     */
-    public function testSetOriginNode_invalidInput()
-    {
-        $aDF = new DataFlow($this->storage);
-        $this->object->setOriginNode($aDF);
-    }
-
-    /**
-     * @covers DataFlow::clearOriginNode.
-     */
-    public function testClearOriginNode_null()
-    {
-        $this->assertNull($this->object->getOriginNode());
-        $this->object->clearOriginNode();
-        $this->assertNull($this->object->getOriginNode());
-    }
-
-    /**
-     * @covers DataFlow::clearOriginNode.
-     */
-    public function testClearOriginNode_smoke()
-    {
-        $this->assertNull($this->object->getOriginNode());
-        $aNode = new Process($this->storage);
-        $aNodeId = $aNode->getId();
-        $aNode->save();
-        
-        $this->object->setOriginNode($aNode);
-        $this->assertEquals($this->object->getId(), $aNode->getLinkbyId($this->object->getId()));
-                
-        $this->object->clearOriginNode();
-        
-        // Having done updates, need to refresh $aNode
-        $aNode = new Process($this->storage, $aNodeId);
-        
-        $this->assertNull($this->object->getOriginNode());
-        $this->assertNull($aNode->getLinkbyId($this->object->getId()));
-    }
-
-    /**
-     * @covers DataFlow::getDestinationNode
-     */
-    public function testGetDestinationNode_null()
-    {
-        $this->assertNull($this->object->getDestinationNode());
-    }
-
-    /**
-     * @covers DataFlow::getDestinationNode
-     * @covers DataFlow::setDestinationNode
-     */
-    public function testGetDestinationNodeSetDestinationNode_smoke()
-    {
-        $aNode = new Process($this->storage);
-        $this->object->setDestinationNode($aNode);
-        $this->assertEquals($aNode->getId(), $this->object->getDestinationNode());
-        $this->assertEquals($this->object->getId(), $aNode->getLinkbyId($this->object->getId()));
-    }
-
-    /**
-     * @covers DataFlow::setDestinationNode
-     * @expectedException BadFunctionCallException
-     */
-    public function testSetDestinationNode_null()
-    {
-        $this->object->setDestinationNode(null);
-    }
-
-    /**
-     * @covers DataFlow::setDestinationNode
-     * @expectedException BadFunctionCallException
-     */
-    public function testSetDestinationNode_invalidInput()
-    {
-        $aDF = new DataFlow($this->storage);
-        $this->object->setDestinationNode($aDF);
-    }
-
-    /**
-     * @covers DataFlow::clearDestinationNode.
-     */
-    public function testClearDestinationNode_null()
-    {
-        $this->assertNull($this->object->getDestinationNode());
-        $this->object->clearDestinationNode();
-        $this->assertNull($this->object->getDestinationNode());
-    }
-
-    /**
-     * @covers DataFlow::clearDestinationNode.
-     */
-    public function testClearDestinationNode_smoke()
-    {
-        $this->assertNull($this->object->getDestinationNode());
-        $aNode = new Process($this->storage);
-        $aNodeId = $aNode->getId();
-        $aNode->save();
-        
-        $this->object->setDestinationNode($aNode);
-        $this->assertEquals($this->object->getId(), $aNode->getLinkbyId($this->object->getId()));
-        
-        $this->object->clearDestinationNode();
-        
-        // Need to refresh $aNode object
-        $aNode = new Process($this->storage, $aNodeId);
-        
-        $this->assertNull($this->object->getDestinationNode());
-        $this->assertNull($aNode->getLinkbyId($this->object->getId()));
-    }
-
-    /**
-     * @covers DataFlow::removeAllLinks
-     */
-    public function testRemoveAllLinks_null()
-    {
-        $this->object->removeAllNodes();
-        $this->assertNull($this->object->getOriginNode());
-        $this->assertNull($this->object->getDestinationNode());
-    }
-
-    /**
-     * @covers DataFlow::removeAllLinks
-     */
-    public function testRemoveAllLinks_smoke()
-    {
-        // Require that process is saved or else removeAll doesn't work - 
-        // which is fair since only one element can be worked on at a time
-        // under our paradigm, still it might be good to have checks if
-        // an object is saved before attempting to delete it.
-        $node1 = new Process($this->storage);
-        $node1Id = $node1->getId();
-        $node1->save();
-        
-        $node2 = new Process($this->storage);
-        $node2Id = $node2->getId();
-        $node2->save();
-        
-        $this->object->setOriginNode($node1);
-        $this->object->setDestinationNode($node2);
-                
-        $this->object->removeAllNodes();
-        
-        // Need to refresh node objects
-        $node1 = new Process($this->storage, $node2Id);
-        $node2 = new Process($this->storage, $node2Id);
-        
-        $this->assertNull($this->object->getOriginNode());
-        $this->assertNull($this->object->getDestinationNode());
-        $this->assertNull($node1->getLinkbyId($this->object->getId()));
-        $this->assertNull($node2->getLinkbyId($this->object->getId()));
-    }
-
-    /**
-     * @covers DataFlow::save
-     */
-    public function testSave_smoke()
-    {
-        $node = new Process($this->storage);
-        $node->setLabel('someNode');
-        $node->setLocation(20, 20);
-        $node->setOriginator('Josh');
-        $node->save();
-        
-        $node2 = new Process($this->storage);
-        $node2->setLabel('someNode2');
-        $node2->setLocation(30, 20);
-        $node2->setOriginator('The Eugene');
-        $node2->save();
-        
-        $this->object->setLabel('name');
-        $this->object->setOriginator('Josh');
-        $this->object->setLocation(50, 50);
-        $this->object->setOriginNode($node);
-        $this->object->setDestinationNode($node2);
-
-        $this->object->save();
-
-        //check that the DF stored correctly
-        $row = $this->pdo->query("SELECT * FROM entity WHERE id = '" . $this->object->getId() . "'")->fetch();
-        $this->assertEquals($this->object->getId(), $row['id']);
-        $this->assertEquals($this->object->getLabel(), $row['label']);
-        $this->assertEquals($this->object->getOriginator(), $row['originator']);
-        $this->assertEquals(get_class($this->object), $row['type']);
-
-        $row = $this->pdo->query("SELECT * FROM element WHERE id = '" . $this->object->getId() . "'")->fetch();
-        $this->assertEquals($this->object->getX(), $row['x']);
-        $this->assertEquals($this->object->getY(), $row['y']);
-
-        $row = $this->pdo->query("SELECT * FROM link WHERE id = '" . $this->object->getId() . "'")->fetch();
-        $this->assertEquals($this->object->getOriginNode(), $row['originNode']);
-        $this->assertEquals($this->object->getDestinationNode(), $row['destinationNode']);
-    }
-
-    public function testLoad_smoke()
-    {
-        // Setup a node to use for the test and store it
-        $node = new Process($this->storage);
-        $node->setLabel('someNode');
-        $node->setLocation(20, 20);
-        $node->setOriginator('Josh');
-        $node->save($this->storage);
-        
-        // Setup a second node to test with
-        $node2 = new DataStore($this->storage);
-        $node2->setLabel('some Other Node');
-        $node2->setLabel(1, 12);
-        $node2->setOriginator('The Eugene');
-        $node2->save($this->storage);
-        
-        // Variables to insert and compare to
-        $resource = 'theawesomenode';
-        $label ='something';
-        $type = 'DataFlow';
-        $originator = 'The Eugene';
-        $x = 3;
-        $y = 4;
-                
-        //<editor-fold desc="save to Entity table" defaultstate="collapsed">
-        // Prepare the statement
-        $insert_stmt = $this->pdo->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
-
-        // Bind the parameters of the prepared statement
-        $insert_stmt->bindParam(1, $resource);
-        $insert_stmt->bindParam(2, $label);
-        $insert_stmt->bindParam(3, $type);
-        $insert_stmt->bindParam(4, $originator);
-
-        // Execute, catch any errors resulting
-        $insert_stmt->execute();
-        //</editor-fold>
-        //<editor-fold desc="save to Element table" defaultstate="collapsed">
-        // Prepare the statement
-        $insert_stmt = $this->pdo->prepare("INSERT INTO element (id, x, y) VALUES(?,?,?)");
-
-        // Bind the parameters of the prepared statement
-        $insert_stmt->bindParam(1, $resource);
-        $insert_stmt->bindParam(2, $x);
-        $insert_stmt->bindParam(3, $y);
-
-        // Execute, catch any errors resulting
-        $insert_stmt->execute();
-        //</editor-fold>
-        //<editor-fold desc="save to Links table" defaultstate="collapsed">
-        $insert_stmt = $this->pdo->prepare('INSERT INTO link (id, originNode, destinationNode) VALUES(?,?,?)');
-        // Bind the parameters of the prepared statement
-        $insert_stmt->bindParam(1, $resource);
-        $insert_stmt->bindParam(2, $node->getId());
-        $insert_stmt->bindParam(3, $node2->getId());
-        // Execute, catch any errors resulting
-        $insert_stmt->execute();
-        //</editor-fold>
-         
-        $dfd = new DataFlowDiagram();
-        $dfd->addElement($node);
-        $dfd->addElement($node2);
-        $dataflow = new DataFlow($this->storage, $resource);
-        
-        $this->assertEquals($resource, $dataflow->getId());
-        $this->assertEquals($label, $dataflow->getLabel());
-        $this->assertEquals($type, get_class($dataflow));
-        $this->assertEquals($originator, $dataflow->getOriginator());
-        $this->assertEquals($x, $dataflow->getX());
-        $this->assertEquals($y, $dataflow->getY());
-        $this->assertEquals($node->getId(), $dataflow->getOriginNode());
-        $this->assertEquals($node2->getId(), $dataflow->getDestinationNode());
-    }
 }
