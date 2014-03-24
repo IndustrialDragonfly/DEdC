@@ -111,11 +111,15 @@ abstract class Diagram extends Entity
                     $this->parentDiaNode = func_get_arg(1);
                     
                     //to set the ancestry load the parent Diagram and then set this object's ancestry equal to it then add the parent Diagram to it
-                    $type = $this->storage->getTypeFromUUID($this->diaNode);
-                    $parentDiaNode = new $type(func_get_arg(0), $this->diaNode);
+                    //load the parent DiaNode
+                    $type = $this->storage->getTypeFromUUID($this->parentDiaNode);
+                    $parentDiaNode = new $type(func_get_arg(0), $this->parentDiaNode);
+                    //get the id of parent Diagram of the parentDiaNode
                     $parentDiagramId = $parentDiaNode->getParent();
+                    //load the parentDiagram
                     $type = $this->storage->getTypeFromUUID($parentDiagramId);
                     $parentDiagram = new $type(func_get_arg(0), $parentDiagramId);
+                    //set this Diagram's ancestry to the parentDiagrams, then add it to the list
                     $this->ancestry = $parentDiagram->getAncestry();
                     array_push($this->ancestry, $parentDiagram->getId()); 
                 }

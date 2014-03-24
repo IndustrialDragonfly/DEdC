@@ -259,16 +259,22 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * For a given id that is of type diaNode, return what dfd it maps to
      * @param String $id
      * @return String
+     * TODO - this can probably be done with load database accesses but i couldnt determine what the correct join was
      */
     public function loadDiaNode($id)
     {
-         $select_statement = $this->dbh->prepare("SELECT childDiagramId FROM dianode WHERE diaNodeId=?");
-         $select_statement->bindParam(1, $id);
-         $select_statement->execute();
-         $diagramId = $select_statement->fetch();
+        //load all of the node attributes
+        $node_vars = $this->loadNode($id);
+        
+        //get the childDiagramId
+        $select_statement = $this->dbh->prepare("SELECT childDiagramId FROM dianode WHERE diaNodeId=?");
+        $select_statement->bindParam(1, $id);
+        $select_statement->execute();
+        $diagramId = $select_statement->fetch();
          
-         // Return the id from the associative array
-         return $diagramId['childDiagramId'];
+        // append the child id to the associative array of attributes
+        $node_vars['childDiagramId'] = $diagramId['childDiagramId'];
+        return $node_vars;
     }
     
     /**
@@ -641,7 +647,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       {
           $insert_stmt->bindParam(1, $ancestry[$i]);
           $insert_stmt->bindParam(2, $id);
-          $insert_stmt>-bindParam(3, $i);
+          $insert_stmt->bindParam(3, $i);
           
           $insert_stmt->execute();
       }
