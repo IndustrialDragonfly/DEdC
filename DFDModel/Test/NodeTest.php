@@ -37,7 +37,8 @@ class NodeTest extends PHPUnit_Framework_TestCase
         $this->testDiagram->save();
         $this->object = new Process($this->storage, $this->testDiagram->getId());
         //$this->testDiagram->addNode($this->object);
-        $this->object->save();
+        //$this->object->save();
+        $this->testDiagram->refresh();
         
     }
 
@@ -48,6 +49,7 @@ class NodeTest extends PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         //clear the DB
+        $this->testDiagram->refresh();
         $this->testDiagram->delete();
     }
 
@@ -111,10 +113,10 @@ class NodeTest extends PHPUnit_Framework_TestCase
         $someDF = new DataFlow($this->storage, $this->testDiagram->getId());
         //$this->object->addLink($someDF);
         $someDF->setDestinationNode($this->object);
-        $someDF->save();
+        //$someDF->save();
         $aDF = new DataFlow($this->storage, $this->testDiagram->getId());
         $aDF->setOriginNode($this->object);
-        $aDF->save();
+        //$aDF->save();
         $this->object->update();
         $this->assertEquals(2, $this->object->getNumberOfLinks());
         // Only Links can break a linkage
@@ -171,7 +173,7 @@ class NodeTest extends PHPUnit_Framework_TestCase
     {
         $aDF = new DataFlow($this->storage, $this->testDiagram->getId());
         $aDF->setOriginNode($this->object);
-        $aDF->save();
+        //$aDF->save();
         $retrievedDF = $this->object->getLinkbyId($aDF->getId());
         $this->assertEquals($aDF->getId(), $retrievedDF['id']);
     }
@@ -213,11 +215,11 @@ class NodeTest extends PHPUnit_Framework_TestCase
         {
             $annotherDF = new DataFlow($this->storage, $this->testDiagram->getId());
             $annotherDF->setOriginNode($this->object);
-            $annotherDF->save();
+            $annotherDF->update();
         }
         $this->assertEquals(10, $this->object->getNumberOfLinks());
         $this->object->removeAllLinks();
-        $this->object->update();
+        //$this->object->update();
 //      $this->assertEquals(0, $this->object->getNumberOfLinks()); 
         // Check refreshed node for correct number of links
         $node_id = $this->object->getId();

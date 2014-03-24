@@ -68,9 +68,9 @@ class DiagramTest extends PHPUnit_Framework_TestCase
         //$df->save();
         
         //refresh from the DB
-        //$this->object = new DataFlowDiagram($this->storage, $this->object->getId());
-        $this->object->refresh();
-        //var_dump($this->object);
+        $this->object = new DataFlowDiagram($this->storage, $this->object->getId());
+        //$this->object->refresh();
+        var_dump($this->object);
         $this->assertEquals($this->object->getNumberOfLinks(), 1);
     }
     

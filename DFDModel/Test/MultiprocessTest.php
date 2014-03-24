@@ -45,7 +45,7 @@ class MultiprocessTest extends PHPUnit_Framework_TestCase
         $this->testDiagram->save();
         $this->object = new Multiprocess($this->storage, $this->testDiagram->getId());
         //$this->testDiagram->addNode($this->object);
-        $this->object->save();
+        //$this->object->save();
     }
 
     /**

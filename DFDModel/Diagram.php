@@ -196,8 +196,6 @@ abstract class Diagram extends Entity
             $link['id'] = $newLink->getId();
             $link['label'] = $newLink->getLabel();
             array_push($this->linkList, $link);
-            //TODO - remove this vardump
-            var_dump($this->linkList);
         }
         else
         {
@@ -558,6 +556,7 @@ abstract class Diagram extends Entity
         {
             $this->nodeList = Array();
         }
+        
         if(isset($associativeArray['linkList']))
         {
             $this->linkList = $associativeArray['linkList'];
@@ -566,6 +565,7 @@ abstract class Diagram extends Entity
         {
             $this->linkList = Array();
         }
+        
         if(isset($associativeArray['DiaNodeList']))
         {
             $this->diaNodeList = $associativeArray['DiaNodeList'];
@@ -574,6 +574,7 @@ abstract class Diagram extends Entity
         {
             $this->diaNodeList = Array();
         }
+        
         if(isset($associativeArray['diaNode']))
         {
             $this->parentDiaNode = $associativeArray['diaNode'];
@@ -582,6 +583,7 @@ abstract class Diagram extends Entity
         {
             $this->parentDiaNode = null;
         }
+        
         if(isset($associativeArray['ancestry']))
         {
             $this->ancestry = $associativeArray['ancestry'];

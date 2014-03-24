@@ -73,9 +73,9 @@ abstract class Node extends Element
                     $this->linkList = array();
                     $this->save();
                     //add this node to the parent diagram's node list
-                    $theDiagram = new $type($this->storage, func_get_arg(1));
-                    $theDiagram->addNode($this);
-                    $theDiagram->update();
+                    //$theDiagram = new $type($this->storage, func_get_arg(1));
+                    //$theDiagram->addNode($this);
+                    //$theDiagram->update();
                 }
                 //the second parameter did not decend from a Node or a Diagram object
                 else

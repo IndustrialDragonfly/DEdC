@@ -575,12 +575,10 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          // Get the links list from the database
          // This is performed by joining the relevant tables
          $loadDiagram = $this->dbh->prepare("
-             SELECT id, label, type, originNode, destinationNode 
-                FROM link id 
-                        JOIN element_list elementId ON id=elementId
-                        NATURAL JOIN entity
-                        NATURAL JOIN element
-                        NATURAL JOIN link
+             SELECT id, label, type, originNode, destinationNode  
+                FROM entity id 
+                        JOIN element_list elementId ON id=elementId 
+                        NATURAL JOIN link 
                 WHERE diagramId=?;
                 ");
          $loadDiagram->bindParam(1, $id);
