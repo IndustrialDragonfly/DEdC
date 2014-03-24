@@ -33,7 +33,7 @@ class DiaNode extends Node
             if (is_string(func_get_arg(1)))
             {
                 //the second parameter is an id
-                //check to see if the second parameter is an id of a Diagram or a DiaNode
+                //check to see if the second parameter is a DiaNode
                 $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
                 if (is_subclass_of($type, "DiaNode"))
                 {
@@ -51,9 +51,10 @@ class DiaNode extends Node
                     $assocativeArray = $this->storage->loadDiaNode($this->id);
                     $this->loadAssociativeArray($assocativeArray);
                 }
+                //otherwise just send it up the constructor stack
                 else
                 {
-                    throw new BadConstructorCallException("Passed ID was for neither a Node nor a Diagram.");
+                    parent::__construct(func_get_arg(0), func_get_arg(1));
                 }
             }
             else if (is_array(func_get_arg(1)))
@@ -75,28 +76,30 @@ class DiaNode extends Node
     //</editor-fold>
     //<editor-fold desc="Accessor functions" defaultstate="collapsed">
     /**
-     *
-     * @return DataFlowDiagram
+     * This function returns the ID of the Diagram contained within this DiaNode
+     * @return String
      */
-    public function getSubDFD()
+    public function getSubDiagram()
     {
         return $this->subDiagram;
     }
 
     /**
-     *
-     * @param DataFlowDiagram $aDiagram a new DFD to set the sub DFD to
-     * @throws BadFunctionCallException if the input is not a DFD
+     *  This function chages the ID of the Diagram contained within this DiaNode
+     * @param String $aDiagramID The id of the Diagram to be placed within this DiaNode
+     * @throws BadFunctionCallException if the input is not a Diagram's ID
      */
-    public function setSubDFD($aDiagram)
+    public function setSubDiagram($aDiagramID)
     {
-        if ($aDiagram instanceof DataFlowDiagram)
+        //TODO - is this check needed? this will require a DB access to function
+        $type = $this->storage->getTypeFromUUID($aDiagramID);
+        if (is_subclass_of($type, "Diagram"))
         {
-            $this->subDiagram = $aDiagram;
+            $this->subDiagram = $aDiagramID;
         }
         else
         {
-            throw new BadFunctionCallException("input parameter was not a DataFlowDiagram");
+            throw new BadFunctionCallException("input parameter was not a Diagram");
         }
     }
 
@@ -134,49 +137,13 @@ class DiaNode extends Node
     {
         parent::loadAssociativeArray($associativeArray);
 
-        // TODO - error handling for missing elements/invalid elements
-        $this->subDiagram = $associativeArray['childDiagramId'];
-    }
-
-    //</editor-fold>
-    //<editor-fold desc="overriding functions" defaultstate="collapsed">
-    /**
-     * function that adds a new link to the list of links
-     * @param DataFlow $newLink
-     * @throws BadFunctionCallException
-     */
-    public function addLink($newLink)
-    {
-        parent::addLink($newLink);
-        // Check if this is equal to null - if it is, this can't happen yet
-        // This function as such must be called when a new DFD is linked up to
-        // this diaNode
-        if ($this->subDiagram !== NULL)
+        if(isset($associativeArray['childDiagramId']))
         {
-            if (is_subclass_of($newLink, "Link"))
-            {
-                $this->subDiagram->addExternalLink($newLink);
-            }
-            else
-            {
-                throw new BadFunctionCallException("Input parameter was not a Link");
-            }
+            $this->subDiagram = $associativeArray['childDiagramId'];
         }
-    }
-
-    /**
-     * Removes a specified DataFlow from the list of links
-     * @param type $link the link to be removed
-     * @return boolean if the link was in the array
-     * @throws BadFunctionCallException if the input was not a DataFlow
-     */
-    public function removeLink($link)
-    {
-        // If removed the link from the Node object and subDFD exists, remove from
-        // the subDFD
-        if (parent::removeLinks() && $this->subDiagram != NULL)
+        else
         {
-            $this->subDiagram->removeExternalLink($link);
+            $this->subDiagram = null;
         }
     }
 

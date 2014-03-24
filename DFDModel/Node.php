@@ -65,12 +65,22 @@ abstract class Node extends Element
                     $assocativeArray = $this->storage->loadNode(func_get_arg(1));
                     $this->loadAssociativeArray($assocativeArray);
                 }
-                //second parameter was an id but not of a node type so create an empty object (should be a Diagram object)
-                else
+                //second parameter was an id of a diagram object so call the higher constructor and add this object to the nodeList of that Diagram
+                else if (is_subclass_of($type, 'Diagram'))
                 {
                     //call the parent constructor and set the linkList to be an empty list
                     parent::__construct(func_get_arg(0), func_get_arg(1));
                     $this->linkList = array();
+                    $this->save();
+                    //add this node to the parent diagram's node list
+                    //$theDiagram = new $type($this->storage, func_get_arg(1));
+                    //$theDiagram->addNode($this);
+                    //$theDiagram->update();
+                }
+                //the second parameter did not decend from a Node or a Diagram object
+                else
+                {
+                    throw new BadConstructorCallException("The id passed to the Node Constructor was neither a valid Node or Diagram decended object");
                 }
             }
             //second parameter should be an associative array so pass it along to Element's constructor
@@ -118,6 +128,15 @@ abstract class Node extends Element
      */
     public function addLink($newLink)
     {
+        //ensure that this is only called by a Link object
+        $trace=debug_backtrace();
+        $caller=array_shift($trace);
+        $caller=array_shift($trace);
+        if($caller['class'] != 'Link')
+        {
+            throw new BadFunctionCallException("addLink() was not called by a Link object");
+        }
+        
         // Check that it is a link
         if (is_subclass_of($newLink, "Link"))
         {
@@ -161,7 +180,7 @@ abstract class Node extends Element
     {
         for ($i = 0; $i < count($this->linkList); $i++)
         {
-            if ($this->linkList[$i] == $linkId)
+            if ($this->linkList[$i]['id'] == $linkId)
             {
                 return $this->linkList[$i];
             }
@@ -194,11 +213,9 @@ abstract class Node extends Element
                     $loc = $i;
                 }
             }
-            
+            //if the Link was found remove it
             if ($loc !== FALSE)
-            if (FALSE !== array_search($link->getId(), $this->linkList, False))
             {
-
                 //remove the link from the list
                 unset($this->linkList[$loc]);
                 //normalize the indexes of the list
@@ -207,7 +224,7 @@ abstract class Node extends Element
             }
             else
             {
-                throw new BadFunctionCallException("Input parameter not contained in Node");
+                throw new BadFunctionCallException("Input parameter not contained in this Node");
             }
         }
         else
@@ -217,16 +234,16 @@ abstract class Node extends Element
     }
 
     /**
-     * function that removes every link to this node, used when deleting a node
+     * This function that removes every link to this node, used when deleting a node
      */
     public function removeAllLinks()
     {
         // Counts down to avoid any ambigutity with unsetting of things in
         // links
-        for ($i = count($this->linkList); $i > 0; $i--)
+        for ($i = count($this->linkList)-1; $i >= 0; $i--)
         {
-            $type = $this->storage->getTypeFromUUID($this->linkList[0]);
-            $link = new $type($this->storage, $this->linkList[0]);
+            $type = $this->storage->getTypeFromUUID($this->linkList[$i]['id']);
+            $link = new $type($this->storage, $this->linkList[$i]['id']);
             $link->removeNode($this);
             $link->update();
             // The call to link will actually call removeLink in this node
@@ -253,7 +270,7 @@ abstract class Node extends Element
      * genericType String
      * x Int
      * y Int
-     * parent String
+     * diagramId String
      * links String[]
      * 
      * @return Mixed[]

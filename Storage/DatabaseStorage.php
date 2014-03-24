@@ -110,6 +110,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     }
     
 //<editor-fold desc="Node Related Functions" defaultstate="collapsed">
+    
     public function saveNode($id, $label, $type, $originator, $x, $y, $links, $numLinks, $parentId)
     {
         //<editor-fold desc="save to Entity table" defaultstate="collapsed">
@@ -144,7 +145,9 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         {
             // Bind the parameters of the prepared statement
             $insert_stmt->bindParam(1, $id);
-            $insert_stmt->bindParam(2, $links[$i]);
+            //TODO - links should only be passing id
+            //$insert_stmt->bindParam(2, $links[$i]);
+            $insert_stmt->bindParam(2, $links[$i]['id']);
             // Execute, catch any errors resulting
             $insert_stmt->execute();
         }
@@ -259,16 +262,22 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * For a given id that is of type diaNode, return what dfd it maps to
      * @param String $id
      * @return String
+     * TODO - this can probably be done with load database accesses but i couldnt determine what the correct join was
      */
     public function loadDiaNode($id)
     {
-         $select_statement = $this->dbh->prepare("SELECT childDiagramId FROM dianode WHERE diaNodeId=?");
-         $select_statement->bindParam(1, $id);
-         $select_statement->execute();
-         $diagramId = $select_statement->fetch();
+        //load all of the node attributes
+        $node_vars = $this->loadNode($id);
+        
+        //get the childDiagramId
+        $select_statement = $this->dbh->prepare("SELECT childDiagramId FROM dianode WHERE diaNodeId=?");
+        $select_statement->bindParam(1, $id);
+        $select_statement->execute();
+        $diagramId = $select_statement->fetch();
          
-         // Return the id from the associative array
-         return $diagramId['childDiagramId'];
+        // append the child id to the associative array of attributes
+        $node_vars['childDiagramId'] = $diagramId['childDiagramId'];
+        return $node_vars;
     }
     
     /**
@@ -414,12 +423,16 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $select_stmt->execute();
         $originNode =  $select_stmt->fetch(PDO::FETCH_ASSOC);
         
+        //if the orgin is set set it otherwise set that field to null
         if($originNode === FALSE )
          {
-            throw new BadFunctionCallException("No matching id found in link");
+            //throw new BadFunctionCallException("No matching id found in link");
+            $results['originNode'] = NULL;
          }
-        
-        $results['originNode'] = $originNode;
+         else
+         {
+            $results['originNode'] = $originNode;
+         }
         
         
         // Setup select statement to grab destination node info
@@ -432,12 +445,16 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $select_stmt->execute();
         $destNode =  $select_stmt->fetch(PDO::FETCH_ASSOC);
         
+        //if there is no destination node set it to null otherwise set it
         if($destNode === FALSE )
          {
-            throw new BadFunctionCallException("No matching id found in link");
+            //throw new BadFunctionCallException("No matching id found in link");
+            $results['destinationNode'] = NULL;
          }
-        
-        $results['destinationNode'] = $destNode;
+         else
+         {
+            $results['destinationNode'] = $destNode;
+         }
          
          // Return the assocative array
          return $results;
@@ -541,7 +558,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          // filtering out all diaNodes and links from the list with a
          // a subquery
          $loadDiagram = $this->dbh->prepare("
-            SELECT id, label, type 
+            SELECT id, label, type, x, y
             FROM entity id
                     JOIN element_list elementId ON elementId=id
                     NATURAL JOIN element
@@ -561,12 +578,10 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          // Get the links list from the database
          // This is performed by joining the relevant tables
          $loadDiagram = $this->dbh->prepare("
-             SELECT id, label, type, originNode, destinationNode 
-                FROM link id 
-                        JOIN element_list elementId ON id=elementId
-                        NATURAL JOIN entity
-                        NATURAL JOIN element
-                        NATURAL JOIN link
+             SELECT id, label, type, originNode, destinationNode  
+                FROM entity id 
+                        JOIN element_list elementId ON id=elementId 
+                        NATURAL JOIN link 
                 WHERE diagramId=?;
                 ");
          $loadDiagram->bindParam(1, $id);
@@ -633,7 +648,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       {
           $insert_stmt->bindParam(1, $ancestry[$i]);
           $insert_stmt->bindParam(2, $id);
-          $insert_stmt>-bindParam(3, $i);
+          $insert_stmt->bindParam(3, $i);
           
           $insert_stmt->execute();
       }

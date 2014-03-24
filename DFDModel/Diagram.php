@@ -111,11 +111,15 @@ abstract class Diagram extends Entity
                     $this->parentDiaNode = func_get_arg(1);
                     
                     //to set the ancestry load the parent Diagram and then set this object's ancestry equal to it then add the parent Diagram to it
-                    $type = $this->storage->getTypeFromUUID($this->diaNode);
-                    $parentDiaNode = new $type(func_get_arg(0), $this->diaNode);
+                    //load the parent DiaNode
+                    $type = $this->storage->getTypeFromUUID($this->parentDiaNode);
+                    $parentDiaNode = new $type(func_get_arg(0), $this->parentDiaNode);
+                    //get the id of parent Diagram of the parentDiaNode
                     $parentDiagramId = $parentDiaNode->getParent();
+                    //load the parentDiagram
                     $type = $this->storage->getTypeFromUUID($parentDiagramId);
                     $parentDiagram = new $type(func_get_arg(0), $parentDiagramId);
+                    //set this Diagram's ancestry to the parentDiagrams, then add it to the list
                     $this->ancestry = $parentDiagram->getAncestry();
                     array_push($this->ancestry, $parentDiagram->getId()); 
                 }
@@ -539,17 +543,54 @@ abstract class Diagram extends Entity
      */
     public function loadAssociativeArray($associativeArray)
     {
-        // TODO - error handling for missing elements/invalid elements
         // Potentially this section could be rewritten using a foreach loop
         // on the array and reflection on the current node to determine
         // what it should store locally
         parent::loadAssociativeArray($associativeArray);
+        if(isset($associativeArray['nodeList']))
+        {
+            $this->nodeList = $associativeArray['nodeList'];
+        }
+        else
+        {
+            $this->nodeList = Array();
+        }
         
-        $this->nodeList = $associativeArray['nodeList'];
-        $this->linkList = $associativeArray['linkList'];
-        $this->diaNodeList = $associativeArray['DiaNodeList'];
-        $this->parentDiaNode = $associativeArray['diaNode'];
-        $this->ancestry = $associativeArray['ancestry'];
+        if(isset($associativeArray['linkList']))
+        {
+            $this->linkList = $associativeArray['linkList'];
+        }
+        else
+        {
+            $this->linkList = Array();
+        }
+        
+        if(isset($associativeArray['DiaNodeList']))
+        {
+            $this->diaNodeList = $associativeArray['DiaNodeList'];
+        }
+        else
+        {
+            $this->diaNodeList = Array();
+        }
+        
+        if(isset($associativeArray['diaNode']))
+        {
+            $this->parentDiaNode = $associativeArray['diaNode'];
+        }
+        else
+        {
+            $this->parentDiaNode = null;
+        }
+        
+        if(isset($associativeArray['ancestry']))
+        {
+            $this->ancestry = $associativeArray['ancestry'];
+        }
+        else
+        {
+            $this->ancestry = Array();
+        }
     }
     //</editor-fold>
     //</editor-fold>
@@ -599,6 +640,12 @@ abstract class Diagram extends Entity
         // Note that this will NOT delete the children DFDs but leave them
         // orphaned instead
         $this->storage->deleteDiagram($this->id);
+    }
+    
+    public function refresh()
+    {
+        $associativeArray = $this->storage->loadDiagram($this->id);
+        $this->loadAssociativeArray($associativeArray);
     }
 
     //</editor-fold>

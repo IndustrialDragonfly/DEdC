@@ -36,8 +36,9 @@ class NodeTest extends PHPUnit_Framework_TestCase
         $this->testDiagram = new DataFlowDiagram($this->storage);
         $this->testDiagram->save();
         $this->object = new Process($this->storage, $this->testDiagram->getId());
-        $this->testDiagram->addNode($this->object);
-        $this->object->save();
+        //$this->testDiagram->addNode($this->object);
+        //$this->object->save();
+        $this->testDiagram->refresh();
         
     }
 
@@ -48,6 +49,7 @@ class NodeTest extends PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         //clear the DB
+        $this->testDiagram->refresh();
         $this->testDiagram->delete();
     }
 
@@ -65,19 +67,31 @@ class NodeTest extends PHPUnit_Framework_TestCase
     public function testGetNumberOfLinks_smoke()
     {
         $aDF = new DataFlow($this->storage, $this->object->getParent());
-        $this->object->addLink($aDF);
+        //$this->object->addLink($aDF);
+        $aDF->setDestinationNode($this->object);
         $this->assertEquals(1, $this->object->getNumberOfLinks());
     }
 
+    /**
+     * @covers Node::AddLink
+     * @expectedException BadFunctionCallException
+     */
+    public function testAddLink_calledFromNonLink()
+    {
+        $aDF = new DataFlow($this->storage, $this->object->getParent());
+        $this->object->addLink($aDF);
+    }
+    
     /**
      * @covers Node::addLink
      */
     public function testAddLink_smoke()
     {
         $aDF = new DataFlow($this->storage, $this->object->getParent());
-        $this->object->addLink($aDF);
+        //$this->object->addLink($aDF);
+        $aDF->setDestinationNode($this->object);
         $this->assertEquals(1, $this->object->getNumberOfLinks());
-        $annotherDF = $this->object->getLinkbyPosition(0);
+        $annotherDF = $this->object->getLinkbyPosition(0)['id'];
         $this->assertEquals($aDF->getId(), $annotherDF);
     }
 
@@ -96,17 +110,21 @@ class NodeTest extends PHPUnit_Framework_TestCase
      */
     public function testRemoveLink_smoke()
     {
-        $someDF = new DataFlow($this->storage, $this->object->getParent());
-        $this->object->addLink($someDF);
-        $aDF = new DataFlow($this->storage, $this->object->getParent());
+        $someDF = new DataFlow($this->storage, $this->testDiagram->getId());
+        //$this->object->addLink($someDF);
+        $someDF->setDestinationNode($this->object);
+        //$someDF->save();
+        $aDF = new DataFlow($this->storage, $this->testDiagram->getId());
         $aDF->setOriginNode($this->object);
-        $aDF->save();
+        //$aDF->save();
+        $this->object->update();
         $this->assertEquals(2, $this->object->getNumberOfLinks());
         // Only Links can break a linkage
-        var_dump($this->object->getLinks());
-        var_dump($aDF->getId());
+        
         $aDF->removeNode($this->object);
-        $this->assertEquals(0, $this->object->getNumberOfLinks());
+        //refresh the current object from the storage
+        $this->object = new Process($this->storage, $this->object->getId());
+        $this->assertEquals(1, $this->object->getNumberOfLinks());
         $this->assertNull($aDF->getOriginNode());
     }
 
@@ -125,9 +143,9 @@ class NodeTest extends PHPUnit_Framework_TestCase
      */
     public function testGetLinkbyPosition_smoke()
     {
-        $aDF = new DataFlow($this->storage);
+        $aDF = new DataFlow($this->storage, $this->testDiagram->getId());
         $aDF->setOriginNode($this->object);
-        $this->assertEquals($this->object->getLinkbyPosition(0), $aDF->getId());
+        $this->assertEquals($this->object->getLinkbyPosition(0)['id'], $aDF->getId());
     }
 
     /**
@@ -153,9 +171,11 @@ class NodeTest extends PHPUnit_Framework_TestCase
      */
     public function testGetLinkbyId_smoke()
     {
-        $aDF = new DataFlow($this->storage);
+        $aDF = new DataFlow($this->storage, $this->testDiagram->getId());
         $aDF->setOriginNode($this->object);
-        $this->assertEquals($aDF->getId(), $this->object->getLinkbyId($aDF->getId()));
+        //$aDF->save();
+        $retrievedDF = $this->object->getLinkbyId($aDF->getId());
+        $this->assertEquals($aDF->getId(), $retrievedDF['id']);
     }
 
     /**
@@ -164,7 +184,7 @@ class NodeTest extends PHPUnit_Framework_TestCase
      */
     public function testGetLinkbyId_null()
     {
-        $aDF = new DataFlow($this->storage);
+        $aDF = new DataFlow($this->storage, $this->testDiagram->getId());
         $this->assertNull($this->object->getLinkbyId($aDF->getId()));
     }
 
@@ -173,15 +193,15 @@ class NodeTest extends PHPUnit_Framework_TestCase
      */
     public function testGetLinkbyId_BiggerSmoke()
     {
-        $aDF = new DataFlow($this->storage);
+        $aDF = new DataFlow($this->storage, $this->testDiagram->getId());
         $aDF->setOriginNode($this->object);
         for ($i = 0; $i < 10; $i++)
         {
-            $annotherDF = new DataFlow($this->storage);
+            $annotherDF = new DataFlow($this->storage, $this->testDiagram->getId());
             $annotherDF->setOriginNode($this->object);
         }
         // Ok, this might be reduntant now...
-        $this->assertEquals($aDF->getId(), $this->object->getLinkbyId($aDF->getId()));
+        $this->assertEquals($aDF->getId(), $this->object->getLinkbyId($aDF->getId())['id']);
     }
 
     /**
@@ -193,13 +213,13 @@ class NodeTest extends PHPUnit_Framework_TestCase
     {
         for ($i = 0; $i < 10; $i++)
         {
-            $annotherDF = new DataFlow($this->storage);
+            $annotherDF = new DataFlow($this->storage, $this->testDiagram->getId());
             $annotherDF->setOriginNode($this->object);
-            $annotherDF->save();
+            $annotherDF->update();
         }
         $this->assertEquals(10, $this->object->getNumberOfLinks());
         $this->object->removeAllLinks();
-        $this->object->update();
+        //$this->object->update();
 //      $this->assertEquals(0, $this->object->getNumberOfLinks()); 
         // Check refreshed node for correct number of links
         $node_id = $this->object->getId();
