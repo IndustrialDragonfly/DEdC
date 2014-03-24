@@ -59,8 +59,7 @@ function __autoload($classname)
     }
     else
     {
-        // TODO: Make throw an exception later
-        echo "Problem loading class";
+        echo "Problem loading class " . $classname . " definition does not appear to exist.";
         exit;
     }
 }
@@ -68,19 +67,6 @@ function __autoload($classname)
 require_once "MethodsEnum.php";
 require_once "conf.php";
 
-    // Initialize a storage object
-    $storage = new DatabaseStorage(); 
-
-     // Instantiate a new authentication module as named by conf.php
-    $authenticator = new $authenModule($storage);    
-    
-    // Pass authentication information from client
-    if (!$authenticator->authenticate())
-    {
-        // TODO - handle authentication
-        exit;
-    }
-    
     /*
     * Checks to see if the incoming request has the proper user agent product,
     * if it does not loads the web client page.
@@ -94,7 +80,20 @@ require_once "conf.php";
        webClient($web_client_location);
        exit;
    }
+
+    // Initialize a storage object
+    $storage = new DatabaseStorage(); 
+
+     // Instantiate a new authentication module as named by conf.php
+    $authenticator = new $authenModule($storage);    
     
+    // Pass authentication information from client
+    if (!$authenticator->authenticate())
+    {
+        // TODO - handle authentication
+        exit;
+    }
+     
     // Retrieve information about request and put it in a request object
     $body = file_get_contents('php://input'); // Get the body of the request
     $request = new SimpleRequest($_SERVER['HTTP_ACCEPT'], 
