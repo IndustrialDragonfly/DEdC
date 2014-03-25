@@ -461,14 +461,16 @@ class DiagramTest extends PHPUnit_Framework_TestCase
     {
         $mp = new Multiprocess($this->storage, $this->object->getId());
         $childDiagram = new DataFlowDiagram($this->storage, $mp->getId());
-        //$this->object->refresh();
-        //$childDiagram->refresh();
+        $this->object->refresh();
+        $childDiagram->refresh();
+        
         $this->object->setLabel("parent DFD");
-        //$this->object->update();
-        $childDiagram->setLabel("child DFD");
-        $childDiagram->update();
         var_dump($this->object);
-        var_dump($childDiagram);
+        $this->object->update();
+        //$childDiagram->setLabel("child DFD");
+        //$childDiagram->update();
+        var_dump($this->object);
+        //var_dump($childDiagram);
         $this->assertEquals(1, $childDiagram->getNumberOfAncestors());
     }
 //

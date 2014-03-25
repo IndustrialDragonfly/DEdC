@@ -495,6 +495,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
             WHERE descendantId=?
             ORDER BY depth DESC");
         $loadAncestry->bindParam(1, $id);
+        $loadAncestry->execute();
         
         // Iterate through the results until all have been pulled out
         $ancestryStack = array();
@@ -689,7 +690,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         {
            // Bind the parameters of the prepared statement
            $insert_stmt->bindParam(1, $id);
-           $insert_stmt->bindParam(2, $node);
+           $insert_stmt->bindParam(2, $node['id']);
            // Execute, catch any errors resulting
            $insert_stmt->execute();
         }
@@ -702,7 +703,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         {
            // Bind the parameters of the prepared statement
            $insert_stmt->bindParam(1, $id);
-           $insert_stmt->bindParam(2, $link);
+           $insert_stmt->bindParam(2, $link['id']);
            // Execute, catch any errors resulting
            $insert_stmt->execute();
         }
@@ -715,7 +716,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         {
            // Bind the parameters of the prepared statement
            $insert_stmt->bindParam(1, $id);
-           $insert_stmt->bindParam(2, $diaNodeId);
+           $insert_stmt->bindParam(2, $diaNodeId['id']);
            // Execute, catch any errors resulting
            $insert_stmt->execute();
         }
