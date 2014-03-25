@@ -1,5 +1,4 @@
 <?php
-require_once 'Responsable.php';
 
 /**
  * Abstract object which provides the response to send to a client

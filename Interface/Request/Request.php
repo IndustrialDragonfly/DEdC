@@ -1,6 +1,5 @@
 <?php
-require_once 'Requestable.php';
-require_once 'associativeArrayManager.php';
+require_once 'Interface/associativeArrayManager.php';
 
 /**
   * Abstract object which parses the incoming requests objects and provides
