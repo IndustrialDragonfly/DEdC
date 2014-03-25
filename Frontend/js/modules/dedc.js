@@ -126,7 +126,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             $(deleteButton).button().click(function () {
                 var c = getCurrentCanvas();
                 if (c) {
-                                       
+                    // Remove Elements          
                     c.getSelection().forEach(function (entry) {
                         if (entry.getId()) {
                             // Element exists in the backend because it has an id
@@ -142,6 +142,25 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                             // Element did not exist in the backend
                             c.removeElement(entry);
                         }
+                    });
+                    
+                    // Remove Dataflows
+                    c.getSelectedDataFlows().forEach(function (entry) {
+                        if (entry.getId()) {
+                            // Element exists in the backend because it has an id
+                            var onSuccess = function(response) {
+                                c.removeDataflowById(entry.getId());
+                            };
+                            var onFail = function(response) {
+                                console.log("Removing Dataflow failed. " + response.getError());
+                            };
+                            
+                            Connector.delete("Controller.php/" + entry.getId(), onSuccess, onFail);
+                        } else {
+                            // Element did not exist in the backend
+                            c.removeDataflow(entry);
+                        }
+
                     });
                 } else {
                     console.log("No tab currently selected.");
