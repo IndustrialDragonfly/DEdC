@@ -708,8 +708,8 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         }
       }
       
-      // Save each element in the suDFDNodeList to the table if it isn't null
-      if (is_array($nodeList))
+      // Save each element in the subDiaNodeList to the table if it isn't null
+      if (is_array($DiaNodeList))
       {
         foreach ($DiaNodeList as $diaNodeId)
         {
