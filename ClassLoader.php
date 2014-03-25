@@ -14,25 +14,25 @@ function __autoload($classname)
     }
     
     // Request
-    elseif (file_exists("Request/" . $classname . ".php"))
+    elseif (file_exists("Interface/Request/" . $classname . ".php"))
     {
-        require_once "Request/" . $classname . ".php";
+        require_once "Interface/Request/" . $classname . ".php";
     }
-    elseif (file_exists("Request/AuthenticationHandlers/" . $classname . ".php"))
+    elseif (file_exists("Interface/Request/AuthenticationHandlers/" . $classname . ".php"))
     {
-        require_once "Request/AuthenticationHandlers/" . $classname . ".php";
+        require_once "Interface/Request/AuthenticationHandlers/" . $classname . ".php";
     }
     
     // Response
-    elseif (file_exists("Response/" . $classname . ".php"))
+    elseif (file_exists("Interface/Response/" . $classname . ".php"))
     {
-        require_once "Response/" . $classname . ".php";
+        require_once "Interface/Response/" . $classname . ".php";
     }
     
     // DFD Model
-    elseif (file_exists("DFDModel/" . $classname . ".php"))
+    elseif (file_exists("Models/DataModel/" . $classname . ".php"))
     {
-        require_once "DFDModel/" . $classname . ".php";
+        require_once "Models/DataModels/" . $classname . ".php";
     }
     
     // Storage
@@ -42,13 +42,13 @@ function __autoload($classname)
     }
     
     // User Model
-    elseif (file_exists("UserModel/" . $classname . ".php"))
+    elseif (file_exists("Models/UserModel/" . $classname . ".php"))
     {
-        require_once "UserModel/" . $classname . ".php";
+        require_once "Models/UserModel/" . $classname . ".php";
     }
-    elseif (file_exists("UserModel/AuthenticationModules/" . $classname . ".php"))
+    elseif (file_exists("Models/UserModel/AuthenticationModules/" . $classname . ".php"))
     {
-        require_once "UserModel/AuthenticationModules/" . $classname . ".php";
+        require_once "Models/UserModel/AuthenticationModules/" . $classname . ".php";
     }
     
     // Auth Info
