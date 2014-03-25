@@ -21,6 +21,26 @@ define(function() {
                 myOriginator = "";
         
         /**
+         * Remove the element from the canvas
+         */
+        this.remove = function () {
+            if (textBox) {
+                textBox.remove();
+                textBox = null;
+            }
+
+            if (path) {
+                path.remove();
+                path = null;
+            }
+            
+            if (arrow) {
+                arrow.remove();
+                arrow = null;
+            }
+        };
+        
+        /**
          * Get the Dataflow's Id
          * @returns {String} id
          */
