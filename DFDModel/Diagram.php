@@ -654,17 +654,20 @@ abstract class Diagram extends Entity
         // Remove its links
         foreach ($this->linkList as $link)
         {
-            $this->removeLink($link['id']);
+            //$this->removeLink($link['id']);
+            $this->storage->deleteLink($link['id']);
         }
         // Remove its nodes
         foreach ($this->nodeList as $node)
         {
-            $this->removeNode($node['id']);
+            //$this->removeNode($node['id']);
+            $this->storage->deleteNode($node['id']);
         }
         // Remove its diaNodes
         foreach ($this->diaNodeList as $diaNode)
         {
-            $this->removeDiaNode($diaNode['id']);
+            //$this->removeDiaNode($diaNode['id']);
+            $this->storage->deleteDiaNode($diaNode['id']);
         }
 
         // Remove the remaining portions of the DFD from the database.

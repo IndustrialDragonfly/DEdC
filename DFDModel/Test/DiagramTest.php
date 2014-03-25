@@ -467,8 +467,8 @@ class DiagramTest extends PHPUnit_Framework_TestCase
         $this->object->setLabel("parent DFD");
         var_dump($this->object);
         $this->object->update();
-        //$childDiagram->setLabel("child DFD");
-        //$childDiagram->update();
+        $childDiagram->setLabel("child DFD");
+        $childDiagram->update();
         var_dump($this->object);
         //var_dump($childDiagram);
         $this->assertEquals(1, $childDiagram->getNumberOfAncestors());
