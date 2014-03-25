@@ -180,7 +180,7 @@ set_exception_handler("ExceptionHandler");
                 } 
                 catch (Exception $e) 
                 {
-                    // TODO: Handle error exception
+                    // TODO: Element not found is expected
                 }
 
                 // Delete element if it was found
@@ -253,19 +253,42 @@ set_exception_handler("ExceptionHandler");
 
         case MethodsEnum::DELETE:
             // Delete needs to send no data other than a header
-            $element = existingElementFactory($request->getId(), $storage);
-            $element->delete();
-            // TODO - Handle fail cases
-            $response = new SimpleResponse();
-            $response->setHeader(404);
+            $element = NULL;
+            $response = new SimpleResponse();;
+            if (NULL != $request->getId())
+            {
+                // Start by loading then deleting the element
+                try 
+                {
+                    // TODO: Check that element types are the same before deleting
+                    $element = existingElementFactory($request->getId(), $storage);
+                } 
+                catch (Exception $e) 
+                {
+                    // TODO: Narrow down exception to handle 404 case only
+                }
+
+                // Delete element if it was found
+                if ($element)
+                {
+                    $element->delete();
+                    $response->setHeader(200);
+
+                }
+                else
+                {
+                    $response->setHeader(404);
+                }
+            }
+
             header($response->getHeader());
             break;
 
 
-        case MethodsEnum::UPDATE:
+        case MethodsEnum::PATCH:
             // TODO: Allow configuring of the response type
             $response = new SimpleErrorResponse();
-            $response->setError("Invalid HTTP Method. UPDATE is not supported.");
+            $response->setError("Invalid HTTP Method. PATCH is not supported.");
             $response->setHeader(405);
             header($response->getHeader());           
             echo $response->getRepresentation();

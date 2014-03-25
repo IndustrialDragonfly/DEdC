@@ -670,6 +670,7 @@ abstract class Diagram extends Entity
         {
             //$this->removeDiaNode($diaNode['id']);
             $this->storage->deleteDiaNode($diaNode['id']);
+            $this->storage->deleteNode($diaNode['id']);
         }
 
         // Remove the remaining portions of the DFD from the database.

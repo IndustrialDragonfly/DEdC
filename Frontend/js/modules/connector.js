@@ -103,8 +103,8 @@ define(["modules/response", "jquery"], function (Response, $) {
            } catch (e) {
                exception = e;
            }
-           
-           if (jsonData && !exception) {
+                      
+           if (jsonData) {
                // Data received was successfully parsed as JSON
                 var response = new Response();
 
@@ -122,9 +122,10 @@ define(["modules/response", "jquery"], function (Response, $) {
                     response.setData(data);
                 }
                 response.setStatus(textStatus);
-                response.setError("DELETE " + url + " " + data);
                 
-                failCallback(response);
+                // This is not a failure case because we don't expect anything 
+                // back from the request.
+                successCallback(response);
            }
        }).fail(function (jqXHR, textStatus, errorThrown) {
            // Request failed for some reason
