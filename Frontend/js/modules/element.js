@@ -66,9 +66,12 @@ define(function () {
          * Called when the Element is unselected
          */
         this.setUnselected = function () {
-            set.animate({
-                "fill-opacity": 1.0
-            }, 100);
+            // Apparently unselect is called when the Element is deleted
+            if (set) {
+                set.animate({
+                    "fill-opacity": 1.0
+                }, 100);
+            }
         };
 
         /**
