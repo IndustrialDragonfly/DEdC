@@ -20,8 +20,10 @@ class PasswordAuthenticationModule implements Authenticatable
      */
     public function __construct($storage, $id, $authenticationInfo)
     {
+        // TODO CHeck everything is right type
         $this->storage = $storage;
         $this->id = $id;
+        // TODO check that this is the right type of auth info object
         $this->password = $authenticationInfo->getCredentials();
     }
     

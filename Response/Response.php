@@ -43,13 +43,13 @@ abstract class Response implements Responsable
         switch ($code)
         {
             //<editor-fold desc="1xx Informational" defaultstate="collapsed">
-            //</editor-fold>
             case 100:
                 $header = $header . " 100 Continue";
                 break;
             case 101:
                 $header = $header . " 101 Switching Protocols";
                 break;
+            //</editor-fold>
             //<editor-fold desc="2xx Successful" defaultstate="collapsed">
             case 200:
                 $header = $header . " 200 OK";

@@ -157,9 +157,12 @@ set_exception_handler("ExceptionHandler");
 
 
         case MethodsEnum::POST:
-            sendHeader(successful);
-            // If needed
-            sendData(result);
+            // TODO: Allow configuring of the response type
+            $response = new SimpleErrorResponse();
+            $response->setError("Invalid HTTP Method. UPDATE is not supported.");
+            $response->setHeader(405);
+            header($response->getHeader());           
+            echo $response->getRepresentation();
             break;
 
         
@@ -235,12 +238,6 @@ set_exception_handler("ExceptionHandler");
 
                     }
 
-                    // If the element was created, save it
-                    if ($element)
-                    {
-                        $element->save();
-                    }
-
                     // Setup a response object with just a header
                     $response = new SimpleResponse($element->getAssociativeArray());
                     $response->setHeader(201);
@@ -271,7 +268,7 @@ set_exception_handler("ExceptionHandler");
             $response->setError("Invalid HTTP Method. UPDATE is not supported.");
             $response->setHeader(405);
             header($response->getHeader());           
-            echo $response->getRepresentation();  
+            echo $response->getRepresentation();
             break;
 
 

@@ -53,6 +53,7 @@ abstract class Node extends Element
                 if (is_subclass_of($type, "Node"))
                 {
                     $this->id = func_get_arg(1);
+                    // Storage is set here, as entity (parent) is never called
                     $this->storage = func_get_arg(0);
                     if (!is_subclass_of($this->storage, "ReadStorable"))
                     {
@@ -87,6 +88,7 @@ abstract class Node extends Element
             else
             {
                 parent::__construct(func_get_arg(0), func_get_arg(1));
+                $this->save();
             }
         }
         else
@@ -144,6 +146,7 @@ abstract class Node extends Element
             $link['id']  = $newLink->getId();
             $link['label'] = $newLink->getLabel();
             array_push($this->linkList, $link);
+            $this->update();
         }
         else
         {
@@ -198,6 +201,14 @@ abstract class Node extends Element
      */
     public function removeLink($link)
     {
+        //ensure that this is only called by a Link object
+        $trace=debug_backtrace();
+        $caller=array_shift($trace);
+        $caller=array_shift($trace);
+        if($caller['class'] != 'Link')
+        {
+            throw new BadFunctionCallException("removeLink() was not called by a Link object");
+        }
         
         if (is_subclass_of($link, "Link"))
         {
@@ -220,6 +231,7 @@ abstract class Node extends Element
                 unset($this->linkList[$loc]);
                 //normalize the indexes of the list
                 $this->linkList = array_values($this->linkList);
+                $this->update();
                 return true;
             }
             else

@@ -58,6 +58,7 @@ abstract class Link extends Element
                 if (is_subclass_of($type, "Link"))
                 {
                     $this->id = func_get_arg(1);
+                    // Never calling parent, so must handle setting up the storage
                     $this->storage = func_get_arg(0);
                     if (!is_subclass_of($this->storage, "ReadStorable"))
                     {
