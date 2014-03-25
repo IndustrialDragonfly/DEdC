@@ -275,7 +275,7 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
            var element;
 
            elements.forEach(function (entry) {
-               if (entry.getData().id === id) {
+               if (entry.getId() === id) {
                    element = entry;
                }
            });

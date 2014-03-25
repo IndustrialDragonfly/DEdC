@@ -128,16 +128,16 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                 if (c) {
                                        
                     c.getSelection().forEach(function (entry) {
-                        if (entry.getData() && entry.getData().id) {
+                        if (entry.getId()) {
                             // Element exists in the backend because it has an id
                             var onSuccess = function(response) {
-                                c.removeElementById(entry.getData().id);
+                                c.removeElementById(entry.getId());
                             };
                             var onFail = function(response) {
                                 console.log("Removing element failed. " + response.getError());
                             };
                             
-                            Connector.delete("Controller.php/" + entry.getData().id, onSuccess, onFail);
+                            Connector.delete("Controller.php/" + entry.getId(), onSuccess, onFail);
                         } else {
                             // Element did not exist in the backend
                             c.removeElement(entry);
