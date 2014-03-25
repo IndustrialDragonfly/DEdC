@@ -1,7 +1,5 @@
 <?php
 
-require_once 'Element.php';
-require_once 'BadConstructorCallException.php';
 /**
  * Node is the abstract class that governs all node objects, like process, datastore
  * etc. For all storage access methods, they could currently go in the Element

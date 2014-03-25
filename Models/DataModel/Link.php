@@ -1,7 +1,5 @@
 <?php
 
-require_once 'Element.php';
-require_once 'Constants.php';
 /**
  * Abstract class which implementes the conections between Node objects
  *

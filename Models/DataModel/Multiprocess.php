@@ -1,5 +1,5 @@
 <?php
-require_once 'DiaNode.php';
+
 /**
  * Description of Multiprocess
  *

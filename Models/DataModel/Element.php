@@ -1,6 +1,5 @@
 <?php
 
-require_once 'Entity.php';
 /**
  * this class reresents an abstract object in a DFD which has a everything in an 
  * Enity in addition to a X-Y coordinate and a parent DFD 

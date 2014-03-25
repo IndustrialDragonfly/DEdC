@@ -32,7 +32,7 @@ function __autoload($classname)
     // DFD Model
     elseif (file_exists("Models/DataModel/" . $classname . ".php"))
     {
-        require_once "Models/DataModels/" . $classname . ".php";
+        require_once "Models/DataModel/" . $classname . ".php";
     }
     
     // Storage

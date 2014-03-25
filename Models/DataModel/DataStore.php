@@ -1,6 +1,5 @@
 <?php
 
-require_once 'Node.php';
 require_once 'Constants.php';
 
 /**

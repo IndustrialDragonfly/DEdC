@@ -1,6 +1,5 @@
 <?php
 
-require_once 'Diagram.php';
 /**
  * This is an object that represents a dataflow diagram which consists of a 
  * collection of nodes and links between them

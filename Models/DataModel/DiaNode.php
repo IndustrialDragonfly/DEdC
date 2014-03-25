@@ -1,7 +1,5 @@
 <?php
 
-require_once 'Node.php';
-require_once 'DataFlowDiagram.php';
 /**
  * Description of DiaNode
  *
