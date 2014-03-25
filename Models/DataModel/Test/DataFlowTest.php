@@ -41,10 +41,8 @@ class DataFlowTest extends PHPUnit_Framework_TestCase
         }
         
         $this->testDiagram = new DataFlowDiagram($this->storage);
-        $this->testDiagram->save();
         $this->object = new DataFlow($this->storage, $this->testDiagram->getId());
-        //$this->testDiagram->addNode($this->object);
-        //$this->object->save();
+        $this->testDiagram->refresh();
     }
 
     /**
@@ -54,6 +52,7 @@ class DataFlowTest extends PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         //clear the DB
+        $this->testDiagram->refresh();
         $this->testDiagram->delete();
     }
     

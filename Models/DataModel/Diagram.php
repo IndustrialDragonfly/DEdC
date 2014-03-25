@@ -72,6 +72,7 @@ abstract class Diagram extends Entity
             $this->diaNodeList = array();
             $this->linkList = array();
             $this->nodeList = array();
+            $this->save();
                     
         }
         //if 2 things were passed we are either loading a Diagram from storage, 
@@ -100,7 +101,10 @@ abstract class Diagram extends Entity
                     $assocativeArray = $this->storage->loadDiagram(func_get_arg(1));
                     $this->loadAssociativeArray($assocativeArray);
                 }
-                //second parameter was an id of a DiaNode object create an empty object with that diaNode as its parent and set up your ancestry accordingly
+                //second parameter was an id of a DiaNode object create an empty 
+                //Diagram with that diaNode as its parent and set up its ancestry 
+                //to be the ancestry of the parent Diagrams and then add the parent 
+                //Diagram to this new Diagram's ancestry.  Next set the subDiagram in the parentDiaNode to be this Diagram
                 else if (is_subclass_of($type, "DiaNode"))
                 {
                     //call the parent constructor and set the linkList to be an empty list
@@ -121,7 +125,13 @@ abstract class Diagram extends Entity
                     $parentDiagram = new $type(func_get_arg(0), $parentDiagramId);
                     //set this Diagram's ancestry to the parentDiagrams, then add it to the list
                     $this->ancestry = $parentDiagram->getAncestry();
-                    array_push($this->ancestry, $parentDiagram->getId()); 
+                    array_push($this->ancestry, $parentDiagram->getId());
+                    
+                    //set the subDiagram in the parentDiaNode
+                    $this->addDiaNode($parentDiaNode);
+                    $this->save();
+                    $parentDiaNode->setSubDiagram($this->getId());
+                    $parentDiaNode->update();
                 }
                 else
                 {
@@ -195,6 +205,10 @@ abstract class Diagram extends Entity
             //add it to the list
             $link['id'] = $newLink->getId();
             $link['label'] = $newLink->getLabel();
+            $link['originNode'] = $newLink->getOriginNode()['id'];
+            $link['destinationNode'] = $newLink->getDestinationNode()['id'];
+            $link['type'] = get_class($newLink);
+            
             array_push($this->linkList, $link);
         }
         else
@@ -291,6 +305,7 @@ abstract class Diagram extends Entity
             $node['label'] = $newNode->getLabel();
             $node['x'] = $newNode->getX();
             $node['y'] = $newNode->getY();
+            $node['type'] = get_class($newNode);
             
             array_push($this->nodeList, $node);
         }
@@ -379,16 +394,23 @@ abstract class Diagram extends Entity
     
     /**
      * This is a function that will add an ID of a $diaNode to the list of $diaNodes
-     * @param DiaNode $node the diaNode whose id is to be added
+     * @param DiaNode $newNode the diaNode whose id is to be added
      * @throws BadFunctionCallException if you pass a variable that does not inherit from DiaNode
      */
-    public function addDiaNode($node)
+    public function addDiaNode($newNode)
     {
         //ensure that a valid Node child was passed
-        if (is_subclass_of($node, 'DiaNode')  )
+        if (is_subclass_of($newNode, 'DiaNode')  )
         {
             //add it to the list
-            array_push($this->diaNodeList, $node->getId());
+            $node['id'] = $newNode->getId();
+            $node['label'] = $newNode->getLabel();
+            $node['x'] = $newNode->getX();
+            $node['y'] = $newNode->getY();
+            $node['type'] = get_class($newNode);
+            $node['childDiagramId'] = $newNode->getSubDiagram();
+            
+            array_push($this->diaNodeList, $node);
         }
         else
         {
@@ -407,7 +429,16 @@ abstract class Diagram extends Entity
         $type = $this->storage->getTypeFromUUID($DiaNodeId);
         $subDFDNode = new $type($this->storage, $DiaNodeId);
         $subDFDNode->delete();
-        $loc = array_search($DiaNodeId, $this->diaNodeList);
+        //$loc = array_search($DiaNodeId, $this->diaNodeList);
+        $loc = FALSE;
+        for ($i = 0; $i < count($this->diaNodeList); $i++)
+        {
+            $current = $this->diaNodeList[$i];
+            if( $current['id'] == $DiaNodeId)
+            {
+                $loc = $i;
+            }
+        }
         if ($loc !== FALSE)
         {
 
@@ -623,17 +654,20 @@ abstract class Diagram extends Entity
         // Remove its links
         foreach ($this->linkList as $link)
         {
-            $this->removeLink($link['id']);
+            //$this->removeLink($link['id']);
+            $this->storage->deleteLink($link['id']);
         }
         // Remove its nodes
         foreach ($this->nodeList as $node)
         {
-            $this->removeNode($node['id']);
+            //$this->removeNode($node['id']);
+            $this->storage->deleteNode($node['id']);
         }
         // Remove its diaNodes
         foreach ($this->diaNodeList as $diaNode)
         {
-            $this->deleteDiaNode(diaNode);
+            //$this->removeDiaNode($diaNode['id']);
+            $this->storage->deleteDiaNode($diaNode['id']);
         }
 
         // Remove the remaining portions of the DFD from the database.
