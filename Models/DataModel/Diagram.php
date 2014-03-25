@@ -75,6 +75,7 @@ abstract class Diagram extends Entity
             $this->save();
                     
         }
+        
         //if 2 things were passed we are either loading a Diagram from storage, 
         //or loading from a associative array, or we are creating a new mostly 
         //empty Diagram with a specified parent
@@ -142,6 +143,7 @@ abstract class Diagram extends Entity
            else if(is_array(func_get_arg(1)))
            {
                parent::__construct(func_get_arg(0), func_get_arg(1));
+               $this->save();
            }
            else
            {

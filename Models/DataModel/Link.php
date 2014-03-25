@@ -87,6 +87,7 @@ abstract class Link extends Element
             else
             {
                 parent::__construct(func_get_arg(0), func_get_arg(1));
+                $this->save();
             }
         }
         else
