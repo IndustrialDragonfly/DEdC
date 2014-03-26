@@ -22,6 +22,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             var id = tabs.tabs('option', 'active');
             return canvases[id];
         };
+       
 
         /**
          * Setup the UI for the browser
@@ -177,8 +178,19 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             $("#dialog-modal").dialog({
                 autoOpen: false,
                 modal: true,
+                height: 500,
+                width: 600,
                 buttons: {
-                    "Open DFDs": function () {
+                	 "Delete DFD(s)": function () {
+                     	// Delete button
+                         $(".ui-selected", this).each(function() {
+                             // Get the id of the selected element
+                         	Connector.delete("Controller.php/" + this.id);
+                         });
+                         
+                         $(this).dialog("close");
+                     },
+                    "Open DFD(s)": function () {
                         // Open button
                         // Go through each DOM element with the class ".ui-selected"
                         $(".ui-selected", this).each(function() {
@@ -186,10 +198,6 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                             getDfd("Controller.php/" + this.id);
                         });
                         
-                        $(this).dialog("close");
-                    },
-                    "Cancel": function () {
-                        // Cancel button
                         $(this).dialog("close");
                     }
                 },
@@ -238,6 +246,10 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                         Connector.setCredentials($("#organization").val(), $("#username").val(), $("#password").val());
                         Connector.get("Controller.php/DataFlowDiagram", onSuccess, onFail);
                     }
+                },
+                open: function(event, ui) { 
+                    // Hide close button.
+                    $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                 }
             });
 
@@ -257,7 +269,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
          * @returns {canvas} Canvas that was created in the tab
          */
         var createNewTab = function (name) {
-            var tabTemplate = "<li><a href='#{href}'>#{label}</a></li>",
+            var tabTemplate = "<li><a href='#{href}'>#{label}</a><span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span></li>",
                 // Template for the tabs
                 label = "Tab" + canvases.length,
                 // Name of the tab
@@ -281,6 +293,15 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             var c = new Canvas(id, 640, 480);
             canvases.push(c);
             c.setBackground('#A8A8A8');
+            
+            tabs.delegate("span.ui-icon-close", "click", function() {
+        	    // close icon: removing the tab on click
+			    tabs.delegate( "span.ui-icon-close", "click", function() {
+			      var panelId = $( this ).closest( "li" ).remove().attr( "aria-controls" );
+			      $( "#" + panelId ).remove();
+			      tabs.tabs( "refresh" );
+			    });
+            })
 
             // Update the tab view
             $(content).tabs("refresh");

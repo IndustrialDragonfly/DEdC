@@ -52,7 +52,8 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
 
     return function Canvas(container, width, height) {
        // Create canvas with Raphael with given arguments
-       var paper = Raphael(container, width, height);
+    	var myContainer = container,
+    		paper = Raphael(container, width, height);
 
        // Datamodel
        var myOriginator = "",
@@ -82,6 +83,12 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
            }
        });
        
+       /**
+        * Return the id of the container
+        */
+       this.getContainer = function () {
+    	   return myContainer;
+       }
        /**
         * Event called when an Element on the canvas is clicked
         * It handles the selection of elements;

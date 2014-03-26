@@ -87,7 +87,7 @@ echo <<<EOF
                     <div id="toolbar" class="ui-widget-header ui-conrner-all">
                             <button id="connect">Create Dataflow</button>
                             <button id="delete">Delete Element</button>
-                            <button id="load">Load DFD</button>
+                            <button id="load">DFD Chooser</button>
                             <button id="newTab">New Tab</button>
                             <button id="save">Save DFD</button>
                     </div>
