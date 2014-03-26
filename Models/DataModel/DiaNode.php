@@ -89,11 +89,11 @@ class DiaNode extends Node
      */
     public function setSubDiagram($aDiagramID)
     {
-        //TODO - is this check needed? this will require a DB access to function
         $type = $this->storage->getTypeFromUUID($aDiagramID);
         if (is_subclass_of($type, "Diagram"))
         {
             $this->subDiagram = $aDiagramID;
+            $this->update();
         }
         else
         {
