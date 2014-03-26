@@ -40,7 +40,7 @@ abstract class Entity
     /**
      * Storage object, should be readable and/or writable (depending on whether
      * this is a normal data store, import data source, or export data format)
-     * @var Readable/Writable
+     * @var DatabaseStorage
      */
     protected $storage;
 
