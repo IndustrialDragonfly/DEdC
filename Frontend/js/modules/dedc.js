@@ -381,7 +381,8 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                         type: entry.getType().name,
                         label: entry.getText(),
                         x: entry.getPosition().x,
-                        y: entry.getPosition().y
+                        y: entry.getPosition().y,
+                        genericType: "Node"
                     };
 
                     Connector.put("Controller.php/" + entry.getId(), data, onSuccess, onFail, false);
@@ -410,7 +411,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                         }
                     };
                     
-                    Connector.put("Controller.php/" + entry.getId(), data, onSuccess, onFail);
+                    Connector.put("Controller.php/" + entry.getId(), data, onSuccess, onFail, false);
                 });
             };
             

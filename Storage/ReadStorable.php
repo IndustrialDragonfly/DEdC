@@ -63,6 +63,14 @@ interface ReadStorable
      * @return String
      */
     public function loadDiaNode($id);
+    
+    /**
+     * Returns true if the Entity exists, false otherwise
+     * @param String $id
+     * @return Boolean
+     */
+    public function entityExists($id);
+    
     //</editor-fold>
     
     //<editor-fold desc="User Model" defaultstate="collapsed">
@@ -88,7 +96,7 @@ interface ReadStorable
      * @param String $id User's id
      */
     public function getHash($id);
-
+    
     //</editor-fold>
 
 }

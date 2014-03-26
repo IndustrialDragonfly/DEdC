@@ -302,6 +302,12 @@ abstract class Entity
             $this->organization = "";
         }
     }
+    
+    public function setAssociativeArray($associativeArray)
+    {
+    	$this->loadAssociativeArray($associativeArray);
+    	$this->update();
+    }
 
     //</editor-fold>
 }

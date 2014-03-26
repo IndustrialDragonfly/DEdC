@@ -191,9 +191,16 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          //extract all the ids of the elements
          $linkList = $load->fetchAll(PDO::FETCH_ASSOC);
          
-         // Put array of all dataflow ids into array to return as links
-         $node_vars['linkList'] = $linkList;
-         
+         if ($linkList === FALSE)
+        {
+            $node_vars['linkList'] = NULL;
+        }
+        else
+        {
+            // Put array of all dataflow ids into array to return as links
+            $node_vars['linkList'] = $linkList;;
+        }
+                 
          // Setup select statement to grab parent DFD id
         $select_stmt = $this->dbh->prepare('SELECT * FROM element_list WHERE elementId = ?');
         $select_stmt->bindParam(1, $id);
@@ -754,6 +761,28 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $delete->bindParam(1, $id);
         $delete->execute();
     }
+    
+    /**
+     * Returns true if the Entity exists, false otherwise
+     * @param String $id
+     * @return Boolean
+     */
+    public function entityExists($id)
+    {
+		$existsQuery = $this->dbh->prepare ( "SELECT type FROM entity WHERE id=?" );
+		$existsQuery->bindParam ( 1, $id );
+		$existsQuery->execute ();
+		$exists = $existsQuery->fetch();
+		if ($exists == FALSE) 
+		{
+			return FALSE;
+		}
+		else
+		{
+			return TRUE;
+		}
+    }
+    
     
         //</editor-fold>
 
