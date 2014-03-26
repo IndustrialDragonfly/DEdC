@@ -1,10 +1,18 @@
 <?php
 
+require_once '../Entity.php';
+require_once '../Element.php';
+require_once '../Node.php';
+require_once '../DiaNode.php';
+require_once '../Link.php';
+require_once '../DataFlow.php';
+require_once '../Diagram.php';
+require_once '../Process.php';
+require_once '../DataStore.php';
+require_once '../ExternalInteractor.php';
 require_once '../Multiprocess.php';
 require_once '../DataFlowDiagram.php';
-require_once '../DataFlow.php';
-require_once 'testDB_functions.php';
-
+require_once 'Models/BadConstructorCallException.php';
 require_once 'Storage/DatabaseStorage.php';
 
 /**
