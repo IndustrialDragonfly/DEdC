@@ -6,10 +6,6 @@
  * to deal with them.
  */
 
-
-
-require_once 'ClassLoader.php';
-require_once 'ExceptionHandler.php';
 require_once "MethodsEnum.php";
 require_once "conf.php";
 require_once 'Methods/ElementFactory.php'; // Remove this one once the methods are updated.
@@ -17,8 +13,26 @@ require_once 'Methods/PUT.php';
 require_once 'Methods/GET.php';
 require_once 'Methods/DELETE.php';
 
-
+require_once 'ExceptionHandler.php';
 set_exception_handler("ExceptionHandler");
+
+// Classloaders of the various components
+require_once 'ClassLoader.php';
+require_once 'Models/ClassLoader.php';
+require_once 'Models/DataModel/ClassLoader.php';
+require_once 'Models/UserModel/ClassLoader.php';
+require_once 'AuthenticationInformation/ClassLoader.php';
+require_once 'Storage/ClassLoader.php';
+require_once 'Interface/ClassLoader.php';
+
+spl_autoload_register("DataModelClassLoader");
+spl_autoload_register("ModelsClassLoader");
+spl_autoload_register("InterfaceClassLoader");
+spl_autoload_register("StorageClassLoader");
+spl_autoload_register("UserModelClassLoader");
+spl_autoload_register("AuthenicationInformationClassLoader");
+// Must always be last in the stack so that it can handle failure to load
+spl_autoload_register("GeneralLoader");
 
     /*
     * Checks to see if the incoming request has the proper user agent product,
