@@ -22,6 +22,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             var id = tabs.tabs('option', 'active');
             return canvases[id];
         };
+       
 
         /**
          * Setup the UI for the browser
@@ -268,7 +269,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
          * @returns {canvas} Canvas that was created in the tab
          */
         var createNewTab = function (name) {
-            var tabTemplate = "<li><a href='#{href}'>#{label}</a></li>",
+            var tabTemplate = "<li><a href='#{href}'>#{label}</a><span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span></li>",
                 // Template for the tabs
                 label = "Tab" + canvases.length,
                 // Name of the tab
@@ -292,6 +293,15 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             var c = new Canvas(id, 640, 480);
             canvases.push(c);
             c.setBackground('#A8A8A8');
+            
+            tabs.delegate("span.ui-icon-close", "click", function() {
+        	    // close icon: removing the tab on click
+			    tabs.delegate( "span.ui-icon-close", "click", function() {
+			      var panelId = $( this ).closest( "li" ).remove().attr( "aria-controls" );
+			      $( "#" + panelId ).remove();
+			      tabs.tabs( "refresh" );
+			    });
+            })
 
             // Update the tab view
             $(content).tabs("refresh");
