@@ -6,24 +6,13 @@
  * to deal with them.
  */
 
-/**
- * Creates an element object from an object already in storage.
- * @param String $id
- * @param Readable and Writable $storage
- * @return \elementType
- */
-function existingElementFactory($id, $storage)
-{
-    // Construct object that has been requested
-    $elementType = $storage->getTypeFromUUID($id);
-    $element = new $elementType($storage, $id);
-    return $element;
-}
+
 
 require_once 'ClassLoader.php';
 require_once 'ExceptionHandler.php';
 require_once "MethodsEnum.php";
 require_once "conf.php";
+require_once 'Methods/ElementFactory.php'; // Remove this one once the methods are updated.
 require_once 'Methods/PUT.php';
 
 set_exception_handler("ExceptionHandler");
@@ -130,7 +119,7 @@ set_exception_handler("ExceptionHandler");
                 $element;
                 try
                 {
-                    $element = existingElementFactory($request->getId(), $storage);
+                    $element = existingElementFactory($storage, $request->getId());
                 }
                 catch (Exception $e) // TODO: Make more specific catch cases
                 {
@@ -190,7 +179,7 @@ set_exception_handler("ExceptionHandler");
                 try 
                 {
                     // TODO: Check that element types are the same before deleting
-                    $element = existingElementFactory($request->getId(), $storage);
+                    $element = existingElementFactory($storage, $request->getId());
                 } 
                 catch (Exception $e) 
                 {

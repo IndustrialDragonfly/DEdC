@@ -387,9 +387,7 @@ abstract class Link extends Element
     		$newNode->addLink($this);
     	}
     	
-    	$this->loadAssociativeArray($associativeArray);
-    	 
-    	$this->update();
+    	parent::setAssociativeArray($associativeArray);
     }
 
     //</editor-fold>
