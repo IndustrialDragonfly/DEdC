@@ -136,7 +136,7 @@ abstract class Link extends Element
     public function setOriginNode($aNode)
     {
         //make sure a Node object was passed
-        if ($aNode instanceof Node)
+        if (is_subclass_of($aNode, "Node"))
         {
             //if origin has not been set yet
             if ($this->originNode == NULL)
@@ -146,7 +146,6 @@ abstract class Link extends Element
                 $this->originNode['label'] = $aNode->getLabel();
                 
                 $aNode->addLink($this);
-                $aNode->update();
             }
             //if the origin node has already been set
             else
@@ -157,13 +156,12 @@ abstract class Link extends Element
                 $type = $this->storage->getTypeFromUUID($this->originNode);
                 $node = new $type($this->storage, $this->originNode);
                 $node->removeLink($this);
-                $node->update();
 
                 $this->originNode['id'] = $aNode->getId();
                 $this->originNode['label'] = $aNode->getLabel();
                 $aNode->addLink($this);
-                $aNode->update();
             }
+            $this->update();
         }
         else
         {
@@ -182,7 +180,8 @@ abstract class Link extends Element
             $node = new $type($this->storage, $this->originNode['id']);
             $node->removeLink($this);
             $this->originNode = NULL;
-            $node->update();
+            //$node->update();remove link already did this
+            $this->update();
         }
     }
 
@@ -216,7 +215,6 @@ abstract class Link extends Element
                 $this->destinationNode['label'] = $aNode->getLabel();
                 
                 $aNode->addLink($this);
-                $aNode->update();
             }
             //if the destination node has already been set
             else
@@ -227,13 +225,12 @@ abstract class Link extends Element
                 $type = $this->storage->getTypeFromUUID($this->destinationNode);
                 $node = new $type($this->storage, $this->destinationNode);
                 $node->removeLink($this);
-                $node->update();
 
                 $this->destinationNode['id'] = $aNode->getId();
                 $this->destinationNode['label'] = $aNode->getLabel();
                 $aNode->addLink($this);
-                $node->update();
             }
+            $this->update();
         }
         else
         {
@@ -251,8 +248,9 @@ abstract class Link extends Element
             $type = $this->storage->getTypeFromUUID($this->destinationNode['id']);
             $node = new $type($this->storage, $this->destinationNode['id']);
             $node->removeLink($this);
-            $node->update();
+            //$node->update(); remove link already did this
             $this->destinationNode = NULL;
+            $this->update();
         }
     }
 

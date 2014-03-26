@@ -266,6 +266,7 @@ abstract class Node extends Element
         // have been updated to reflected
         unset($this->linkList);
         $this->linkList = array();
+        $this->update();
     }
     //</editor-fold>
     //<editor-fold desc="AssociativeArray functions" defaultstate="collapsed">
