@@ -6,5 +6,6 @@
  * the root of the project (i.e. the controller folder) at the start of the
  * test
  */
-set_include_path(implode(PATH_SEPARATOR, array(realpath('../..'), get_include_path())));
+set_include_path(implode(PATH_SEPARATOR, array(realpath('../../..'), get_include_path())));
+spl_autoload_register();
 ?>

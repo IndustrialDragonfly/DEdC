@@ -114,7 +114,11 @@ abstract class Entity
      */
     public function setLabel($newLabel)
     {
-        $this->label = $newLabel;
+        if ($this->label != $newLabel)
+        {
+            $this->label = $newLabel;
+            $this->update();
+        }
     }
 
     /**
@@ -147,6 +151,7 @@ abstract class Entity
     public function setOriginator($newOriginator)
     {
         $this->originator = $newOriginator;
+        $this->update();
     }
 
     /**
@@ -166,7 +171,11 @@ abstract class Entity
      */
     public function setOrganization($newOrg)
     {
-        $this->organization = $newOrg;
+        if ($this->organization != $newOrg)
+        {
+            $this->organization = $newOrg;
+            $this->update();
+        }
     }
 
     /**
