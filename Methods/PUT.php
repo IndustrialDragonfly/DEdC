@@ -1,9 +1,12 @@
 <?php
 
-//require_once 'ElementFactory.php';
-
-// If there is an ID attached, then we are being asked to update
-// an existing element
+/**
+ * Handle a PUT request
+ * @param {ReadStorable,WriteStorable} $storage
+ * @param SimpleRequest $request
+ * @throws BadFunctionCallException
+ * @return SimpleResponse
+ */
 function put($storage, $request) {
 	$response = new SimpleResponse();
 	
@@ -15,6 +18,7 @@ function put($storage, $request) {
 		// TODO Use getTypeByUUID to find out if the entity exists thus saving an SQL query
 		if ($storage->entityExists($request->getId()))
 		{
+			// If the entity exists, load it and update it.
 			if ($storage->getTypeFromUUID($request->getId()) == $bodyArray['type'])
 			{
 				$element = existingElementFactory($storage, $request->getId());
@@ -24,12 +28,14 @@ function put($storage, $request) {
 			}
 			else
 			{
+				// The new element's type different from what was stored.
 				// TODO Send correct HTTP status code
 				throw new BadFunctionCallException("Requested type did not match stored type.");
 			}
 		}
 		else
 		{
+			// An ID was requested, but it was not found in the database.
 			// TODO Send correct HTTP status code
 			throw new BadFunctionCallException("No such ID.");
 		}
@@ -48,6 +54,7 @@ function put($storage, $request) {
 				'DataFlow'
 		);
 		
+		// Check that the received type was valid
 		if (in_array($type, $validTypesArray))
 		{
 			$element = new $type($storage, $bodyArray);
@@ -66,5 +73,6 @@ function put($storage, $request) {
 		throw new BadFunctionCallException("Request was not formed correctly.");
 	}
 	
+	// Return the response
 	return $response;
 }
