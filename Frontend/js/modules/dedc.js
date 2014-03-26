@@ -177,8 +177,19 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             $("#dialog-modal").dialog({
                 autoOpen: false,
                 modal: true,
+                height: 500,
+                width: 600,
                 buttons: {
-                    "Open DFDs": function () {
+                	 "Delete DFD(s)": function () {
+                     	// Delete button
+                         $(".ui-selected", this).each(function() {
+                             // Get the id of the selected element
+                         	Connector.delete("Controller.php/" + this.id);
+                         });
+                         
+                         $(this).dialog("close");
+                     },
+                    "Open DFD(s)": function () {
                         // Open button
                         // Go through each DOM element with the class ".ui-selected"
                         $(".ui-selected", this).each(function() {
@@ -186,10 +197,6 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                             getDfd("Controller.php/" + this.id);
                         });
                         
-                        $(this).dialog("close");
-                    },
-                    "Cancel": function () {
-                        // Cancel button
                         $(this).dialog("close");
                     }
                 },
@@ -238,6 +245,10 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                         Connector.setCredentials($("#organization").val(), $("#username").val(), $("#password").val());
                         Connector.get("Controller.php/DataFlowDiagram", onSuccess, onFail);
                     }
+                },
+                open: function(event, ui) { 
+                    // Hide close button.
+                    $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                 }
             });
 
