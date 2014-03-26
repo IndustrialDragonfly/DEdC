@@ -21,7 +21,7 @@ abstract class Entity
 
     /**
      * This contains a universally unique identifier
-     * @var String
+     * @var ID
      */
     protected $id;
 
@@ -29,7 +29,7 @@ abstract class Entity
      * UUID of the originator of this DFD
      * @var String 
      */
-    protected $originator;
+    protected $user;
 
     /**
      * This is a container for the organization that this object belongs to
@@ -72,7 +72,7 @@ abstract class Entity
         {
             $this->label = '';
             $this->organization = '';
-            $this->originator = '';
+            $this->user = '';
             
         }
         //if there was a second parameter load an associative array
@@ -150,7 +150,7 @@ abstract class Entity
      */
     public function setOriginator($newOriginator)
     {
-        $this->originator = $newOriginator;
+        $this->user = $newOriginator;
         $this->update();
     }
 
@@ -160,7 +160,7 @@ abstract class Entity
      */
     public function getOriginator()
     {
-        return $this->originator;
+        return $this->user;
     }
 
     //</editor-fold>
@@ -236,7 +236,7 @@ abstract class Entity
 
         $entityArray['id'] = $this->id;
         $entityArray['label'] = $this->label;
-        $entityArray['originator'] = $this->originator;
+        $entityArray['originator'] = $this->user;
         $entityArray['organization'] = $this->organization;
         $entityArray['type'] = get_class($this);
 
@@ -287,11 +287,11 @@ abstract class Entity
         
         if(isset($associativeArray['originator']))
         {
-            $this->originator = $associativeArray['originator'];
+            $this->user = $associativeArray['originator'];
         }
         else
         {
-            $this->originator = "";
+            $this->user = "";
         }
         if(isset($associativeArray['organization']))
         {

@@ -326,7 +326,7 @@ abstract class Node extends Element
      */
     public function save()
     {
-        $this->storage->saveNode($this->id, $this->label, get_class($this), $this->originator, $this->x, $this->y, $this->linkList, $this->getNumberOfLinks(), $this->parent);
+        $this->storage->saveNode($this->id, $this->label, get_class($this), $this->user, $this->x, $this->y, $this->linkList, $this->getNumberOfLinks(), $this->parent);
     }
 
     /**

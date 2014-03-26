@@ -399,7 +399,7 @@ abstract class Link extends Element
     {
         // Send info required to save dataflow to the data store
         $this->storage->saveLink($this->id, $this->label, get_class($this), 
-                $this->originator, $this->x, $this->y, $this->originNode['id'], 
+                $this->user, $this->x, $this->y, $this->originNode['id'], 
                 $this->destinationNode['id'], $this->parent);
     }
 

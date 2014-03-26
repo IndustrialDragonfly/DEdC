@@ -655,7 +655,7 @@ abstract class Diagram extends Entity
     public function save()
     {
         $this->storage->saveDiagram($this->id, get_class($this), $this->label, 
-                $this->originator, $this->ancestry, $this->nodeList, 
+                $this->user, $this->ancestry, $this->nodeList, 
                 $this->linkList, $this->diaNodeList, $this->parentDiaNode);
     }
 
