@@ -139,6 +139,7 @@ class ElementTest extends PHPUnit_Framework_TestCase
     /**
      * @covers Element::setParent
      * @covers Element::getParent
+     * @expectedException BadFunctionCallException
      */
     public function testSetParent_null()
     {
@@ -155,6 +156,16 @@ class ElementTest extends PHPUnit_Framework_TestCase
         $someDiagram = new DataFlowDiagram($this->storage);
         $this->object->setParent($someDiagram->getId());
         $this->assertEquals($this->object->getParent(), $someDiagram->getId());
+    }
+    
+    /**
+     * @covers Element::SetParent
+     * @expectedException BadFunctionCallException
+     */
+    public function testSetParent_invalidInput()
+    {
+        $notADiagram = new DataStore($this->storage, $this->testDiagram->getId());
+        $this->object->setParent($notADiagram->getId());
     }
     
     
@@ -191,8 +202,6 @@ class ElementTest extends PHPUnit_Framework_TestCase
         
         $this->object->setX(50);
         $this->object->setY(150);
-        //$newElement = new Process($this->storage, $this->testDiagram->getId());
-        //$newElement->loadAssociativeArray($this->object->getAssociativeArray());
         
         $newElement = new Process($this->storage, $this->object->getAssociativeArray());
         

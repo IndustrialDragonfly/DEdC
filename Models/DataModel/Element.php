@@ -97,7 +97,11 @@ abstract class Element extends Entity
      */
     public function setX($newX)
     {
-        $this->x = $newX;
+        if($this->x != $newX)
+        {
+            $this->x = $newX;
+            $this->update();
+        }
     }
 
     /**
@@ -115,7 +119,11 @@ abstract class Element extends Entity
      */
     public function setY($newY)
     {
-        $this->y = $newY;
+        if($this->y != $newY)
+        {
+            $this->y = $newY;
+            $this->update();
+        }
     }
 
     /**
@@ -134,8 +142,12 @@ abstract class Element extends Entity
      */
     public function setLocation($newX, $newY)
     {
-        $this->x = $newX;
-        $this->y = $newY;
+        if( $this->x != $newX || $this->y != $newY)
+        {
+            $this->x = $newX;
+            $this->y = $newY;
+            $this->update();
+        }
     }
 
     /**
@@ -158,7 +170,23 @@ abstract class Element extends Entity
      */
     public function setParent($newParent)
     {
-        $this->parent = $newParent;
+        if($newParent == NULL)
+        {
+            throw new BadFunctionCallException("passed parent was null");
+        }
+        $type = $this->storage->getTypeFromUUID($newParent);
+        if(is_subclass_of($type, "Diagram"))
+        {
+            if($this->parent != $newParent)
+            {
+                $this->parent = $newParent;
+                $this->update();
+            }
+        }
+        else
+        {
+            throw new BadFunctionCallException("ID passed to the setParent function did not belong to a valid Diagram Object!");
+        }
     }
 
     /**
