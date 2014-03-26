@@ -163,7 +163,7 @@ abstract class Request implements Requestable {
     }
     public function getData()
     {
-        return $this->associativeArray;
+        return stripTags($this->associativeArray, $this->uuidTag);
     }
     
     /**
@@ -172,7 +172,16 @@ abstract class Request implements Requestable {
      */
     public function getAuthenticationInfo()
     {
-        return $this->authenticationHandler->getAuthenticationInfo();
+    	// AuthenticationHandler will not created if no credentials are present in the query string
+    	// Calling that object will result in PHP crashing.
+    	if ($this->authenticationHandler)
+    	{
+    		return $this->authenticationHandler->getAuthenticationInfo();
+    	}
+    	else
+    	{
+    		return NULL;
+    	}
     }
     //</editor-fold>
 }
