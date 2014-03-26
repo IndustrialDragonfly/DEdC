@@ -411,7 +411,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                         }
                     };
                     
-                    Connector.put("Controller.php/" + entry.getId(), data, onSuccess, onFail);
+                    Connector.put("Controller.php/" + entry.getId(), data, onSuccess, onFail, false);
                 });
             };
             

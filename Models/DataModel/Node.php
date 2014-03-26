@@ -198,7 +198,7 @@ abstract class Node extends Element
      * @throws BadFunctionCallException if the input was not a DataFlow]
      */
     public function removeLink($link)
-    {
+    {    	 
         //ensure that this is only called by a Link object
         $trace=debug_backtrace();
         $caller=array_shift($trace);
@@ -281,7 +281,7 @@ abstract class Node extends Element
      * x Int
      * y Int
      * diagramId String
-     * links String[]
+     * linkList String[][]
      * 
      * @return Mixed[]
      */

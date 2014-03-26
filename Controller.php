@@ -48,13 +48,16 @@ set_exception_handler("ExceptionHandler");
     $body = file_get_contents('php://input'); // Get the body of the request
     $request = new SimpleRequest($_SERVER['HTTP_ACCEPT'], 
             $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], $body);
+        
     // Try to create a new User
     $user;
     try
     {
         $user = new User($storage, $request->getAuthenticationInfo());
 
-    } catch (Exception $ex) {
+    } 
+    catch (Exception $ex) 
+    {
         // If the User threw an exception, return the exception message.
         // TODO: Allow configuring of the response type
         // TODO: Make authentication error message extending from error
@@ -185,8 +188,16 @@ set_exception_handler("ExceptionHandler");
 
                 // Delete element if it was found
                 if ($element)
-                {
-                    $element->delete();
+                {                	 
+                    //$element->delete();
+                    if ($request->getData()["type"] == "DataFlow")
+                    {
+                    	$element->setAssociativeArray($request->getData());
+                    }
+                    else
+                    {
+                    	$element->delete();
+                    }
                 }
             }
 
@@ -223,6 +234,8 @@ set_exception_handler("ExceptionHandler");
                     }
 
                     // Create a new element, loading it from the element array
+                    //if ($elementArray['type'] == "DataFlow")
+                    //	var_dump($request);
                     $element = NULL;
                     try
                     {
@@ -239,8 +252,17 @@ set_exception_handler("ExceptionHandler");
                     }
 
                     // Setup a response object with just a header
-                    $response = new SimpleResponse($element->getAssociativeArray());
-                    $response->setHeader(201);
+                    if ($element)
+                    {
+	                    $response = new SimpleResponse($element->getAssociativeArray());
+	                    $response->setHeader(201);
+                    }
+                    else
+                    {
+                    	$response = new SimpleResponse();
+                    	$response->setRawData("Element failed to initialize.");
+                    	$response->setHeader(500);
+                    }
                 }
             }
 

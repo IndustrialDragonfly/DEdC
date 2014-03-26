@@ -310,7 +310,7 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
            });
            
            if (dataflow) {
-               return this.removeDataflow(element);
+               return this.removeDataflow(dataflow);
            }
            
            return false;

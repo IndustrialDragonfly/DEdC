@@ -84,10 +84,28 @@ abstract class Link extends Element
                 }
             }
             //second parameter should be an associative array so pass it along to Element's constructor
+            // TODO Check if the Link is already in the database, and call save/update accordingly
             else
             {
                 parent::__construct(func_get_arg(0), func_get_arg(1));
-                $this->save();
+				$associativeArray = $this->getAssociativeArray();
+				if ($associativeArray ['originNode'] != NULL) 
+				{
+					// New node
+					$newType = $this->storage->getTypeFromUUID ( $associativeArray ['originNode'] ['id'] );
+					$newNode = new $newType ( $this->storage, $associativeArray ['originNode'] ['id'] );
+					$newNode->addLink ( $this );
+				}
+				
+				if ($associativeArray ['destinationNode'] != NULL) 
+				{
+					// New node
+					$newType = $this->storage->getTypeFromUUID ( $associativeArray ['destinationNode'] ['id'] );
+					$newNode = new $newType ( $this->storage, $associativeArray ['destinationNode'] ['id'] );
+					$newNode->addLink ( $this );
+				}
+				
+				$this->save ();				
             }
         }
         else
@@ -95,6 +113,7 @@ abstract class Link extends Element
             throw new BadConstructorCallException("An incorrect number of parameters were passed to the Link constructor");
         }
     }
+
 
 //</editor-fold>
 //<editor-fold desc="Accessor functions" defaultstate="collapsed">
@@ -334,6 +353,43 @@ abstract class Link extends Element
             $this->destinationNode = NULL;
         }
         
+    }
+    
+
+    public function setAssociativeArray($associativeArray)
+    {
+    	// TODO: Make new storage function to use fewer sql queries
+    	// Temporary fix for checking origin and destination node changes
+    	if ($associativeArray['originNode']['id'] != $this->originNode['id'])
+    	{
+    		// Original node
+    		$type = $this->storage->getTypeFromUUID($this->originNode['id']);
+    		$originalNode = new $type($this->storage, $this->originNode['id']);
+    		$originalNode->removeLink($this);
+    	
+    		// New node
+    		$newType = $this->storage->getTypeFromUUID($associativeArray['originNode']['id']);
+    		$newNode = new $newType($this->storage, $associativeArray['originNode']['id']);
+    		$newNode->addLink($this);
+    	
+    	}
+    	 
+    	if ($associativeArray['destinationNode']['id'] != $this->destinationNode['id'])
+    	{
+    		// Original node
+    		$type = $this->storage->getTypeFromUUID($this->destinationNode['id']);
+    		$originalNode = new $type($this->storage, $this->destinationNode['id']);
+    		$originalNode->removeLink($this);
+    		 
+    		// New node
+    		$newType = $this->storage->getTypeFromUUID($associativeArray['destinationNode']['id']);
+    		$newNode = new $newType($this->storage, $associativeArray['destinationNode']['id']);
+    		$newNode->addLink($this);
+    	}
+    	
+    	$this->loadAssociativeArray($associativeArray);
+    	 
+    	$this->update();
     }
 
     //</editor-fold>

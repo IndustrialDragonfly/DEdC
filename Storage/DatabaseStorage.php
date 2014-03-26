@@ -762,6 +762,28 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $delete->execute();
     }
     
+    /**
+     * Returns true if the Entity exists, false otherwise
+     * @param String $id
+     * @return Boolean
+     */
+    public function entityExists($id)
+    {
+		$existsQuery = $this->dbh->prepare ( "SELECT type FROM entity WHERE id=?" );
+		$existsQuery->bindParam ( 1, $id );
+		$existsQuery->execute ();
+		$exists = $existsQuery->fetch();
+		if ($exists == FALSE) 
+		{
+			return FALSE;
+		}
+		else
+		{
+			return TRUE;
+		}
+    }
+    
+    
         //</editor-fold>
 
     //<editor-fold desc="User Model" defaultstate="collapsed">
