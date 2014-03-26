@@ -13,12 +13,12 @@ interface ReadStorable
 {
     //<editor-fold desc="DFD Model" defaultstate="collapsed">
     /**
-     * Returns the type of element from the data store based on the given resource
+     * Returns the type of element from the data store based on the given id
      * UUID
      * 
-     * @param string $resource
+     * @param string $id
      */
-    public function getTypeFromUUID($resource);
+    public function getTypeFromUUID($id);
     
     /**
      * Returns a list of of a given type by the given type from the datastore

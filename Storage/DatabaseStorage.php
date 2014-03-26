@@ -51,14 +51,14 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     /**
      * Given a resource UUID, returns its type (or throws an exception if that
      * id doesn't exist). Uses PDO to access many different SQL type databases.
-     * @param String $resource
+     * @param String $id
      * @return String
      * @throws BadFunctionCallException
      */
-    public function getTypeFromUUID($resource)
+    public function getTypeFromUUID($id)
     {
          $type_find = $this->dbh->prepare("SELECT type FROM entity WHERE id=?");
-         $type_find->bindParam(1, $resource);
+         $type_find->bindParam(1, $id);
          $type_find->execute();
          $type = $type_find->fetch();
          if($type == FALSE )
