@@ -3,10 +3,10 @@
 function idListConvert($idArray, $idLabel)
 {
     foreach ($idArray as &$id)
-        {
-            // Convert each id string into an ID object
-            $id[$idLabel] = new ID($id[$idLabel]);
-        }
+    {
+        // Convert each id string into an ID object
+        $id[$idLabel] = new ID($id[$idLabel]);
+    }
    return $idArray;   
 }
 
@@ -621,7 +621,6 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          $vars['nodeList'] = $nodeList;
          $vars['nodeList'] = idListConvert($vars['nodeList'], "id");
          
-         
          // Get the links list from the database
          // This is performed by joining the relevant tables
          $loadDiagram = $this->dbh->prepare("
@@ -640,9 +639,10 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          // Add the data of the links to the $vars array that is
          // to be returned
          $vars['linkList'] = $linkList;
-         $vars['linkList'] = idListConvert($vars['linkList'], "id");
-         
-         
+         $vars['linkList'] = idListConvert($vars['linkList'], "id");         
+         $vars['linkList'] = idListConvert($vars['linkList'], "originNode");
+         $vars['linkList'] = idListConvert($vars['linkList'], "destinationNode");
+              
          // Get the diaNode list from the database
          // This is performed by joining the relevant tables
          // This first approach should work, but MySQL seems to have a bug

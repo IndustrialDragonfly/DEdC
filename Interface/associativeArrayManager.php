@@ -26,8 +26,8 @@ function addTags($rawData, $tag)
             foreach ($rawData['linkList'] as &$link)
             {
                 $link['id'] = $link['id']->getTaggedId();
-                $link['originNode']['id'] = $link['originNode']['id']->getTaggedId();
-                $link['destinationNode']['id'] = $link['destinationNode']['id']->getTaggedId();
+                $link['originNode'] = $link['originNode']->getTaggedId();
+                $link['destinationNode'] = $link['destinationNode']->getTaggedId();
             }
 
             foreach ($rawData['DiaNodeList'] as &$diaNode)
