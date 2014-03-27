@@ -599,9 +599,10 @@ abstract class Diagram extends Entity
             $type = $this->storage->getTypeFromUUID($newParentDiaNodeID);
             if(is_subclass_of($type, "DiaNode"))
             {
-            $diaNode = new $type($this->storage, $newParentDiaNodeID);
-            $diaNode->setSubDiagram($this->getId());
-            $this->update();
+                // Provides implicit authorization, as diaNode constructor will error if not authorized
+                $diaNode = new $type($this->storage, $this->user, $newParentDiaNodeID);
+                $diaNode->setSubDiagram($this->getId());
+                $this->update();
             }
             else
             {
