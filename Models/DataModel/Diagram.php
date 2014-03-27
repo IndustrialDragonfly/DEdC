@@ -55,95 +55,51 @@ abstract class Diagram extends Entity
      * 2 parameters: create a create a new Diagram with a parent or load a 
      * diagram from storage or load from an assocative array
      * first parameter will always be the storage and is required
-     * second parameter is optional; this is either the UUID of a parent DiaNode 
+     * second parameter will always be the user and is required
+     * third parameter is optional; this is either the UUID of a parent DiaNode 
      * or a UUID of a diagram to load from storage, or it is an associative array
      * @param {Read,Write}Storable $storage
+     * @param User $user
      * @param String $id ID of a Diagram or DiaNode to link to (optionial if an assocative array is in its place)
      * @param Mixed[] $associativeArray associative array representing a diagram object (optional if an ID is in its place) 
      */
    public function __construct()
    {
-        //if only a storage medium is passed create an empty root Diagram
-        if(func_num_args() == 1)
+        // If only given storage and user
+        if(func_num_args() == 2)
         {
-            parent::__construct(func_get_arg(0));
-            $this->ancestry = array();
-            $this->parentDiaNode = null;
-            $this->diaNodeList = array();
-            $this->linkList = array();
-            $this->nodeList = array();
-            $this->save();
-                    
+            $this->ConstructNewDiagram();                    
         }
         
-        //if 2 things were passed we are either loading a Diagram from storage, 
-        //or loading from a associative array, or we are creating a new mostly 
-        //empty Diagram with a specified parent
-        else if (func_num_args() == 2)
+        // If 3 things were passed we are either loading a Diagram from storage, 
+        // or loading from a associative array, or we are creating a new mostly 
+        // empty Diagram with a specified parent
+        else if (func_num_args() == 3)
         {
-            //the second parameter was an ID of either a Diagram to be loaded or DiaNode which will be the parent
-            if(is_a(func_get_arg(1), "ID"))
+            // Third parameter was an ID of either a Diagram to be loaded or DiaNode which will be the parent
+            if(is_a(func_get_arg(2), "ID"))
             {
-                
                 $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
-                //if the id belonged to a Diagram object load it
+                // If the ID was for a Diagram, then load
                 if (is_subclass_of($type, "Diagram"))
                 {
-                    $this->id = func_get_arg(1);
-                    $this->storage = func_get_arg(0);
-                    if (!is_subclass_of($this->storage, "ReadStorable"))
-                    {
-                        throw new BadConstructorCallException("Passed storage object does not implement ReadStorable.");
-                    }
-                    if (!is_subclass_of($this->storage, "WriteStorable"))
-                    {
-                        throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
-                    }
-                    $assocativeArray = $this->storage->loadDiagram(func_get_arg(1));
-                    $this->loadAssociativeArray($assocativeArray);
+                    $this->ConstructDiagramFromId(func_get_arg(0), func_get_arg(1), func_get_arg(2));
                 }
-                //second parameter was an id of a DiaNode object create an empty 
-                //Diagram with that diaNode as its parent and set up its ancestry 
-                //to be the ancestry of the parent Diagrams and then add the parent 
-                //Diagram to this new Diagram's ancestry.  Next set the subDiagram 
-                //in the parentDiaNode to be this Diagram
+                
+                // If the ID was for a diaNode, load the diaNode and connect to it
                 else if (is_subclass_of($type, "DiaNode"))
                 {
-                    //call the parent constructor and set the linkList to be an empty list
-                    parent::__construct(func_get_arg(0));
-                    $this->linkList = array();
-                    $this->diaNodeList = array();
-                    $this->nodeList = array();
-                    $this->parentDiaNode = func_get_arg(1);
-                    
-                    //to set the ancestry load the parent Diagram and then set this object's ancestry equal to it then add the parent Diagram to it
-                    //load the parent DiaNode
-                    $type = $this->storage->getTypeFromUUID($this->parentDiaNode);
-                    $parentDiaNode = new $type(func_get_arg(0), $this->parentDiaNode);
-                    //get the id of parent Diagram of the parentDiaNode
-                    $parentDiagramId = $parentDiaNode->getParent();
-                    //load the parentDiagram
-                    $type = $this->storage->getTypeFromUUID($parentDiagramId);
-                    $parentDiagram = new $type(func_get_arg(0), $parentDiagramId);
-                    //set this Diagram's ancestry to the parentDiagrams, then add it to the list
-                    $this->ancestry = $parentDiagram->getAncestry();
-                    array_push($this->ancestry, $parentDiagram->getId());
-                    
-                    //set the subDiagram in the parentDiaNode
-                    $this->addDiaNode($parentDiaNode);
-                    $this->save();
-                    $parentDiaNode->setSubDiagram($this->getId());
+                    $this->ConstructDiagramFromDiaNodeId(func_get_arg(0), func_get_arg(1), func_get_arg(2));
                 }
                 else
                 {
                     throw new BadConstructorCallException("the ID passed to the Diagram constructor was neither a Diagram nor a DiaNode");
                 }
            }
-           //if the second parameter was an associative array pass the parameters on to the parent constructor
-           else if(is_array(func_get_arg(1)))
+           // If the third parameter was an associative array pass the parameters on to the parent constructor
+           else if(is_array(func_get_arg(2)))
            {
-               parent::__construct(func_get_arg(0), func_get_arg(1));
-               $this->save();
+               ConstructDiagramFromAssocArray(func_get_arg(0), func_get_arg(1), func_get_arg(2));
            }
            else
            {
@@ -155,6 +111,105 @@ abstract class Diagram extends Entity
            throw new BadConstructorCallException("An incorrect number of parameters were passed to the constructor for Diagram");
        }
    }
+   
+    /**
+     * "Constructor" for Diagram when Diagram is only passed storage and user
+     * Diagram($storage, $user)
+     * @param Readable,Writable $storage
+     * @param User $storage
+     */
+    protected function ConstructNewDiagram($storage, $user)
+    {
+        parent::__construct($storage, $user);
+        $this->ancestry = array();
+        $this->parentDiaNode = null;
+        $this->diaNodeList = array();
+        $this->linkList = array();
+        $this->nodeList = array();
+        $this->save();
+    }
+    
+    /**
+     * "Constructor" for Diagram when Diagram is called with an ID for a Diagram,
+     * loads the Diagram from Storage.
+     * Diagram($storage, $user, $id)
+     * @param Readable,Writable $storage
+     * @param User $user
+     * @param ID $id
+     */
+    protected function ConstructDiagramFromId($storage, $user, $id)
+    {
+        $this->id = $id;
+        $this->setStorage($storage);
+        
+        $assocativeArray = $this->storage->loadDiagram($id);
+        
+        // Perform authorization. Check that user matches stored user ID for
+        // this Diagram. Throws exception on failure.
+        $this->verifyThenSetUser($user, $assocativeArray['originator']);
+        
+        $this->loadAssociativeArray($assocativeArray);
+    }
+    
+    /**
+     * "Constructor" for Diagram when Diagram is called with an ID for a diaNode.
+     * Diagram($storage, $user, $diaNodeId)
+     * @param Readable,Writable $storage
+     * @param User $user
+     * @param ID $diaNodeId
+     */
+    protected function ConstructDiagramFromDiaNodeId($storage, $user, $diaNodeId)
+    {
+        //second parameter was an id of a DiaNode object create an empty 
+        //Diagram with that diaNode as its parent and set up its ancestry 
+        //to be the ancestry of the parent Diagrams and then add the parent 
+        //Diagram to this new Diagram's ancestry.  Next set the subDiagram 
+        //in the parentDiaNode to be this Diagram
+        
+        //call the parent constructor and set the linkList to be an empty list
+        parent::__construct($storage, $user);
+        $this->linkList = array();
+        $this->diaNodeList = array();
+        $this->nodeList = array();
+        $this->parentDiaNode = $diaNodeId;
+
+        //to set the ancestry load the parent Diagram and then set this object's ancestry equal to it then add the parent Diagram to it
+        //load the parent DiaNode
+        $type = $this->storage->getTypeFromUUID($this->parentDiaNode);
+        $parentDiaNode = new $type($storage, $this->parentDiaNode);
+         
+        // Perform authorization. If the diaNode doesn't belong to the user,
+        // don't allow them access to it (throws exception on failure)
+        $this->verifyThenSetUser($user, $parentDiaNode->getUser->getId());
+        
+        //get the id of parent Diagram of the parentDiaNode
+        $parentDiagramId = $parentDiaNode->getParent();
+        //load the parentDiagram
+        $type = $this->storage->getTypeFromUUID($parentDiagramId);
+        $parentDiagram = new $type($storage, $parentDiagramId);
+        //set this Diagram's ancestry to the parentDiagrams, then add it to the list
+        $this->ancestry = $parentDiagram->getAncestry();
+        array_push($this->ancestry, $parentDiagram->getId());
+
+        //set the subDiagram in the parentDiaNode
+        $this->addDiaNode($parentDiaNode);
+        $parentDiaNode->setSubDiagram($this->getId());
+        $this->save();
+    }
+    
+    /**
+     * "Constructor" for Diagram when Diagram is called with an associative array
+     * to load from
+     * Diagram($storage, $user, $associativeArray)
+     * @param Readable,Writable $storage
+     * @param User $user
+     * @param Mixed[] $associativeArray
+     */
+    protected function ConstructDiagramFromAssocArray($storage, $user, $associativeArray)
+    {
+        parent::__construct(func_get_arg(0), func_get_arg(1));
+        $this->save();
+    }
     //</editor-fold>
     //<editor-fold desc="Accessor functions" defaultstate="collapsed">
     //<editor-fold desc="linkList Accessors" defaultstate="collapsed">
