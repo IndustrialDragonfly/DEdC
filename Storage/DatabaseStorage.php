@@ -301,9 +301,18 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $select_statement->bindParam(1, $id->getId());
         $select_statement->execute();
         $diagramId = $select_statement->fetch();
-         
+        
         // append the child id to the associative array of attributes
-        $node_vars['childDiagramId'] = new ID($diagramId['childDiagramId']);
+         // Check for NULL
+         if (isset($node_vars['childDiagramId']))
+         {
+            $node_vars['childDiagramId'] = new ID($diagramId['childDiagramId']);
+         }
+         else
+         {
+             $node_vars['childDiagramId'] = NULL;
+         }
+         
         return $node_vars;
     }
     
