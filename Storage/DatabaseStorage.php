@@ -467,9 +467,9 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          }
          else
          {
-            $results['originNode'] = new ID($results['originNode']);
+            $results['originNode'] = $originNode;
+            $results['originNode']['id'] = new ID($originNode['id']);
          }
-        
         
         // Setup select statement to grab destination node info
         $select_stmt = $this->dbh->prepare('
@@ -489,7 +489,8 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          }
          else
          {
-            $results['destinationNode'] = new ID($results['destinationNode']);
+            $results['destinationNode'] = $destNode;
+            $results['destinationNode']['id'] = new ID($destNode['id']);
          }
          
          // Return the assocative array
