@@ -54,7 +54,7 @@ abstract class Node extends Element
             if (is_a(func_get_arg(2), "ID"))
             {
                 // If third parameter is an id of a node subclass object
-                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
+                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(2));
                 if (is_subclass_of($type, "Node"))
                 {
                     $this->ConstructNodeByID(func_get_arg(0), func_get_arg(1), func_get_arg(2));
@@ -95,7 +95,7 @@ abstract class Node extends Element
         // Storage is set here, as entity (parent) is never called
         $this->setStorage($storage);
         
-        $assocativeArray = $this->storage->loadNode($storage);
+        $assocativeArray = $this->storage->loadNode($id);
         
         // Authorization step
         if($this->verifyThenSetUser($user, $assocativeArray['userId']))

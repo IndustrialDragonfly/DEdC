@@ -294,7 +294,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     public function loadDiaNode($id)
     {
         //load all of the node attributes
-        $node_vars = $this->loadNode($id->getId());
+        $node_vars = $this->loadNode($id);
         
         //get the childDiagramId
         $select_statement = $this->dbh->prepare("SELECT childDiagramId FROM dianode WHERE diaNodeId=?");
