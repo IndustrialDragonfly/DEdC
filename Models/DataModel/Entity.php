@@ -294,7 +294,9 @@ abstract class Entity
      * 
      * id String
      * label String
-     * userId String
+     * user Mixed[]
+     *      userName String
+     *      organization String
      * organization String
      * type String
      * genericType String
@@ -307,8 +309,7 @@ abstract class Entity
 
         $entityArray['id'] = $this->id;
         $entityArray['label'] = $this->label;
-        $entityArray['userId'] = $this->user;
-        $entityArray['organization'] = $this->organization;
+        $entityArray['user'] = $this->user->getAssociativeArray();
         $entityArray['type'] = get_class($this);
 
         $genericType = NULL;
