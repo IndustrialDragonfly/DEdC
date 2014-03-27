@@ -86,15 +86,7 @@ class DiaNode extends Node
         
         // TODO: Consider placing auth step in a function at a high level as it repeats a lot
         // Authorization step
-        if($this->verifyThenSetUser($user, $assocativeArray['userId']))
-        {
-            $this->loadAssociativeArray($assocativeArray);
-        }
-        else
-        {
-            // TODO: Should throw an authorization exception
-            throw new BadConstructorCallException("The user is not authorized to access this object.");
-        }
+        $this->verifyThenSetUser($user, $assocativeArray['userId']);
         
         $this->loadAssociativeArray($assocativeArray);
     }
