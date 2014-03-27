@@ -106,7 +106,7 @@ abstract class Element extends Entity
                     else
                     {
                         // TODO: Should throw an authorization exception
-                        throw new BadConstructorCallException("The user is not authorized to add elements in this diagram.");
+                        throw new BadConstructorCallException("The user is not authorized to perform this operation.");
                     }
                 }
                 else
