@@ -44,10 +44,10 @@ abstract class Node extends Element
         if(func_num_args() == 2)
         {
             //check type of second parameter
-            if (is_string(func_get_arg(1)))
+            if (is_a(func_get_arg(1), "ID"))
             {
                 //if second parameter is an id of a node subclass object
-                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1)->getId());
+                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
                 if (is_subclass_of($type, "Node"))
                 {
                     $this->id = func_get_arg(1);
@@ -252,7 +252,7 @@ abstract class Node extends Element
         // links
         for ($i = count($this->linkList)-1; $i >= 0; $i--)
         {
-            $type = $this->storage->getTypeFromUUID($this->linkList[$i]['id']->getId());
+            $type = $this->storage->getTypeFromUUID($this->linkList[$i]['id']);
             $link = new $type($this->storage, $this->linkList[$i]['id']);
             $link->removeNode($this);
             $link->update();
