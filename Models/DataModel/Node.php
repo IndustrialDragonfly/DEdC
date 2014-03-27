@@ -99,16 +99,11 @@ abstract class Node extends Element
         
         $this->id = $id;
         
-        // Authorization step
-        if($this->verifyThenSetUser($user, $assocativeArray['userId']))
-        {
-            $this->loadAssociativeArray($assocativeArray);
-        }
-        else
-        {
-            // TODO: Should throw an authorization exception
-            throw new BadConstructorCallException("The user is not authorized to add access this object.");
-        } 
+        // Authorization step, throws exception on fail
+        $this->verifyThenSetUser($user, $assocativeArray['userId']);
+        
+        $this->loadAssociativeArray($assocativeArray);
+
     }
     
     /**

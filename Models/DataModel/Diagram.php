@@ -139,7 +139,7 @@ abstract class Diagram extends Entity
            }
            else
            {
-               throw new BadConstructorCallException("The second parameter passed to the Diagram constructor with neither an Id nor an assocaitive array");
+               throw new BadConstructorCallException("The third parameter passed to the Diagram constructor with neither an Id nor an assocaitive array");
            }
        }
        else
