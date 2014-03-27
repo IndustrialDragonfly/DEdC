@@ -13,7 +13,8 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             newTab,
             saveButton,
             tabs, // jQuery tab widget
-            canvases = []; // Array of all open canvases
+            canvases = [], // Array of all open canvases
+            tabCount = 0; // Incremented each time a new tab is created
         
         /**
          * The the canvas object from the currently selected tab
@@ -271,9 +272,9 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
         var createNewTab = function (name) {
             var tabTemplate = "<li><a href='#{href}'>#{label}</a><span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span></li>",
                 // Template for the tabs
-                label = "Tab" + canvases.length,
+                label = "Tab" + ++tabCount,
                 // Name of the tab
-                id = "tab" + canvases.length;
+                id = "tab" + tabCount;
 
             // Support custom tab names
             if (name) {
@@ -297,7 +298,22 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             tabs.delegate("span.ui-icon-close", "click", function() {
         	    // close icon: removing the tab on click
 			    tabs.delegate( "span.ui-icon-close", "click", function() {
+			      // Find the div id
 			      var panelId = $( this ).closest( "li" ).remove().attr( "aria-controls" );
+			      // Find the canvas that was created in the div
+			      var foundCanvas = null;
+			      canvases.forEach(function (entry) {
+			    	  if (panelId === entry.getContainer()) {
+			    		  foundCanvas = entry;
+			    	  }
+			      });
+			      // Find the index of that canvas in the list, and remove it
+			      var index = canvases.indexOf(foundCanvas);
+			      if (index > -1) {
+			    	  canvases.splice(index, 1);
+			      }
+			      
+			      // Remove the div
 			      $( "#" + panelId ).remove();
 			      tabs.tabs( "refresh" );
 			    });
