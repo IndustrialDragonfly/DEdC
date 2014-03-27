@@ -14,7 +14,7 @@ abstract class Node extends Element
 {
     //<editor-fold desc="Attributes" defaultstate="collapsed">
     /**
-     * This is a container which holds the UUIDs of eevry link coming out from 
+     * This is a container which holds the UUIDs of every link coming out from 
      * this node
      * @var ID[]
      */
@@ -32,12 +32,18 @@ abstract class Node extends Element
      * constructor for Element for it to handle.  If the third parameter is an 
      * associative array it is likewise passed to the Element constructor for it
      *  to handle.  
-     * @param ReadStorable,WriteStorable $storage
+     * @param ReadStorable&WriteStorable $storage
      * @param User $user
      * @param ID $id    the UUID of either the parent Diagram or the id of the 
      *                      Node to be loaded (can be replaced by an assocative array
      *                      to load
+     * 
+     * or 
+     * 
+     * @param ReadStorable&WriteStorable $storage
+     * @param User $user
      * @param Mixed[] $assocativeArray
+
      */
     public function __construct()
     {

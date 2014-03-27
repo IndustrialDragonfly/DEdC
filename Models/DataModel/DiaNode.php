@@ -23,10 +23,16 @@ class DiaNode extends Node
      * an existing DiaNode, loads that from the storage object. If passed the ID
      * of an existing Diagram, creates a new DiaNode in that object. If passed
      * an associativeArray which represents a DiaNode, loads that.
-     * @param Readable,Writeable $storage
+     * 
+     * @param Readable&Writeable $storage
      * @param User $user
-     * @param ID $id (Optional if associative array is passed instead)
-     * @param Mixed[] $associativeArray (Optionial if ID is passed instead)
+     * @param ID $id
+     * 
+     * or
+     * 
+     * @param Readable&Writeable $storage
+     * @param User $user
+     * @param Mixed[] $associativeArray
      */
     public function __construct()
     {
@@ -64,7 +70,7 @@ class DiaNode extends Node
         }
     }
     
-        /**
+    /**
      * "Constructs" DiaNode by loading from an ID
      * DiaNode($storage, $user, $id)
      * @param Readable,Writable $storage

@@ -58,9 +58,20 @@ abstract class Diagram extends Entity
      * second parameter will always be the user and is required
      * third parameter is optional; this is either the UUID of a parent DiaNode 
      * or a UUID of a diagram to load from storage, or it is an associative array
-     * @param {Read,Write}Storable $storage
+     * 
+     * @param ReadStorable&WriteStorable $storage
+     * @param User $user
+     * 
+     * or 
+     * 
+     * @param ReadStorable&WriteStorable $storage
      * @param User $user
      * @param String $id ID of a Diagram or DiaNode to link to (optionial if an assocative array is in its place)
+     * 
+     * or
+     * 
+     * @param ReadStorable&WriteStorable $storage
+     * @param User $user
      * @param Mixed[] $associativeArray associative array representing a diagram object (optional if an ID is in its place) 
      */
    public function __construct()
