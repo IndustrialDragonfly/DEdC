@@ -68,7 +68,7 @@ abstract class Diagram extends Entity
         // If only given storage and user
         if(func_num_args() == 2)
         {
-            $this->ConstructNewDiagram();                    
+            $this->ConstructNewDiagram(func_get_arg(0), func_get_arg(1));                    
         }
         
         // If 3 things were passed we are either loading a Diagram from storage, 
@@ -207,7 +207,7 @@ abstract class Diagram extends Entity
      */
     protected function ConstructDiagramFromAssocArray($storage, $user, $associativeArray)
     {
-        parent::__construct(func_get_arg(0), func_get_arg(1));
+        parent::__construct($storage, $user, $associativeArray);
         $this->save();
     }
     //</editor-fold>

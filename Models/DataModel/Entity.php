@@ -273,7 +273,7 @@ abstract class Entity
         {
             throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
         }
-        $this->storage = func_get_arg($storage);
+        $this->storage = $storage;
     }
 
     //</editor-fold>
