@@ -381,6 +381,10 @@ abstract class Entity
         }
     }
     
+    /**
+     * Generic call to allow an element to be externally loaded by an assoc array
+     * @param Mixed[] $associativeArray
+     */
     public function setAssociativeArray($associativeArray)
     {
     	$this->loadAssociativeArray($associativeArray);
