@@ -26,7 +26,7 @@ abstract class Entity
     protected $id;
 
     /**
-     * UUID of the originator of this DFD
+     * UUID of the userId of this DFD
      * @var ID 
      */
     protected $user;
@@ -74,7 +74,7 @@ abstract class Entity
         // If there were three parameters, and the third was an associative array
         else if (func_num_args() == 3)
         {
-            $this->ConstructEntityFromAssocArray(func_get_arg(1));
+            $this->ConstructEntityFromAssocArray(func_get_arg(2));
         }
         else
         {
@@ -102,7 +102,7 @@ abstract class Entity
     {
         if (is_array($associativeArray))
             {
-                $this->loadAssociativeArray(func_get_arg(1));
+                $this->loadAssociativeArray($associativeArray);
             }
             else
             {
@@ -223,7 +223,7 @@ abstract class Entity
     }
 
     /**
-     * This is a function that retrieves the Originator of this object
+     * This is a function that retrieves the userId of this object
      * @return String
      */
     public function getUser()
@@ -295,7 +295,7 @@ abstract class Entity
      * 
      * id String
      * label String
-     * originator String
+     * userId String
      * organization String
      * type String
      * genericType String
@@ -308,7 +308,7 @@ abstract class Entity
 
         $entityArray['id'] = $this->id;
         $entityArray['label'] = $this->label;
-        $entityArray['originator'] = $this->user;
+        $entityArray['userId'] = $this->user;
         $entityArray['organization'] = $this->organization;
         $entityArray['type'] = get_class($this);
 
@@ -358,9 +358,9 @@ abstract class Entity
         }
         
         // No longer possible to load without having a user in the first place.
-        /*if(isset($associativeArray['originator']))
+        /*if(isset($associativeArray['userId']))
         {
-            $this->user = $associativeArray['originator'];
+            $this->user = $associativeArray['userId'];
         }
         else
         {

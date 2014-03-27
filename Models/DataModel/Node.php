@@ -98,7 +98,7 @@ abstract class Node extends Element
         $assocativeArray = $this->storage->loadNode($storage);
         
         // Authorization step
-        if($this->verifyThenSetUser($user, $assocativeArray['originator']))
+        if($this->verifyThenSetUser($user, $assocativeArray['userId']))
         {
             $this->loadAssociativeArray($assocativeArray);
         }
@@ -335,7 +335,7 @@ abstract class Node extends Element
      * assocative array has the following elements and types:
      * id String
      * label String
-     * originator String
+     * userId String
      * organization String 
      * type String
      * genericType String
@@ -386,7 +386,7 @@ abstract class Node extends Element
      */
     public function save()
     {
-        $this->storage->saveNode($this->id, $this->label, get_class($this), $this->user, $this->x, $this->y, $this->linkList, $this->getNumberOfLinks(), $this->parent);
+        $this->storage->saveNode($this->id, $this->label, get_class($this), $this->user->getId(), $this->x, $this->y, $this->linkList, $this->getNumberOfLinks(), $this->parent);
     }
 
     /**

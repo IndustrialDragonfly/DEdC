@@ -79,7 +79,7 @@ spl_autoload_register("GeneralLoader");
     switch ($request->getMethod())
     {
         case MethodsEnum::GET:
-            $response = get($storage, $request);
+            $response = get($storage, $user, $request);
             header($response->getHeader());
             echo $response->getRepresentation();
             break;
@@ -96,7 +96,7 @@ spl_autoload_register("GeneralLoader");
 
         
         case MethodsEnum::PUT:
-        	$response = put($storage, $request);
+        	$response = put($storage, $user, $request);
         	
             // Return the header
             header($response->getHeader());           
@@ -105,7 +105,7 @@ spl_autoload_register("GeneralLoader");
 
 
         case MethodsEnum::DELETE:
-            $response = delete($storage, $request);
+            $response = delete($storage, $user, $request);
             header($response->getHeader());
             break;
 

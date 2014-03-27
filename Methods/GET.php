@@ -7,7 +7,7 @@
  * @throws BadFunctionCallException
  * @return SimpleResponse
  */
-function get($storage, $request)
+function get($storage, $user, $request)
 {
 	// TODO Exceptions should be thrown back to the Controller, and handled from there.
 	
@@ -68,7 +68,7 @@ function get($storage, $request)
 		$element;
 		try
 		{
-			$element = existingElementFactory($storage, $request->getId());
+			$element = existingElementFactory($storage, $user,  $request->getId());
 		}
 		catch (Exception $e) // TODO: Make more specific catch cases
 		{

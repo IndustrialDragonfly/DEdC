@@ -7,7 +7,7 @@
  * @throws BadFunctionCallException
  * @return SimpleResponse
  */
-function put($storage, $request) {
+function put($storage, $user,  $request) {
 	$response = new SimpleResponse();
 	
 	// Cache the request's body
@@ -21,7 +21,7 @@ function put($storage, $request) {
 			// If the entity exists, load it and update it.
 			if ($storage->getTypeFromUUID($request->getId()) == $bodyArray['type'])
 			{
-				$element = existingElementFactory($storage, $request->getId());
+				$element = existingElementFactory($storage, $user,  $request->getId());
 				$element->setAssociativeArray($bodyArray);
 				$response->setRawData($element->getAssociativeArray());
 				$response->setHeader(201);
@@ -57,7 +57,7 @@ function put($storage, $request) {
 		// Check that the received type was valid
 		if (in_array($type, $validTypesArray))
 		{
-			$element = new $type($storage, $bodyArray);
+			$element = new $type($storage, $user,  $bodyArray);
 			$response->setRawData($element->getAssociativeArray());
 			$response->setHeader(201);
 		}
