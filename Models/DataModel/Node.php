@@ -109,7 +109,6 @@ abstract class Node extends Element
         } 
         // Save the ID after authorization has occurred
         $this->id = $id;
-        $this->save();
     }
     
     /**
