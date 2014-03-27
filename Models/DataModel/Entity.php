@@ -249,21 +249,6 @@ abstract class Entity
     //</editor-fold>
     //<editor-fold desc="Storage Accessors" defaultstate="collapsed">
     /**
-     * This a a function that will set the storage object that is associated 
-     * with this object
-     * 
-     * should this function exist?
-     *   -nope
-     * 
-     * @param Readable/Writable $newStorage
-     */
-    /* disabled
-      public function setStorage($newStorage)
-      {
-      $this->storage = $newStorage;
-      } */
-
-    /**
      * This is a function that retrieves the Storage object that is associated 
      * with this object
      * @return Readable/Writable
