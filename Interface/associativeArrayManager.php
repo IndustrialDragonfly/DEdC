@@ -63,8 +63,8 @@ function addTags($rawData, $tag)
         case "Link":
             $rawData['id'] = $rawData['id']->getTaggedId();
             $rawData['diagramId'] = $rawData['diagramId']->getTaggedId();
-            $rawData['originNode']['id']['id'] = $rawData['originNode']['id']['id']->getTaggedId();
-            $rawData['destinationNode']['id']['id'] = $rawData['destinationNode']['id']['id']->getTaggedId();
+            $rawData['originNode']['id'] = $rawData['originNode']['id']->getTaggedId();
+            $rawData['destinationNode']['id'] = $rawData['destinationNode']['id']->getTaggedId();
             break;
             
         case "List":
