@@ -14,10 +14,4 @@ function GeneralLoader($classname)
     {
         require_once $classname . ".php";
     }
-    
-    else
-    {
-        echo "Problem loading class " . $classname . " definition does not appear to exist.";
-        exit;
-    }
 }
