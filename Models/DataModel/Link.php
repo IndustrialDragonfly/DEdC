@@ -107,17 +107,13 @@ abstract class Link extends Element
         }
         $assocativeArray = $this->storage->loadLink($id);
         
-        // Authorization step
-        if($this->verifyThenSetUser($user, $assocativeArray['userId']))
-        {
-            $this->loadAssociativeArray($assocativeArray);
-        }
-        else
-        {
-            // TODO: Should throw an authorization exception
-            throw new BadConstructorCallException("The user is not authorized to add access this object.");
-        }  
         $this->id = $id;
+        
+        // Authorization step
+        $this->verifyThenSetUser($user, $assocativeArray['userId']);
+        
+        $this->loadAssociativeArray($assocativeArray);
+
     }
     
     /**
