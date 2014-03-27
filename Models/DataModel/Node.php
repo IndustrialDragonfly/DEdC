@@ -67,7 +67,7 @@ abstract class Node extends Element
             // Third parameter should be an associative array so pass it along to Element's constructor
             else
             {
-                $this->ConstructLinkFromAssocArray(func_get_arg(0), func_get_arg(1), func_get_arg(2))
+                $this->ConstructLinkFromAssocArray(func_get_arg(0), func_get_arg(1), func_get_arg(2));
             }
         }
         else
@@ -136,7 +136,7 @@ abstract class Node extends Element
         // Client shouldn't be trying to PUT links, block any such attempts
         if (isset($associativeArray['linkList']))
         {
-            throw new BadConstructorCallException("Node does not support PUT operations with links.")
+            throw new BadConstructorCallException("Node does not support PUT operations with links.");
         }
         // Authorization handled by parent (Element) constructor
         parent::__construct(func_get_arg(0), func_get_arg(1), func_get_arg(2));

@@ -40,7 +40,7 @@ class DiaNode extends Node
                 $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
                 if (is_subclass_of($type, "DiaNode"))
                 {
-                    $this->ConstructDiaNodeByID($storage, $user, $id)
+                    $this->ConstructDiaNodeByID($storage, $user, $id);
                 }
                 // Otherwise pass up (if not a Diagram ID, will be handled by Node)
                 else

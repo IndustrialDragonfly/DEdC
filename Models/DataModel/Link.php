@@ -56,7 +56,7 @@ abstract class Link extends Element
                 $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(2));
                 if (is_subclass_of($type, "Link"))
                 {
-                    $this->ConstructLinkByID(func_get_arg(0), func_get_arg(1), func_get_arg(2))
+                    $this->ConstructLinkByID(func_get_arg(0), func_get_arg(1), func_get_arg(2));
                 }
                 // If ID is of a Diagram type object, create a new Link in the Diagram
                 else if (is_subclass_of($type, "Diagram"))
