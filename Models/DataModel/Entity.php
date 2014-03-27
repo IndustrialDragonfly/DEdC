@@ -211,9 +211,9 @@ abstract class Entity
         		return true;
         	}
         }
-        else
+        else if (is_string($storedUser))
         {
-	        if ($user->getId() == $storedUser)
+	        if ($user->getId()->getId() == $storedUser)
 	        {
 	         	return true;
 	        }
