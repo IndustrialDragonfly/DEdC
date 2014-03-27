@@ -37,10 +37,10 @@ class DiaNode extends Node
             {
                 //the second parameter is an ID
                 //check to see if the second parameter is a DiaNode
-                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
+                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(2));
                 if (is_subclass_of($type, "DiaNode"))
                 {
-                    $this->ConstructDiaNodeByID($storage, $user, $id);
+                    $this->ConstructDiaNodeByID(func_get_arg(0), func_get_arg(1), func_get_arg(2));
                 }
                 // Otherwise pass up (if not a Diagram ID, will be handled by Node)
                 else
@@ -49,9 +49,9 @@ class DiaNode extends Node
                     parent::__construct(func_get_arg(0), func_get_arg(1), func_get_arg(2));
                 }
             }
-            else if (is_array(func_get_arg(1)))
+            else if (is_array(func_get_arg(2)))
             {
-                $this->ConstructEntityFromAssocArray($storage, $user, $associativeArray);
+                $this->ConstructDiaNodeFromAssocArray(func_get_arg(0), func_get_arg(1), func_get_arg(2));
             }
             else
             {
@@ -74,13 +74,13 @@ class DiaNode extends Node
      */
     protected function ConstructDiaNodeByID($storage, $user, $id)
     {
-        $this->id = func_get_arg(1);
-        $this->setStorage(func_get_arg(0));
+        $this->id = $id;
+        $this->setStorage($storage);
         $assocativeArray = $this->storage->loadDiaNode($this->id);
         
         // TODO: Consider placing auth step in a function at a high level as it repeats a lot
         // Authorization step
-        if($this->verifyThenSetUser($user, $assocativeArray['originator']))
+        if($this->verifyThenSetUser($user, $assocativeArray['userId']))
         {
             $this->loadAssociativeArray($assocativeArray);
         }
@@ -102,7 +102,7 @@ class DiaNode extends Node
      * @param Mixed[] $associativeArray
      * @throws BadConstructorCallException
      */
-    protected function ConstructEntityFromAssocArray($storage, $user, $associativeArray)
+    protected function ConstructDiaNodeFromAssocArray($storage, $user, $associativeArray)
     {
         // Verify that childDIagramId belongs to the same user (authorization)
         if(isset($associativeArray['childDiagramId']))
@@ -129,7 +129,7 @@ class DiaNode extends Node
         }
         // Third parameter was an array pass this constructor on to the parent constructor
         // handles the rest of authorization
-        parent::__construct(func_get_arg(0), func_get_arg(1), func_get_arg(2));   
+        parent::__construct($storage, $user, $associativeArray);   
     }
 
     //</editor-fold>
@@ -177,7 +177,7 @@ class DiaNode extends Node
      * assocative array has the following elements and types:
      * id ID
      * label String
-     * originator String
+     * userId String
      * organization String 
      * type String
      * genericType String

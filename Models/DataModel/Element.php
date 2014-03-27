@@ -231,7 +231,7 @@ abstract class Element extends Entity
      * assocative array has the following elements and types:
      * id ID
      * label String
-     * originator String
+     * userId String
      * organization String
      * type String 
      * x Int

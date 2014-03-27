@@ -79,7 +79,7 @@ abstract class Diagram extends Entity
             // Third parameter was an ID of either a Diagram to be loaded or DiaNode which will be the parent
             if(is_a(func_get_arg(2), "ID"))
             {
-                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
+                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(2));
                 // If the ID was for a Diagram, then load
                 if (is_subclass_of($type, "Diagram"))
                 {
@@ -146,7 +146,7 @@ abstract class Diagram extends Entity
         
         // Perform authorization. Check that user matches stored user ID for
         // this Diagram. Throws exception on failure.
-        $this->verifyThenSetUser($user, $assocativeArray['originator']);
+        $this->verifyThenSetUser($user, $assocativeArray['userId']);
         
         $this->loadAssociativeArray($assocativeArray);
     }
@@ -618,7 +618,7 @@ abstract class Diagram extends Entity
     * array has the following elements and types:
     * id String
     * label String
-    * originator String
+    * userId String
     * organization String 
     * type String
     * genericType String
@@ -711,7 +711,7 @@ abstract class Diagram extends Entity
     public function save()
     {
         $this->storage->saveDiagram($this->id, get_class($this), $this->label, 
-                $this->user, $this->ancestry, $this->nodeList, 
+                $this->user->getId(), $this->ancestry, $this->nodeList, 
                 $this->linkList, $this->diaNodeList, $this->parentDiaNode);
     }
 

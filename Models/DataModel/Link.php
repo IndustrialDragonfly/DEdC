@@ -103,7 +103,7 @@ abstract class Link extends Element
         $assocativeArray = $this->storage->loadLink($id);
         
         // Authorization step
-        if($this->verifyThenSetUser($user, $assocativeArray['originator']))
+        if($this->verifyThenSetUser($user, $assocativeArray['userId']))
         {
             $this->loadAssociativeArray($assocativeArray);
         }
@@ -355,7 +355,7 @@ abstract class Link extends Element
      * assocative array has the following elements and types:
      * id String
      * label String
-     * originator String
+     * userId String
      * organization String 
      * type String
      * genericType String
@@ -463,7 +463,7 @@ abstract class Link extends Element
     {
         // Send info required to save dataflow to the data store
         $this->storage->saveLink($this->id, $this->label, get_class($this), 
-                $this->user, $this->x, $this->y, $this->originNode['id'], 
+                $this->user->getId(), $this->x, $this->y, $this->originNode['id'], 
                 $this->destinationNode['id'], $this->parent);
     }
 

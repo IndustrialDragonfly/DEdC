@@ -29,7 +29,7 @@ UNIQUE userOrg (userName, organization)
 CREATE TABLE entity
 (
 id CHAR(44) NOT NULL,
-label VARCHAR(100) NOT NULL,
+label VARCHAR(100),
 type VARCHAR(20) NOT NULL,
 userId CHAR(44) NOT NULL,
 PRIMARY KEY (id),

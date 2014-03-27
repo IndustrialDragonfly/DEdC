@@ -134,7 +134,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $insert_stmt->bindParam(1, $id->getId());
         $insert_stmt->bindParam(2, $label);
         $insert_stmt->bindParam(3, $type);
-        $insert_stmt->bindParam(4, $userId);
+        $insert_stmt->bindParam(4, $userId->getId());
 
         // Execute, catch any errors resulting
         $insert_stmt->execute();
@@ -270,7 +270,14 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       $insert_stmt = $this->dbh->prepare("INSERT INTO dianode (childDiagramId, diaNodeId) VALUES(?,?)");
 
       // Bind the parameters of the prepared statement
-      $insert_stmt->bindParam(1, $diagramId->getId());
+      if ($diagramId)
+      {
+          $insert_stmt->bindParam(1, $diagramId->getId());
+      }
+      else
+      {
+          $insert_stmt->bindParam(1, $diagramId);
+      }
       $insert_stmt->bindParam(2, $diaNodeId->getId());
 
       // Execute, catch any errors resulting
@@ -333,7 +340,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       $insert_stmt->bindParam(1, $id->getId());
       $insert_stmt->bindParam(2, $label);
       $insert_stmt->bindParam(3, $type);
-      $insert_stmt->bindParam(4, $userId->getd());
+      $insert_stmt->bindParam(4, $userId->getId());
 
       // Execute, catch any errors resulting
       $insert_stmt->execute();
@@ -709,7 +716,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       $insert_stmt->bindParam(1, $id->getId());
       $insert_stmt->bindParam(2, $label);
       $insert_stmt->bindParam(3, $type);
-      $insert_stmt->bindParam(4, $userId);
+      $insert_stmt->bindParam(4, $userId->getId());
 
       // Execute, catch any errors resulting
       $insert_stmt->execute();
@@ -823,12 +830,12 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     
     /**
      * Save a User to the database
-     * @param String $userName
+     * @param String $userIdName
      * @param ID $id
      * @param String $organization
      * @param Bool $admin
      */
-    public function saveUser($id, $userName, $organization, $admin)
+    public function saveUser($id, $userIdName, $organization, $admin)
     {
         // Prepare the insert statement
         $insert_stmt = $this->dbh->prepare(
@@ -839,7 +846,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         
         // Bind the parameters
         $insert_stmt->bindParam(1, $id->getId());
-        $insert_stmt->bindParam(2, $userName);
+        $insert_stmt->bindParam(2, $userIdName);
         $insert_stmt->bindParam(3, $organization);
         $insert_stmt->bindParam(4, $admin);
 
@@ -852,7 +859,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * @param String organization
      * @return String
      */
-    public function getUserId($userName, $organization)
+    public function getUserId($userIdName, $organization)
     {
         // Given userName and organization
         $loadUser = $this->dbh->prepare("
@@ -860,7 +867,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
                 FROM users
                 WHERE userName=? AND organization=?"
                 );
-        $loadUser->bindParam(1, $userName);
+        $loadUser->bindParam(1, $userIdName);
         $loadUser->bindParam(2, $organization);
 
         $loadUser->execute();

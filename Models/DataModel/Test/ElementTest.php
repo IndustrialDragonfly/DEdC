@@ -179,7 +179,7 @@ class ElementTest extends PHPUnit_Framework_TestCase
         $newElement->loadAssociativeArray($this->object->getAssociativeArray());
         //Variables from Entity
         $this->assertEquals($this->object->getAssociativeArray()['label'], $newElement->getAssociativeArray()['label']);
-        $this->assertEquals($this->object->getAssociativeArray()['originator'], $newElement->getAssociativeArray()['originator']);
+        $this->assertEquals($this->object->getAssociativeArray()['userId'], $newElement->getAssociativeArray()['userId']);
         $this->assertEquals($this->object->getAssociativeArray()['organization'], $newElement->getAssociativeArray()['organization']);
         $this->assertFalse($this->object->getAssociativeArray()['id'] == $newElement->getAssociativeArray()['id']);
         
@@ -206,7 +206,7 @@ class ElementTest extends PHPUnit_Framework_TestCase
         $newElement = new Process($this->storage, $this->object->getAssociativeArray());
         
         $this->assertEquals($this->object->getAssociativeArray()['label'], $newElement->getAssociativeArray()['label']);
-        $this->assertEquals($this->object->getAssociativeArray()['originator'], $newElement->getAssociativeArray()['originator']);
+        $this->assertEquals($this->object->getAssociativeArray()['userId'], $newElement->getAssociativeArray()['userId']);
         $this->assertEquals($this->object->getAssociativeArray()['organization'], $newElement->getAssociativeArray()['organization']);
         $this->assertFalse($this->object->getAssociativeArray()['id'] == $newElement->getAssociativeArray()['id']);
         

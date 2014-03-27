@@ -102,10 +102,10 @@ class EntityTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Entity::setOriginator
-     * @covers Entity::getOriginator
+     * @covers Entity::setuserId
+     * @covers Entity::getuserId
      */
-    public function testSetOriginatorGetOriginator_smoke()
+    public function testSetuserIdGetuserId_smoke()
     {
         $testStr = 'something';
         $this->object->setUser($testStr);
@@ -113,13 +113,13 @@ class EntityTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Entity::setOriginator
-     * @covers Entity::getOriginator
+     * @covers Entity::setuserId
+     * @covers Entity::getuserId
      */
-    public function testSetOriginatorGetOriginator_empty()
+    public function testSetuserIdGetuserId_empty()
     {
         $testStr = '';
-        //$this->object->setOriginator($testStr);
+        //$this->object->setuserId($testStr);
         $this->assertEquals($testStr, $this->object->getUser());
     }
 
@@ -154,7 +154,7 @@ class EntityTest extends PHPUnit_Framework_TestCase
         $newEntity = new Process($this->storage, $this->testDiagram->getId());
         $newEntity->loadAssociativeArray($this->object->getAssociativeArray());
         $this->assertEquals($this->object->getAssociativeArray()['label'], $newEntity->getAssociativeArray()['label']);
-        $this->assertEquals($this->object->getAssociativeArray()['originator'], $newEntity->getAssociativeArray()['originator']);
+        $this->assertEquals($this->object->getAssociativeArray()['userId'], $newEntity->getAssociativeArray()['userId']);
         $this->assertEquals($this->object->getAssociativeArray()['organization'], $newEntity->getAssociativeArray()['organization']);
         $this->assertFalse($this->object->getAssociativeArray()['id'] == $newEntity->getAssociativeArray()['id']);
     }
@@ -171,7 +171,7 @@ class EntityTest extends PHPUnit_Framework_TestCase
         $newEntity = new Process($this->storage, $this->testDiagram->getId());
         $newEntity->loadAssociativeArray($this->object->getAssociativeArray());
         $this->assertEquals($this->object->getAssociativeArray()['label'], $newEntity->getAssociativeArray()['label']);
-        $this->assertEquals($this->object->getAssociativeArray()['originator'], $newEntity->getAssociativeArray()['originator']);
+        $this->assertEquals($this->object->getAssociativeArray()['userId'], $newEntity->getAssociativeArray()['userId']);
         $this->assertEquals($this->object->getAssociativeArray()['organization'], $newEntity->getAssociativeArray()['organization']);
         $this->assertFalse($this->object->getAssociativeArray()['id'] == $newEntity->getAssociativeArray()['id']);
     }
@@ -188,34 +188,34 @@ class EntityTest extends PHPUnit_Framework_TestCase
         //missing organization
         $assocArray1 = Array();
         $assocArray1['label'] = $testLabel;
-        $assocArray1['originator'] = $testOrginator;
+        $assocArray1['userId'] = $testOrginator;
         //$assocArray1['organization'] = $testOrganization;
         $this->object->loadAssociativeArray($assocArray1);
         $this->assertTrue($this->object->getAssociativeArray()['label'] == $testLabel);
-        $this->assertTrue($this->object->getAssociativeArray()['originator'] == $testOrginator);
+        $this->assertTrue($this->object->getAssociativeArray()['userId'] == $testOrginator);
         $this->assertFalse($this->object->getAssociativeArray()['organization'] == $testOrganization);
         $this->assertTrue($this->object->getAssociativeArray()['organization'] == "");
         
-        //missing originator
+        //missing userId
         $assocArray2 = Array();
         $assocArray2['label'] = $testLabel;
-        //$assocArray2['originator'] = $testOrginator;
+        //$assocArray2['userId'] = $testOrginator;
         $assocArray2['organization'] = $testOrganization;
         $this->object->loadAssociativeArray($assocArray2);
         $this->assertTrue($this->object->getAssociativeArray()['label'] == $testLabel);
-        $this->assertFalse($this->object->getAssociativeArray()['originator'] == $testOrginator);
+        $this->assertFalse($this->object->getAssociativeArray()['userId'] == $testOrginator);
         $this->assertTrue($this->object->getAssociativeArray()['organization'] == $testOrganization);
-        $this->assertTrue($this->object->getAssociativeArray()['originator'] == "");
+        $this->assertTrue($this->object->getAssociativeArray()['userId'] == "");
         
         
         //missing label
         $assocArray3 = Array();
         //$assocArray3['label'] = $testLabel;
-        $assocArray3['originator'] = $testOrginator;
+        $assocArray3['userId'] = $testOrginator;
         $assocArray3['organization'] = $testOrganization;
         $this->object->loadAssociativeArray($assocArray3);
         $this->assertFalse($this->object->getAssociativeArray()['label'] == $testLabel);
-        $this->assertTrue($this->object->getAssociativeArray()['originator'] == $testOrginator);
+        $this->assertTrue($this->object->getAssociativeArray()['userId'] == $testOrginator);
         $this->assertTrue($this->object->getAssociativeArray()['organization'] == $testOrganization);
         $this->assertTrue($this->object->getAssociativeArray()['label'] == "");
     }
