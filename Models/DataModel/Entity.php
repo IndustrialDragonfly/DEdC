@@ -179,7 +179,7 @@ abstract class Entity
         if (is_a($user, "User"))
         {
             // Compare $user's ID to the user stored in the database for the object
-            if ($user->getId() == $storedUser)
+            if ($this->verifyUser($user, $storedUser))
             {
                 $this->setUser($user);
             }
@@ -193,6 +193,23 @@ abstract class Entity
             // TODO: Authorization exception
             throw new BadFunctionCallException("Passed user object is not/does not inherit user.");
         }
+    }
+    
+    /**
+     * Checks if the user passed in matches the string passed in (from Storage)
+     * @param User $user
+     * @param String $storedUser
+     * @returns bool
+     */
+    protected function verifyUser($user, $storedUser)
+    {
+        // If user matches the string, return true
+        if ($user->getId() == $storedUser)
+            {
+                return true;
+            }
+        // Otherwise return false
+        return false;
     }
 
     /**
