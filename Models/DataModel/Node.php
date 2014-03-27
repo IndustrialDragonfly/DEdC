@@ -16,7 +16,7 @@ abstract class Node extends Element
     /**
      * This is a container which holds the UUIDs of eevry link coming out from 
      * this node
-     * @var String[]
+     * @var ID[]
      */
     protected $linkList;
 
@@ -33,7 +33,7 @@ abstract class Node extends Element
      * associative array it is likewise passed to the Element constructor for it
      *  to handle.  
      * @param {ReadStorable,WriteStorable} $datastore
-     * @param string $id    the UUID of either the parent Diagram or the id of the 
+     * @param ID $id    the UUID of either the parent Diagram or the id of the 
      *                      Node to be loaded (can be replaced by an assocative array
      *                      to load
      * @param Mixed[] $assocativeArray
@@ -47,7 +47,7 @@ abstract class Node extends Element
             if (is_string(func_get_arg(1)))
             {
                 //if second parameter is an id of a node subclass object
-                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
+                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1)->getId());
                 if (is_subclass_of($type, "Node"))
                 {
                     $this->id = func_get_arg(1);
@@ -252,7 +252,7 @@ abstract class Node extends Element
         // links
         for ($i = count($this->linkList)-1; $i >= 0; $i--)
         {
-            $type = $this->storage->getTypeFromUUID($this->linkList[$i]['id']);
+            $type = $this->storage->getTypeFromUUID($this->linkList[$i]['id']->getId());
             $link = new $type($this->storage, $this->linkList[$i]['id']);
             $link->removeNode($this);
             $link->update();

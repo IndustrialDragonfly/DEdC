@@ -39,7 +39,7 @@ abstract class Link extends Element
      * associative array it is likewise passed to the Element constructor for it
      *  to handle.  
      * @param {ReadStorable,WriteStorable} $datastore
-     * @param string $id    the UUID of either the parent Diagram or the id of the 
+     * @param ID $id    the UUID of either the parent Diagram or the id of the 
      *                      Link to be loaded 
      * @param Mixed[] $assocativeArray
      */
@@ -48,8 +48,8 @@ abstract class Link extends Element
         //check number of paramenters
         if(func_num_args() == 2)
         {
-            //check type of second parameter
-            if (is_string(func_get_arg(1)))
+            // Check if second parameter is a ID object
+            if (is_a(func_get_arg(1), "ID"))
             {
                 //if second parameter is an id of a link subclass object
                 $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
@@ -92,15 +92,15 @@ abstract class Link extends Element
 				if ($associativeArray ['originNode'] != NULL) 
 				{
 					// New node
-					$newType = $this->storage->getTypeFromUUID ( $associativeArray ['originNode'] ['id'] );
-					$newNode = new $newType ( $this->storage, $associativeArray ['originNode'] ['id'] );
+					$newType = $this->storage->getTypeFromUUID($associativeArray['originNode']['id'] );
+					$newNode = new $newType ( $this->storage, $associativeArray['originNode']['id'] );
 					$newNode->addLink ( $this );
 				}
 				
 				if ($associativeArray ['destinationNode'] != NULL) 
 				{
 					// New node
-					$newType = $this->storage->getTypeFromUUID ( $associativeArray ['destinationNode'] ['id'] );
+					$newType = $this->storage->getTypeFromUUID( $associativeArray['destinationNode']['id'] );
 					$newNode = new $newType ( $this->storage, $associativeArray ['destinationNode'] ['id'] );
 					$newNode->addLink ( $this );
 				}
@@ -142,7 +142,7 @@ abstract class Link extends Element
             if ($this->originNode == NULL)
             {
                 //set the origin node and add this DataFlow to its list of Links
-                $this->originNode['id'] = $aNode->getId();
+                $this->originNode['id'] = $aNode;
                 $this->originNode['label'] = $aNode->getLabel();
                 
                 $aNode->addLink($this);
@@ -153,11 +153,11 @@ abstract class Link extends Element
                 //remove this DataFlow from the old origin nodes list of links and 
                 //thenset the origin node to the new node and add this DataFlow to 
                 //its list of Links
-                $type = $this->storage->getTypeFromUUID($this->originNode);
+                $type = $this->storage->getTypeFromUUID($this->originNode->getId);
                 $node = new $type($this->storage, $this->originNode);
                 $node->removeLink($this);
 
-                $this->originNode['id'] = $aNode->getId();
+                $this->originNode['id'] = $aNode;
                 $this->originNode['label'] = $aNode->getLabel();
                 $aNode->addLink($this);
             }
@@ -211,7 +211,7 @@ abstract class Link extends Element
             if ($this->destinationNode == NULL)
             {
                 //set the destination node and add this DataFlow to its list of Links
-                $this->destinationNode['id'] = $aNode->getId();
+                $this->destinationNode['id'] = $aNode;
                 $this->destinationNode['label'] = $aNode->getLabel();
                 
                 $aNode->addLink($this);
@@ -226,7 +226,7 @@ abstract class Link extends Element
                 $node = new $type($this->storage, $this->destinationNode);
                 $node->removeLink($this);
 
-                $this->destinationNode['id'] = $aNode->getId();
+                $this->destinationNode['id'] = $aNode;
                 $this->destinationNode['label'] = $aNode->getLabel();
                 $aNode->addLink($this);
             }
@@ -266,7 +266,7 @@ abstract class Link extends Element
      */
     public function removeNode($node)
     {
-        if ($node->getId() == $this->getOriginNode()['id'])
+        if ($node == $this->getOriginNode()['id'])
         {
             $this->clearOriginNode();
             // Actually call back the node that just called and remove the node
@@ -274,7 +274,7 @@ abstract class Link extends Element
             //$node->removeLink($this);
             //$node->update();
         }
-        elseif ($node->getId() == $this->getDestinationNode()['id'])
+        elseif ($node == $this->getDestinationNode()['id'])
         {
             $this->clearDestinationNode();
             //$node->removeLink($this);

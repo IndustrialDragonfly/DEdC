@@ -29,7 +29,7 @@ abstract class Element extends Entity
 
     /**
      * the UUID of the parent DFD that contains this element
-     * @var type String
+     * @var ID
      */
     protected $parent;
 
@@ -45,7 +45,7 @@ abstract class Element extends Entity
      * values.  If the second parameter is an associative array it is passed to 
      * the Entity constructor for it to handle.
      * @param {ReadStorable,WriteStorable} $datastore
-     * @param string $id the UUID of the parent Diagram
+     * @param ID $id the UUID of the parent Diagram
      * @param Mixed[] $assocativeArray
      */
     public function __construct()
@@ -53,7 +53,7 @@ abstract class Element extends Entity
         if(func_num_args() == 2)
         {
             //if the second parameter is an ID
-            if(is_string(func_get_arg(1)))
+            if(is_a(func_get_arg(1), "ID"))
             {
                 parent::__construct(func_get_arg(0));
                 $this->x = 0;
@@ -69,12 +69,12 @@ abstract class Element extends Entity
                     throw new BadConstructorCallException("The Id passed to the Element constructor was not valid Diagram");
                 }
             }
-            //if the second parmeter as an associative array pass it along to the Entity constructor
+            // If the second parmeter as an associative array pass it along to the Entity constructor
             else if(is_array(func_get_arg(1)))
             {
                 parent::__construct(func_get_arg(0), func_get_arg(1));
             }
-            //if the second paramenter wasnt an ID or an array throw an exception
+            // If the second paramenter wasn't an ID or an array throw an exception
             else
             {
                 throw new BadConstructorCallException("Invalid second parameter passed to Element constructor, can be either an ID or an assocative array");
@@ -202,7 +202,7 @@ abstract class Element extends Entity
     /**
      * Returns an assocative array representing the element object. This 
      * assocative array has the following elements and types:
-     * id String
+     * id ID
      * label String
      * originator String
      * organization String

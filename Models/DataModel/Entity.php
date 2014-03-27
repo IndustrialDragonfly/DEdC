@@ -27,7 +27,7 @@ abstract class Entity
 
     /**
      * UUID of the originator of this DFD
-     * @var String 
+     * @var ID 
      */
     protected $user;
 
@@ -57,7 +57,8 @@ abstract class Entity
      */
     public function __construct()
     {
-        $this->id = $this->generateId();
+        // Generate a fresh ID
+        $this->id = new ID();
         $this->storage = func_get_arg(0);
         if (!is_subclass_of($this->storage, "ReadStorable"))
         {
@@ -93,17 +94,6 @@ abstract class Entity
         }
     }
 
-    /**
-     * This is a function that generates a UUID String with a length of 265 bits
-     * @return String
-     */
-    private function generateId()
-    {
-        $length = 256;
-        $numberOfBytes = $length / 8;
-        // Replaces all instances of +, = or / in the Base64 string with x
-        return str_replace(array("+", "=", "/"), array("x", "x", "x"), base64_encode(openssl_random_pseudo_bytes($numberOfBytes)));
-    }
 
     //</editor-fold>
     //<editor-fold desc="Accessor functions" defaultstate="collapsed">

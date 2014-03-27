@@ -9,6 +9,10 @@
 class DiaNode extends Node
 {
     //<editor-fold desc="Attributes" defaultstate="collapsed">
+    /**
+     * The ID object for a subDiagram
+     * @var ID
+     */
     protected $subDiagram;
 
     //</editor-fold>
@@ -20,17 +24,17 @@ class DiaNode extends Node
      * of an existing Diagram, creates a new DiaNode in that object. If passed
      * an associativeArray which represents a DiaNode, loads that.
      * @param {Read,Write}Storable $storage
-     * @param String $id (Optional if associative array is passed instead)
+     * @param ID $id (Optional if associative array is passed instead)
      * @param Mixed[] $associativeArray (Optionial if ID is passed instead)
      */
     public function __construct()
     {
         if (func_num_args() == 2)
         {
-            // check the second parameter 
-            if (is_string(func_get_arg(1)))
+            // check the second parameter is an ID
+            if (is_a(func_get_arg(1), "ID"))
             {
-                //the second parameter is an id
+                //the second parameter is an ID
                 //check to see if the second parameter is a DiaNode
                 $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
                 if (is_subclass_of($type, "DiaNode"))
@@ -104,7 +108,7 @@ class DiaNode extends Node
     /**
      * Returns an assocative array representing the entity object. This 
      * assocative array has the following elements and types:
-     * id String
+     * id ID
      * label String
      * originator String
      * organization String 

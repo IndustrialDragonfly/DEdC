@@ -82,7 +82,7 @@ abstract class Diagram extends Entity
         else if (func_num_args() == 2)
         {
             //the second parameter was an ID of either a Diagram to be loaded or DiaNode which will be the parent
-            if(is_string(func_get_arg(1)))
+            if(is_a(func_get_arg(1), "ID"))
             {
                 
                 $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));

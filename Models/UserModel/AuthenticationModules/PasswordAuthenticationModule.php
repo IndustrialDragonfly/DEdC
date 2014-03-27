@@ -34,7 +34,7 @@ class PasswordAuthenticationModule implements Authenticatable
     public function authenticate()
     {
         // Get the user's hash from the database
-        $hash = $this->storage->getHash($this->id->getId());
+        $hash = $this->storage->getHash($this->id);
         
         // Verify the password
         return password_verify($this->password, $hash);
@@ -60,6 +60,6 @@ class PasswordAuthenticationModule implements Authenticatable
    
     public function saveNew()
     {
-        $this->storage->saveHash($this->id->getId(), $this->getToken());
+        $this->storage->saveHash($this->id, $this->getToken());
     }
 }

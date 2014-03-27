@@ -127,7 +127,7 @@ abstract class Request implements Requestable {
         {
             $idLength = strlen($id);
             $tagLength = strlen($this->uuidTag);
-            $this->id = stripTag($id, $idLength - $tagLength);
+            $this->id = new ID($id);
         }
     }
     protected function setAcceptTypes($type)
