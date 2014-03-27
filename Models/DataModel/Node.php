@@ -24,15 +24,16 @@ abstract class Node extends Element
     
     //<editor-fold desc="Constructor" defaultstate="collapsed">
     /**
-     * This is the constructor for the Node Class.  It takes in 2 parameters; 
-     * the first is always a valid storage medium, the second one is either an 
-     * id or an associative array.  If the second parameter is an id of a valid 
+     * This is the constructor for the Node Class.  It takes in 3 parameters; 
+     * the first is always a valid storage medium, the second one is a user 
+     * The third is an id or an associative array.  If the third parameter is an id of a valid 
      * node subclass the node is loaded in from the storage medium.  If the 
-     * second parameter was an id of anything else it is passed to the 
-     * constructor for Element for it to handle.  If the second parameter is an 
+     * third parameter was an id of anything else it is passed to the 
+     * constructor for Element for it to handle.  If the third parameter is an 
      * associative array it is likewise passed to the Element constructor for it
      *  to handle.  
-     * @param {ReadStorable,WriteStorable} $datastore
+     * @param ReadStorable,WriteStorable $storage
+     * @param User $user
      * @param ID $id    the UUID of either the parent Diagram or the id of the 
      *                      Node to be loaded (can be replaced by an assocative array
      *                      to load
@@ -41,58 +42,105 @@ abstract class Node extends Element
     public function __construct()
     {
         //check number of paramenters
-        if(func_num_args() == 2)
+        if(func_num_args() == 3)
         {
-            //check type of second parameter
-            if (is_a(func_get_arg(1), "ID"))
+            // Check type of tird parameter
+            if (is_a(func_get_arg(2), "ID"))
             {
-                //if second parameter is an id of a node subclass object
+                // If third parameter is an id of a node subclass object
                 $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
                 if (is_subclass_of($type, "Node"))
                 {
-                    $this->id = func_get_arg(1);
-                    // Storage is set here, as entity (parent) is never called
-                    $this->storage = func_get_arg(0);
-                    if (!is_subclass_of($this->storage, "ReadStorable"))
-                    {
-                        throw new BadConstructorCallException("Passed storage object does not implement ReadStorable.");
-                    }
-                    if (!is_subclass_of($this->storage, "WriteStorable"))
-                    {
-                        throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
-                    }
-                    $assocativeArray = $this->storage->loadNode(func_get_arg(1));
-                    $this->loadAssociativeArray($assocativeArray);
+                    $this->ConstructNodeByID(func_get_arg(0), func_get_arg(1), func_get_arg(2));
                 }
-                //second parameter was an id of a diagram object so call the higher constructor and add this object to the nodeList of that Diagram
+                // Third parameter was an id of a diagram object so call the higher constructor and add this object to the nodeList of that Diagram
                 else if (is_subclass_of($type, 'Diagram'))
                 {
-                    //call the parent constructor and set the linkList to be an empty list
-                    parent::__construct(func_get_arg(0), func_get_arg(1));
-                    $this->linkList = array();
-                    $this->save();
-                    //add this node to the parent diagram's node list
-                    //$theDiagram = new $type($this->storage, func_get_arg(1));
-                    //$theDiagram->addNode($this);
-                    //$theDiagram->update();
+                    $this->ConstructLinkWithDiagram(func_get_arg(0), func_get_arg(1), func_get_arg(2));
                 }
-                //the second parameter did not decend from a Node or a Diagram object
+                // Third parameter did not Descend from a Node or a Diagram object
                 else
                 {
                     throw new BadConstructorCallException("The id passed to the Node Constructor was neither a valid Node or Diagram decended object");
                 }
             }
-            //second parameter should be an associative array so pass it along to Element's constructor
+            // Third parameter should be an associative array so pass it along to Element's constructor
             else
             {
-                parent::__construct(func_get_arg(0), func_get_arg(1));
-                $this->save();
+                $this->ConstructLinkFromAssocArray(func_get_arg(0), func_get_arg(1), func_get_arg(2))
             }
         }
         else
         {
             throw new BadConstructorCallException("An incorrect number of parameters were passed to the Node constructor");
         }
+    }
+    
+    /**
+     * "Constructs" Node by loading from an ID
+     * Node($storage, $user, $id)
+     * @param Readable,Writable $storage
+     * @param User $user
+     * @param ID $id
+     * @throws BadConstructorCallException
+     */
+    protected function ConstructNodeByID($storage, $user, $id)
+    {
+        // Storage is set here, as entity (parent) is never called
+        $this->setStorage($storage);
+        
+        $assocativeArray = $this->storage->loadNode($storage);
+        
+        // Authorization step
+        if($this->verifyThenSetUser($user, $assocativeArray['originator']))
+        {
+            $this->loadAssociativeArray($assocativeArray);
+        }
+        else
+        {
+            // TODO: Should throw an authorization exception
+            throw new BadConstructorCallException("The user is not authorized to add access this object.");
+        } 
+        // Save the ID after authorization has occurred
+        $this->id = $id;
+        $this->save();
+    }
+    
+    /**
+     * "Constructs" new Node and attaches it to a diagram
+     * Node($storage, $user, $id)
+     * @param type $storage
+     * @param type $user
+     * @param type $id
+     */
+    protected function ConstructLinkWithDiagram($storage, $user, $id)
+    {
+        // Call the parent constructor and set the linkList to be an empty list
+        // Authorization handled by parent (Element) constructor
+        parent::__construct(func_get_arg(0), func_get_arg(1));
+        $this->linkList = array();
+        $this->save();
+    }
+    
+    /**
+     * "Constructs" a Node from an associative array supplied by the client.
+     * If client has attempted to set links here, it throws an error, as clients
+     * are not supposed to do that.
+     * Node($storage, $user, $associativeArray)
+     * @param Readable,Writable $storage
+     * @param User $user
+     * @param Mixed[] $associativeArray
+     */
+    protected function ConstructLinkFromAssocArray($storage, $user, $associativeArray)
+    {
+        // Client shouldn't be trying to PUT links, block any such attempts
+        if (isset($associativeArray['linkList']))
+        {
+            throw new BadConstructorCallException("Node does not support PUT operations with links.")
+        }
+        // Authorization handled by parent (Element) constructor
+        parent::__construct(func_get_arg(0), func_get_arg(1), func_get_arg(2));
+        $this->save();
     }
 
     //</editor-fold>
@@ -140,6 +188,12 @@ abstract class Node extends Element
         // Check that it is a link
         if (is_subclass_of($newLink, "Link"))
         {
+            // Check that the users match before committing the operation
+            if (!$this->verifyUser($user, $newLink->user->getId()))
+            {
+                // TODO: Authorization error
+                throw new BadFunctionCallException("User does not have access to a required object for this operation.");
+            }
             //create an new associative array and add it to the list
             $link['id']  = $newLink->getId();
             $link['label'] = $newLink->getLabel();
