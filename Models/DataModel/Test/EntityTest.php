@@ -108,8 +108,8 @@ class EntityTest extends PHPUnit_Framework_TestCase
     public function testSetOriginatorGetOriginator_smoke()
     {
         $testStr = 'something';
-        $this->object->setOriginator($testStr);
-        $this->assertEquals($testStr, $this->object->getOriginator());
+        $this->object->setUser($testStr);
+        $this->assertEquals($testStr, $this->object->getUser());
     }
 
     /**
@@ -120,7 +120,7 @@ class EntityTest extends PHPUnit_Framework_TestCase
     {
         $testStr = '';
         //$this->object->setOriginator($testStr);
-        $this->assertEquals($testStr, $this->object->getOriginator());
+        $this->assertEquals($testStr, $this->object->getUser());
     }
 
     /**
@@ -167,7 +167,7 @@ class EntityTest extends PHPUnit_Framework_TestCase
     {
         $this->object->setLabel("newLabel");
         $this->object->setOrganization("InD");
-        $this->object->setOriginator("Josh");
+        $this->object->setUser("Josh");
         $newEntity = new Process($this->storage, $this->testDiagram->getId());
         $newEntity->loadAssociativeArray($this->object->getAssociativeArray());
         $this->assertEquals($this->object->getAssociativeArray()['label'], $newEntity->getAssociativeArray()['label']);

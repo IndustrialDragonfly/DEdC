@@ -258,17 +258,17 @@ class LinkTest extends PHPUnit_Framework_TestCase
         $node = new Process($this->storage, $this->testDiagram->getId());
         $node->setLabel('someNode');
         $node->setLocation(20, 20);
-        $node->setOriginator('Josh');
+        $node->setUser('Josh');
         //$node->save();
         
         $node2 = new Process($this->storage, $this->testDiagram->getId());
         $node2->setLabel('someNode2');
         $node2->setLocation(30, 20);
-        $node2->setOriginator('The Eugene');
+        $node2->setUser('The Eugene');
         //$node2->save();
         
         $this->object->setLabel('name');
-        $this->object->setOriginator('Josh');
+        $this->object->setUser('Josh');
         $this->object->setLocation(50, 50);
         $this->object->setOriginNode($node);
         $this->object->setDestinationNode($node2);

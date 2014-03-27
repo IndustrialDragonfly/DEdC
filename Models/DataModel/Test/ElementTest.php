@@ -198,7 +198,7 @@ class ElementTest extends PHPUnit_Framework_TestCase
     {
         $this->object->setLabel("newLabel");
         $this->object->setOrganization("InD");
-        $this->object->setOriginator("Josh");
+        $this->object->setUser("Josh");
         
         $this->object->setX(50);
         $this->object->setY(150);
