@@ -23,6 +23,13 @@ abstract class Diagram extends Entity
      * List of all nodes contained within this Diagram and basic data to use them.
      * Stored in an associative array. Eldest anchestor will be first in the array
      * @var String[]
+     * associative array:
+     * 'id'
+     * 'label'
+     * 'originator'
+     * 'x'
+     * 'y'
+     * 'type'
      */
     protected $nodeList;
 
@@ -30,6 +37,16 @@ abstract class Diagram extends Entity
      * List of all links contained within this Diagram and basic data to used them.
      * Stored in an associative array.
      * @var String[]
+     * associative array:
+     * 'id'
+     * 'label'
+     * 'originator'
+     * 'x'
+     * 'y'
+     * 'type'
+     * 'originNode'
+     * 'destinationNode'
+     * 
      */
     protected $linkList;
 
@@ -37,6 +54,14 @@ abstract class Diagram extends Entity
      * List of all the the DiaNodes contained with this Diagram and basic data
      * for the frontend to use them. Stored in an associative array.
      * @var Mixed[]
+     * associative array:
+     * 'id'
+     * 'label'
+     * 'originator'
+     * 'x'
+     * 'y'
+     * 'type'
+     * 'childDiagramId'
      */
     protected $diaNodeList;
 
@@ -120,18 +145,22 @@ abstract class Diagram extends Entity
                     //load the parent DiaNode
                     $type = $this->storage->getTypeFromUUID($this->parentDiaNode);
                     $parentDiaNode = new $type(func_get_arg(0), $this->parentDiaNode);
+                    
                     //get the id of parent Diagram of the parentDiaNode
                     $parentDiagramId = $parentDiaNode->getParent();
+                    
                     //load the parentDiagram
                     $type = $this->storage->getTypeFromUUID($parentDiagramId);
                     $parentDiagram = new $type(func_get_arg(0), $parentDiagramId);
+                    
                     //set this Diagram's ancestry to the parentDiagrams, then add it to the list
                     $this->ancestry = $parentDiagram->getAncestry();
                     array_push($this->ancestry, $parentDiagram->getId());
                     
-                    //set the subDiagram in the parentDiaNode
-                    $this->addDiaNode($parentDiaNode);
+                    //save this new Diagram
                     $this->save();
+                    
+                    //set the parent DiaNode's subDiagram to be this Diagram
                     $parentDiaNode->setSubDiagram($this->getId());
                 }
                 else
@@ -207,6 +236,7 @@ abstract class Diagram extends Entity
             //add it to the list
             $link['id'] = $newLink->getId();
             $link['label'] = $newLink->getLabel();
+            $link['originator'] = $newLink->getOriginator();
             $link['originNode'] = $newLink->getOriginNode()['id'];
             $link['destinationNode'] = $newLink->getDestinationNode()['id'];
             $link['type'] = get_class($newLink);
@@ -307,6 +337,7 @@ abstract class Diagram extends Entity
             //add it to the list
             $node['id'] = $newNode->getId();
             $node['label'] = $newNode->getLabel();
+            $node['originator'] = $newNode->getOriginator();
             $node['x'] = $newNode->getX();
             $node['y'] = $newNode->getY();
             $node['type'] = get_class($newNode);
@@ -411,6 +442,7 @@ abstract class Diagram extends Entity
             //add it to the list
             $node['id'] = $newNode->getId();
             $node['label'] = $newNode->getLabel();
+            $node['originator'] = $newNode->getOriginator();
             $node['x'] = $newNode->getX();
             $node['y'] = $newNode->getY();
             $node['type'] = get_class($newNode);

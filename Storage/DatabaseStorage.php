@@ -698,6 +698,8 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       {
         foreach ($nodeList as $node)
         {
+           //$this->saveNode($node['id'], $node['label'], $node['type'], $node['originator'], $node['x'], $node['y'], $node['links'], count($node['links']), $id);
+           //$insert_stmt = $this->dbh->prepare("INSERT INTO element_list (diagramId, elementId) VALUES(?,?)");
            // Bind the parameters of the prepared statement
            $insert_stmt->bindParam(1, $id);
            $insert_stmt->bindParam(2, $node['id']);
