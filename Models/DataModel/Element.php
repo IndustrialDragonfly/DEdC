@@ -99,7 +99,7 @@ abstract class Element extends Entity
                     
                     // Check if user is authorized to access the Diagram before
                     // adding this element to the diagram.
-                    if ($this->verifyUser($user, $Diagram->getId()->getId()))
+                    if ($this->verifyUser($user, $Diagram->getUser()->getId()))
                     {
                         $this->parent = $id;
                     }
