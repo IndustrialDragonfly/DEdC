@@ -189,7 +189,7 @@ abstract class Node extends Element
         if (is_subclass_of($newLink, "Link"))
         {
             // Check that the users match before committing the operation
-            if (!$this->verifyUser($user, $newLink->user->getId()))
+            if (!$this->verifyUser($this->user, $newLink->getUser()))
             {
                 // TODO: Authorization error
                 throw new BadFunctionCallException("User does not have access to a required object for this operation.");
