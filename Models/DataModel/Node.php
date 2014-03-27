@@ -97,6 +97,8 @@ abstract class Node extends Element
         
         $assocativeArray = $this->storage->loadNode($id);
         
+        $this->id = $id;
+        
         // Authorization step
         if($this->verifyThenSetUser($user, $assocativeArray['userId']))
         {
@@ -107,8 +109,6 @@ abstract class Node extends Element
             // TODO: Should throw an authorization exception
             throw new BadConstructorCallException("The user is not authorized to add access this object.");
         } 
-        // Save the ID after authorization has occurred
-        $this->id = $id;
     }
     
     /**

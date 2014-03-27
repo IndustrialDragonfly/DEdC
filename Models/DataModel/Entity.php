@@ -163,7 +163,6 @@ abstract class Entity
         {
             throw new BadConstructorCallException("Passed user object is not/does not inherit user.");
         }
-        $this->update();
     }
     
     /**
