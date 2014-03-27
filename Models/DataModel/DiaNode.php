@@ -97,7 +97,6 @@ class DiaNode extends Node
         }
         
         $this->loadAssociativeArray($assocativeArray);
-        $this->save();
     }
     
      /**

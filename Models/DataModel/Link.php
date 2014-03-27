@@ -118,7 +118,6 @@ abstract class Link extends Element
             throw new BadConstructorCallException("The user is not authorized to add access this object.");
         }  
         $this->id = $id;
-        $this->save();
     }
     
     /**
