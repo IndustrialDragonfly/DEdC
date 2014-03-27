@@ -44,9 +44,15 @@ abstract class Element extends Entity
      * treated like a null constructor, and will create an object with default 
      * values.  If the third parameter is an associative array it is passed to 
      * the Entity constructor for it to handle.
+     * 
      * @param ReadStorable,WriteStorable $datastore
      * @param User $user
      * @param ID $id the UUID of the parent Diagram
+     * 
+     * or
+     * 
+     * @param ReadStorable,WriteStorable $datastore
+     * @param User $user
      * @param Mixed[] $assocativeArray
      */
     public function __construct()

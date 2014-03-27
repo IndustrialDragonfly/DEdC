@@ -38,10 +38,15 @@ abstract class Link extends Element
      * constructor for Element for it to handle.  If the third parameter is an 
      * associative array it is likewise passed to the Element constructor for it
      *  to handle.  
-     * @param {ReadStorable,WriteStorable} $datastore
+     * @param ReadStorable&WriteStorable $datastore
      * @param User $user
      * @param ID $id    the UUID of either the parent Diagram or the id of the 
      *                      Link to be loaded 
+     * 
+     * or
+     * 
+     * @param ReadStorable&WriteStorable $datastore
+     * @param User $user
      * @param Mixed[] $assocativeArray
      */
     public function __construct()

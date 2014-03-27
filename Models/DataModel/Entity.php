@@ -52,9 +52,9 @@ abstract class Entity
      * medium, the second paramenter is always a user, the third parameter is
      * optional and contains an associative array.  If one parameter is passed 
      * the object creates and empty new object.In both cases a new ID is generated.
-     * @param {ReadStorable,WriteStorable} $datastore
+     * @param ReadStorable&WriteStorable $storage
      * @param User $user
-     * @param Mixed[] $assocativeArray 
+     * @param Mixed[] $assocativeArray (optional)
      */
     public function __construct()
     {
@@ -139,7 +139,7 @@ abstract class Entity
     //<editor-fold desc="id Accessors" defaultstate="collapsed">
     /**
      * This function returns the UUID of this object
-     * @return String
+     * @return ID
      */
     public function getId()
     {
@@ -150,8 +150,8 @@ abstract class Entity
     //</editor-fold>
     //<editor-fold desc="owner Accessors" defaultstate="collapsed">
     /**
-     * This is a function that sets the userId of this object
-     * @param String $newuserId
+     * This is a function that sets the Originator of this object
+     * @param User $newUser
      */
     protected function setUser($newUser)
     {
@@ -171,7 +171,7 @@ abstract class Entity
      * the object stored in the database.
      * If it fails, throws an exception.
      * @param User $user
-     * @param String $storedUser
+     * @param String|User $storedUser
      */
     protected function verifyThenSetUser($user, $storedUser)
     {
@@ -198,16 +198,26 @@ abstract class Entity
     /**
      * Checks if the user passed in matches the string passed in (from Storage)
      * @param User $user
-     * @param String $storedUser
+     * @param String|User $storedUser
      * @returns bool
      */
     protected function verifyUser($user, $storedUser)
     {
         // If user matches the string, return true
-        if ($user->getId()->getId() == $storedUser)
-            {
-                return true;
-            }
+        if (is_a($storedUser, "User"))
+        {
+        	if ($user->getId() == $storedUser->getId())
+        	{
+        		return true;
+        	}
+        }
+        else
+        {
+	        if ($user->getId() == $storedUser)
+	        {
+	         	return true;
+	        }
+        }
         // Otherwise return false
         return false;
     }
@@ -251,7 +261,7 @@ abstract class Entity
     /**
      * This is a function that retrieves the Storage object that is associated 
      * with this object
-     * @return Readable/Writable
+     * @return Readable&Writable
      */
     public function getStorage()
     {
@@ -260,7 +270,7 @@ abstract class Entity
     
     /**
      * Sets the storage object, and checks that it is of the right types.
-     * @param Readable Writable $storage
+     * @param Readable&Writable $storage
      */
     protected function setStorage($storage)
     {
@@ -282,6 +292,7 @@ abstract class Entity
     /**
      * Returns an assocative array representing the entity object. This 
      * assocative array has the following elements and types:
+     * 
      * id String
      * label String
      * userId String
@@ -332,7 +343,7 @@ abstract class Entity
 
     /**
      * Takes an assocative array representing an object and loads it into this
-     * object.
+     * object. Loads the label, and the organization;
      * @param Mixed[] $assocativeArray
      */
     public function loadAssociativeArray($associativeArray)
