@@ -14,7 +14,8 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             saveButton,
             tabs, // jQuery tab widget
             canvases = [], // Array of all open canvases
-            tabCount = 0; // Incremented each time a new tab is created
+            tabCount = 0, // Incremented each time a new tab is created
+            selectedElement = null; 
         
         /**
          * The the canvas object from the currently selected tab
@@ -253,6 +254,20 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                     $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                 }
             });
+            
+            $("#info-dialog").dialog({
+                modal: true,
+                autoOpen: false,
+                buttons: {
+                    "Cancel" : function () {
+                        $(this).dialog("close");
+                    },
+                    "OK": function () {
+                        selectedElement.setText($("#label").val());
+                        $(this).dialog("close");
+                    }
+                }
+            });
 
             // New tab button
             $(newTab).button().click(function () {
@@ -289,35 +304,34 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
 
             // Add the body of the tab to the container
             $(tabContainer).prepend("<div id='" + id + "'></div>");
-
+            
             // Create the canvas
             var c = new Canvas(id, 640, 480);
             canvases.push(c);
             c.setBackground('#A8A8A8');
+            c.setElementDoubleClickedCallback(showElementDetails);
             
-            tabs.delegate("span.ui-icon-close", "click", function() {
-        	    // close icon: removing the tab on click
-			    tabs.delegate( "span.ui-icon-close", "click", function() {
-			      // Find the div id
-			      var panelId = $( this ).closest( "li" ).remove().attr( "aria-controls" );
-			      // Find the canvas that was created in the div
-			      var foundCanvas = null;
-			      canvases.forEach(function (entry) {
-			    	  if (panelId === entry.getContainer()) {
-			    		  foundCanvas = entry;
-			    	  }
-			      });
-			      // Find the index of that canvas in the list, and remove it
-			      var index = canvases.indexOf(foundCanvas);
-			      if (index > -1) {
-			    	  canvases.splice(index, 1);
-			      }
-			      
-			      // Remove the div
-			      $( "#" + panelId ).remove();
-			      tabs.tabs( "refresh" );
-			    });
-            })
+            // close icon: removing the tab on click
+            tabs.delegate( "span.ui-icon-close", "click", function() {
+                // Find the div id
+                var panelId = $( this ).closest( "li" ).remove().attr( "aria-controls" );
+                // Find the canvas that was created in the div
+                var foundCanvas = null;
+                canvases.forEach(function (entry) {
+                    if (panelId === entry.getContainer()) {
+                            foundCanvas = entry;
+                    }
+                });
+                // Find the index of that canvas in the list, and remove it
+                var index = canvases.indexOf(foundCanvas);
+                if (index > -1) {
+                    canvases.splice(index, 1);
+                }
+
+                // Remove the div
+                $( "#" + panelId ).remove();
+                tabs.tabs( "refresh" );
+            });
 
             // Update the tab view
             $(content).tabs("refresh");
@@ -466,6 +480,12 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             
             // Execute the request
             Connector.put("Controller.php/" + canvas.getId(), data, onSuccess, onFail);
+        };
+        
+        var showElementDetails = function (element) {
+            selectedElement = element;
+            $("#label").val(element.getText());
+            $("#info-dialog").dialog("open");
         };
         
         // Expose methods to be public

@@ -67,6 +67,8 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
        // Curent selection
        var selection = [];
        var dataflowSelection = [];
+       
+       var doubleClickCallback = null;
 
        // Register key events
        var ctrlState = globals.KEYSTATE.UP; // Default state for ctrl
@@ -115,7 +117,26 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
                }
            }
        };
-
+       
+       /**
+        * Event called when an Element on the canvas is double clicked.
+        * @param {type} element
+        * @returns {undefined}
+        */
+       this.elementDoubleClicked = function (element) {
+           if (doubleClickCallback) {
+               doubleClickCallback(element);
+           }
+       };
+       
+       /**
+        * Set the double click callback
+        * @param Function callback
+        */
+       this.setElementDoubleClickedCallback = function (callback) {
+           doubleClickCallback = callback;
+       }
+       
        /**
         * Event called when an Dataflow on the canvas is clicked
         * It handles the selection of elements;

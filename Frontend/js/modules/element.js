@@ -35,6 +35,7 @@ define(function () {
                 set = myCanvas.createFromJsonArray(json);
             }
             set.mouseup(onMouseClick);
+            set.dblclick(onMouseDoubleClick);
         };
 
         /**
@@ -166,6 +167,13 @@ define(function () {
                 // Using "this" would result in the wrong object being used
                 myCanvas.elementClicked(me);
             };
+       
+       /**
+        * Called when any Shape in the set is double clicked
+        */
+        var onMouseDoubleClick = function() {
+            myCanvas.elementDoubleClicked(me);
+        };
 
         /**
          * Update the position of the text label
