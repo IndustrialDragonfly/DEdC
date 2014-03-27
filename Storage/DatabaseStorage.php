@@ -124,17 +124,17 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     
 //<editor-fold desc="Node Related Functions" defaultstate="collapsed">
     
-    public function saveNode($id, $label, $type, $originator, $x, $y, $links, $numLinks, $parentId)
+    public function saveNode($id, $label, $type, $userId, $x, $y, $links, $numLinks, $parentId)
     {
         //<editor-fold desc="save to Entity table" defaultstate="collapsed">
         // Prepare the statement
-        $insert_stmt = $this->dbh->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
+        $insert_stmt = $this->dbh->prepare("INSERT INTO entity (id, label, type, userId) VALUES(?,?,?,?)");
 
         // Bind the parameters of the prepared statement
         $insert_stmt->bindParam(1, $id->getId());
         $insert_stmt->bindParam(2, $label);
         $insert_stmt->bindParam(3, $type);
-        $insert_stmt->bindParam(4, $originator);
+        $insert_stmt->bindParam(4, $userId);
 
         // Execute, catch any errors resulting
         $insert_stmt->execute();
@@ -317,23 +317,23 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * @param ID $id
      * @param string $label
      * @param string $type
-     * @param origin $originator
+     * @param origin $userId
      * @param int $x
      * @param int $y
      * @param ID $origin_resource
      * @param ID $dest_resource
      */
-    public function saveLink($id, $label, $type, $originator, $x, $y, $origin_resource, $dest_resource, $parentId)
+    public function saveLink($id, $label, $type, $userId, $x, $y, $origin_resource, $dest_resource, $parentId)
     {
       //<editor-fold desc="save to Entity table" defaultstate="collapsed">
       // Prepare the statement
-      $insert_stmt = $this->dbh->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
+      $insert_stmt = $this->dbh->prepare("INSERT INTO entity (id, label, type, userId) VALUES(?,?,?,?)");
 
       // Bind the parameters of the prepared statement
       $insert_stmt->bindParam(1, $id->getId());
       $insert_stmt->bindParam(2, $label);
       $insert_stmt->bindParam(3, $type);
-      $insert_stmt->bindParam(4, $originator->getd());
+      $insert_stmt->bindParam(4, $userId->getd());
 
       // Execute, catch any errors resulting
       $insert_stmt->execute();
@@ -538,7 +538,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * Returns an associative array of the format:
      * ['id'] string
      * ['label'] string
-     * ['originator'] string
+     * ['userId'] string
      * ['elementList'] string[]
      * ['ancestry'] string[]
      * @param ID $id
@@ -547,10 +547,10 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      */
     public function loadDiagram($id)
     {
-        // Get the id, label, originator, and curtesy of diaNode, the 
+        // Get the id, label, userId, and curtesy of diaNode, the 
         // diaNode the DFD is linked to
          $loadDiagram = $this->dbh->prepare("
-             SELECT id, label, originator, diaNodeId, type 
+             SELECT id, label, userId, diaNodeId, type 
              FROM entity id
                 JOIN dianode childDiagramId ON id=childDiagramId
              WHERE id=?");
@@ -562,7 +562,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          if($vars == FALSE )
          {
              $loadDiagram = $this->dbh->prepare("
-                SELECT id, label, originator, type
+                SELECT id, label, userId, type
                 FROM entity id
                 WHERE id=?");
             $loadDiagram->bindParam(1, $id->getId());
@@ -692,24 +692,24 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * @param ID $id
      * @param string $type
      * @param string $label
-     * @param string $originator
+     * @param string $userId
      * @param Mixed[] $ancestry
      * @param Mixed[] $nodeList
      * @param Mixed[] $linkList
      * @param Mixed[] $DiaNodeList
      * @param ID $diaNode
      */
-    public function saveDiagram($id, $type, $label, $originator, $ancestry, 
+    public function saveDiagram($id, $type, $label, $userId, $ancestry, 
             $nodeList, $linkList, $DiaNodeList, $diaNode)
     {
       // Prepare the statement
-      $insert_stmt = $this->dbh->prepare("INSERT INTO entity (id, label, type, originator) VALUES(?,?,?,?)");
+      $insert_stmt = $this->dbh->prepare("INSERT INTO entity (id, label, type, userId) VALUES(?,?,?,?)");
 
       // Bind the parameters of the prepared statement
       $insert_stmt->bindParam(1, $id->getId());
       $insert_stmt->bindParam(2, $label);
       $insert_stmt->bindParam(3, $type);
-      $insert_stmt->bindParam(4, $originator);
+      $insert_stmt->bindParam(4, $userId);
 
       // Execute, catch any errors resulting
       $insert_stmt->execute();

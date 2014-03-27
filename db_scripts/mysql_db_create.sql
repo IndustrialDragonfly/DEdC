@@ -16,15 +16,27 @@ INSERT INTO types(type) VALUES('ExternalInteractor');
 INSERT INTO types(type) VALUES('DataFlow');
 INSERT INTO types(type) VALUES('DataFlowDiagram');
 
+CREATE TABLE users
+(
+id CHAR(44) NOT NULL,
+userName CHAR(100) NOT NULL,
+organization CHAR(100) NOT NULL,
+admin BIT NOT NULL,
+PRIMARY KEY (id),
+UNIQUE userOrg (userName, organization)
+) Engine InnoDB;
+
 CREATE TABLE entity
 (
 id CHAR(44) NOT NULL,
 label VARCHAR(100) NOT NULL,
 type VARCHAR(20) NOT NULL,
-originator VARCHAR(100), # Username
+userId CHAR(44) NOT NULL,
 PRIMARY KEY (id),
 FOREIGN KEY (type)
-REFERENCES types(type)
+REFERENCES types(type),
+FOREIGN KEY (userId)
+REFERENCES users(id)
 )Engine InnoDB;
 
 CREATE TABLE element
@@ -94,16 +106,6 @@ FOREIGN KEY (diaNodeId)
 REFERENCES entity(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE
-) Engine InnoDB;
-
-CREATE TABLE users
-(
-id CHAR(44) NOT NULL,
-userName CHAR(100) NOT NULL,
-organization CHAR(100) NOT NULL,
-admin BIT NOT NULL,
-PRIMARY KEY (id),
-UNIQUE userOrg (userName, organization)
 ) Engine InnoDB;
 
 CREATE TABLE hash
