@@ -143,6 +143,19 @@ class User
     {
         return $this->organization;
     }
+    
+    /**
+     * Returns an associative array of the form:
+     * 
+     * userName String
+     * organization String
+     * 
+     * @return Mixed[]
+     */
+    public function getAssociativeArray()
+    {
+        return array('userName' => $this->userName, 'organization' => $this->organization);
+    }
 
     /**
      * Returns whether the user is an admin. For a regular user, is hardcoded

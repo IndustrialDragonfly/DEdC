@@ -9,7 +9,11 @@ Definition for a DFD (note there are no nested DFDs in this definition)
     "id": "string",
     "label": "string",
     "type": "string",
-    "originator": "string",
+    "user": 
+        {
+            "userName": "string",
+            "organization": "string"
+        },
     "genericType": "string",
     "diaNode": "string",
     "nodeList": 
@@ -47,7 +51,11 @@ Definition for a single node
     "label": "string",
     "x": "value",
     "y": "value",
-    "originator": "string",
+        "user": 
+        {
+            "userName": "string",
+            "organization": "string"
+        },
     "linkList": 
     [ 
         { 
@@ -65,7 +73,11 @@ Definition for a single diaNode
     "label": "string",
     "x": "value",
     "y": "value",
-    "originator": "string",
+    "user": 
+        {
+            "userName": "string",
+            "organization": "string"
+        },
     "diagramId": "string",
     "linkList": 
     [ 
@@ -96,7 +108,11 @@ Definition for a single link
 			"x": "value",
 			"y": "value"
         },
-    "originator": "string",
+     "user": 
+        {
+            "userName": "string",
+            "organization": "string"
+        },
     "x": "value",
     "y": "value"
 }
