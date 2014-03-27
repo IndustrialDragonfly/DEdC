@@ -90,7 +90,6 @@ abstract class Link extends Element
      */
     protected function ConstructLinkByID($storage, $user, $id)
     {
-        $this->id = $id;
         // Never calling parent, so must handle setting up the storage
         $this->storage = $storage;
         if (!is_subclass_of($this->storage, "ReadStorable"))
@@ -113,6 +112,8 @@ abstract class Link extends Element
             // TODO: Should throw an authorization exception
             throw new BadConstructorCallException("The user is not authorized to add access this object.");
         }  
+        $this->id = $id;
+        $this->save();
     }
     
     /**
