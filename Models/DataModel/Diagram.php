@@ -99,7 +99,7 @@ abstract class Diagram extends Entity
            // If the third parameter was an associative array pass the parameters on to the parent constructor
            else if(is_array(func_get_arg(2)))
            {
-               ConstructDiagramFromAssocArray(func_get_arg(0), func_get_arg(1), func_get_arg(2));
+               $this->ConstructDiagramFromAssocArray(func_get_arg(0), func_get_arg(1), func_get_arg(2));
            }
            else
            {
