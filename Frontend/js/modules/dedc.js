@@ -452,6 +452,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                     var data = {
                         id: entry.getId(),
                         diagramId: canvas.getId(),
+                        label: entry.getText(),
                         genericType: "Link",
                         type: "DataFlow",
                         originNode: {

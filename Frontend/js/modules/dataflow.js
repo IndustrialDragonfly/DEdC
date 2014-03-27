@@ -183,6 +183,13 @@ define(function() {
             // Using "this" would result in the wrong object being used
             myCanvas.dataflowClicked(me);
         };
+        
+       /**
+        * Called when any Shape in the set is double clicked
+        */
+        var onMouseDoubleClick = function() {
+            myCanvas.elementDoubleClicked(me);
+        };
 
         /**
          * Calculate Dataflow's path as the minium between the two Elements
@@ -269,8 +276,11 @@ define(function() {
                 // Path did not exist, create
                 path = canvas.createPath(pathString).attr("stroke-width", 3);
                 path.mouseup(onMouseClick);
+                path.dblclick(onMouseDoubleClick);
                 arrow = canvas.createPath(arrowString).attr("fill", "black");
                 arrow.transform(arrowRotationString);
+                arrow.mouseup(onMouseClick);
+                arrow.dblclick(onMouseDoubleClick);
             }
 
             // Update text position
