@@ -6,7 +6,7 @@
  * @throws BadFunctionCallException
  * @return SimpleResponse
  */
-function delete($storage, $request) 
+function delete($storage, $user, $request) 
 {
 	// TODO Update errors to be exceptions that will be handled by the Controller
 	
@@ -19,7 +19,7 @@ function delete($storage, $request)
 		try
 		{
 			// TODO: Check that element types are the same before deleting
-			$element = existingElementFactory($storage, $request->getId());
+			$element = existingElementFactory($storage, $user,  $request->getId());
 		}
 		catch (Exception $e)
 		{

@@ -29,7 +29,7 @@ abstract class Element extends Entity
 
     /**
      * the UUID of the parent DFD that contains this element
-     * @var type String
+     * @var ID
      */
     protected $parent;
 
@@ -37,44 +37,39 @@ abstract class Element extends Entity
     //<editor-fold desc="Constructor" defaultstate="collapsed">
     /**
      *This is a constructor for the Element class.  This function always takes 
-     * in 2 parameters, the first is always a valid storage medium and will be 
-     * handled by the constructor for Entity.  the second paramenter will be 
-     * either the UUID of the parent Diagram or will be an associative array.  
-     * If the second parameter is an UUID the parent Diagram is set and this is 
+     * in 3 parameters, the first is always a valid storage medium and will be 
+     * handled by the constructor for Entity. The second will be a user. The third 
+     * paramenter will be either the UUID of the parent Diagram or will be an associative array.  
+     * If the third parameter is an UUID the parent Diagram is set and this is 
      * treated like a null constructor, and will create an object with default 
-     * values.  If the second parameter is an associative array it is passed to 
+     * values.  If the third parameter is an associative array it is passed to 
      * the Entity constructor for it to handle.
-     * @param {ReadStorable,WriteStorable} $datastore
-     * @param string $id the UUID of the parent Diagram
+     * 
+     * @param ReadStorable,WriteStorable $datastore
+     * @param User $user
+     * @param ID $id the UUID of the parent Diagram
+     * 
+     * or
+     * 
+     * @param ReadStorable,WriteStorable $datastore
+     * @param User $user
      * @param Mixed[] $assocativeArray
      */
     public function __construct()
     {
-        if(func_num_args() == 2)
+        if(func_num_args() == 3)
         {
-            //if the second parameter is an ID
-            if(is_string(func_get_arg(1)))
+            // Third parameter is an ID
+            if(is_a(func_get_arg(1), "ID"))
             {
-                parent::__construct(func_get_arg(0));
-                $this->x = 0;
-                $this->y = 0;
-                // Find if the type of the second argument is an id of Diagram, if so, its a new node
-                $type = $this->storage->getTypeFromUUID(func_get_arg(1));
-                if (is_subclass_of($type, "Diagram"))
-                {
-                    $this->parent = func_get_arg(1);
-                }
-                else
-                {
-                    throw new BadConstructorCallException("The Id passed to the Element constructor was not valid Diagram");
-                }
+                $this->ConstructElementWithDiagram(func_get_arg(0), func_get_arg(1), func_get_arg(2));
             }
-            //if the second parmeter as an associative array pass it along to the Entity constructor
-            else if(is_array(func_get_arg(1)))
+            // If the second parmeter is an associative array pass it along to the Entity constructor
+            else if(is_array(func_get_arg(2)))
             {
-                parent::__construct(func_get_arg(0), func_get_arg(1));
+                parent::__construct(func_get_arg(0), func_get_arg(1), func_get_arg(2));
             }
-            //if the second paramenter wasnt an ID or an array throw an exception
+            // If the second paramenter wasn't an ID or an array throw an exception
             else
             {
                 throw new BadConstructorCallException("Invalid second parameter passed to Element constructor, can be either an ID or an assocative array");
@@ -87,6 +82,44 @@ abstract class Element extends Entity
         }
         
     }
+    
+    /**
+     * "Constructor" to create a new Element and associate it with a given array.
+     * Element($storage, $user, $id)
+     * @param Readable,Writable $storage
+     * @param User $user
+     * @param ID $id
+     * @throws BadConstructorCallException
+     */
+    protected function ConstructElementWithDiagram($storage, $user, $id)
+    {
+        parent::__construct($storage, $user);
+                $this->x = 0;
+                $this->y = 0;
+                // Find if the type of the second argument is an id of Diagram, if so, its a new node
+                $type = $this->storage->getTypeFromUUID($id);
+                if (is_subclass_of($type, "Diagram"))
+                {
+                    // TODO: Adder a getUserOwningID function to Storage bridge to do this in fewer queries
+                    $Diagram = new $type($storage, $user, $id);
+                    
+                    // Check if user is authorized to access the Diagram before
+                    // adding this element to the diagram.
+                    if ($this->verifyUser($user, $Diagram->getUser()->getId()))
+                    {
+                        $this->parent = $id;
+                    }
+                    else
+                    {
+                        // TODO: Should throw an authorization exception
+                        throw new BadConstructorCallException("The user is not authorized to perform this operation.");
+                    }
+                }
+                else
+                {
+                    throw new BadConstructorCallException("The Id passed to the Element constructor was not valid Diagram");
+                }
+    }
 
     //</editor-fold>
     //<editor-fold desc="Accessor functions" defaultstate="collapsed">
@@ -97,7 +130,11 @@ abstract class Element extends Entity
      */
     public function setX($newX)
     {
-        $this->x = $newX;
+        if($this->x != $newX)
+        {
+            $this->x = $newX;
+            $this->update();
+        }
     }
 
     /**
@@ -115,7 +152,11 @@ abstract class Element extends Entity
      */
     public function setY($newY)
     {
-        $this->y = $newY;
+        if($this->y != $newY)
+        {
+            $this->y = $newY;
+            $this->update();
+        }
     }
 
     /**
@@ -134,8 +175,12 @@ abstract class Element extends Entity
      */
     public function setLocation($newX, $newY)
     {
-        $this->x = $newX;
-        $this->y = $newY;
+        if( $this->x != $newX || $this->y != $newY)
+        {
+            $this->x = $newX;
+            $this->y = $newY;
+            $this->update();
+        }
     }
 
     /**
@@ -158,7 +203,23 @@ abstract class Element extends Entity
      */
     public function setParent($newParent)
     {
-        $this->parent = $newParent;
+        if($newParent == NULL)
+        {
+            throw new BadFunctionCallException("passed parent was null");
+        }
+        $type = $this->storage->getTypeFromUUID($newParent);
+        if(is_subclass_of($type, "Diagram"))
+        {
+            if($this->parent != $newParent)
+            {
+                $this->parent = $newParent;
+                $this->update();
+            }
+        }
+        else
+        {
+            throw new BadFunctionCallException("ID passed to the setParent function did not belong to a valid Diagram Object!");
+        }
     }
 
     /**
@@ -174,9 +235,9 @@ abstract class Element extends Entity
     /**
      * Returns an assocative array representing the element object. This 
      * assocative array has the following elements and types:
-     * id String
+     * id ID
      * label String
-     * originator String
+     * userId String
      * organization String
      * type String 
      * x Int
@@ -230,6 +291,26 @@ abstract class Element extends Entity
         {
             //TODO - should this throw an exception?
             $this->parent = null;
+        }
+    }
+    
+    public function setAssociativeArray($associativeArray)
+    {
+        $type = $this->storage->getTypeFromUUID($associativeArray['diagramId']);
+        // TODO: Adder a getUserOwningID function to Storage bridge to do this in fewer queries
+        // Note that constructing an object will fail anyhow, the next step is for after this TODO is done
+        $Diagram = new $type($this->storage, $this->user, $associativeArray['diagramId']);
+
+        // Check if user is authorized to access the Diagram before
+        // adding this element to the diagram.
+        if ($this->verifyUser($this->user, $Diagram->getUser()))
+        {
+            $this->loadAssociativeArray($associativeArray);
+            $this->update();
+        } 
+        else
+        {
+            throw new BadFunctionCallException("User not authorized to access diagram to add element to.");
         }
     }
 

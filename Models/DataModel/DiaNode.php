@@ -9,66 +9,124 @@
 class DiaNode extends Node
 {
     //<editor-fold desc="Attributes" defaultstate="collapsed">
+    /**
+     * The ID object for a subDiagram
+     * @var ID
+     */
     protected $subDiagram;
 
     //</editor-fold>
     //<editor-fold desc="Constructor" defaultstate="collapsed">
 
     /**
-     * Constructs the DiaNode. Always requires a storage object. If passed an ID of
+     * Constructs the DiaNode. Always requires a storage object and a user If passed an ID of
      * an existing DiaNode, loads that from the storage object. If passed the ID
      * of an existing Diagram, creates a new DiaNode in that object. If passed
      * an associativeArray which represents a DiaNode, loads that.
-     * @param {Read,Write}Storable $storage
-     * @param String $id (Optional if associative array is passed instead)
-     * @param Mixed[] $associativeArray (Optionial if ID is passed instead)
+     * 
+     * @param Readable&Writeable $storage
+     * @param User $user
+     * @param ID $id
+     * 
+     * or
+     * 
+     * @param Readable&Writeable $storage
+     * @param User $user
+     * @param Mixed[] $associativeArray
      */
     public function __construct()
     {
-        if (func_num_args() == 2)
+        if (func_num_args() == 3)
         {
-            // check the second parameter 
-            if (is_string(func_get_arg(1)))
+            // check the second parameter is an ID
+            if (is_a(func_get_arg(2), "ID"))
             {
-                //the second parameter is an id
+                //the second parameter is an ID
                 //check to see if the second parameter is a DiaNode
-                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
+                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(2));
                 if (is_subclass_of($type, "DiaNode"))
                 {
-                    //if the id is for a DiaNode object load the object from storage
-                    $this->id = func_get_arg(1);
-                    $this->storage = func_get_arg(0);
-                    if (!is_subclass_of($this->storage, "ReadStorable"))
-                    {
-                        throw new BadConstructorCallException("Passed storage object does not implement ReadStorable.");
-                    }
-                    if (!is_subclass_of($this->storage, "WriteStorable"))
-                    {
-                        throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
-                    }
-                    $assocativeArray = $this->storage->loadDiaNode($this->id);
-                    $this->loadAssociativeArray($assocativeArray);
+                    $this->ConstructDiaNodeByID(func_get_arg(0), func_get_arg(1), func_get_arg(2));
                 }
-                //otherwise just send it up the constructor stack
+                // Otherwise pass up (if not a Diagram ID, will be handled by Node)
                 else
                 {
-                    parent::__construct(func_get_arg(0), func_get_arg(1));
+                    // Parent (Node) handles authorization
+                    parent::__construct(func_get_arg(0), func_get_arg(1), func_get_arg(2));
                 }
             }
-            else if (is_array(func_get_arg(1)))
+            else if (is_array(func_get_arg(2)))
             {
-                // if the second parameter was an array pass this constructor on to the parent constructor
-                parent::__construct(func_get_arg(0), func_get_arg(1));
+                $this->ConstructDiaNodeFromAssocArray(func_get_arg(0), func_get_arg(1), func_get_arg(2));
             }
             else
             {
-                throw new BadConstructorCallException("Invalid second parameter, can be neither an ID or an assocative array");
+                throw new BadConstructorCallException("Invalid third parameter, is neither an ID or an assocative array");
             }
         }
         else
         {
             throw new BadConstructorCallException("Invalid number of input parameters were passed to the DiaNode Constructor");
         }
+    }
+    
+    /**
+     * "Constructs" DiaNode by loading from an ID
+     * DiaNode($storage, $user, $id)
+     * @param Readable,Writable $storage
+     * @param User $user
+     * @param ID $id
+     * @throws BadConstructorCallException
+     */
+    protected function ConstructDiaNodeByID($storage, $user, $id)
+    {
+        $this->id = $id;
+        $this->setStorage($storage);
+        $assocativeArray = $this->storage->loadDiaNode($this->id);
+        
+        // TODO: Consider placing auth step in a function at a high level as it repeats a lot
+        // Authorization step
+        $this->verifyThenSetUser($user, $assocativeArray['userId']);
+        
+        $this->loadAssociativeArray($assocativeArray);
+    }
+    
+     /**
+     * "Constructor" for DiaNode when passed storage, a user, and an associative array
+     * DiaNode($storage, $user, $associativeArray)
+     * @param Readable,Writeable $storage
+     * @param User $user
+     * @param Mixed[] $associativeArray
+     * @throws BadConstructorCallException
+     */
+    protected function ConstructDiaNodeFromAssocArray($storage, $user, $associativeArray)
+    {
+        // Verify that childDIagramId belongs to the same user (authorization)
+        if(isset($associativeArray['childDiagramId']))
+        {
+            $id = $associativeArray['childDiagramId'];
+            $type = $this->storage->getTypeFromUUID($id);
+            if (is_subclass_of($type, "Diagram"))
+            {
+                // TODO: Adder a getUserOwningID function to Storage bridge to do this in fewer queries
+                $Diagram = new $type($storage, $user, $id);
+
+                // Check if user is authorized to access the Diagram before
+                // adding this element to the diagram.
+                if ($this->verifyUser($user, $Diagram->getUser()->getId()))
+                {
+                    $this->parent = $id;
+                }
+                else
+                {
+                    // TODO: Should throw an authorization exception
+                    throw new BadConstructorCallException("The user is not authorized to perform this operation.");
+                }
+            }
+        }
+        // Third parameter was an array pass this constructor on to the parent constructor
+        // handles the rest of authorization
+        parent::__construct($storage, $user, $associativeArray);   
     }
 
     //</editor-fold>
@@ -89,24 +147,34 @@ class DiaNode extends Node
      */
     public function setSubDiagram($aDiagramID)
     {
-        //TODO - is this check needed? this will require a DB access to function
         $type = $this->storage->getTypeFromUUID($aDiagramID);
         if (is_subclass_of($type, "Diagram"))
         {
-            $this->subDiagram = $aDiagramID;
+            $subDia = new $type($this->storage, $this->user, $aDiagramID);
+            // TODO: Update verifyUser to accept two users or a user and a string
+            if ($this->verifyUser($user, $subDia->getUser()->getId()))
+            {
+                $this->subDiagram = $aDiagramID;
+                $this->update();
+            }
+            else
+            {
+                // TODO: Make authentication error
+                throw new BadFunctionCallException("User not authorized for this operation.");
+            }
         }
         else
         {
-            throw new BadFunctionCallException("input parameter was not a Diagram");
+            throw new BadFunctionCallException("Input parameter was not a Diagram");
         }
     }
 
     /**
      * Returns an assocative array representing the entity object. This 
      * assocative array has the following elements and types:
-     * id String
+     * id ID
      * label String
-     * originator String
+     * userId String
      * organization String 
      * type String
      * genericType String

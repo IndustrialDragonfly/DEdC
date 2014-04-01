@@ -60,7 +60,7 @@ class User
             $this->organization = $authInfo->getOrganization();
             
             // Load id
-            $this->id = new ID($this->storage->getUserId($this->userName, $this->organization));
+            $this->id = $this->storage->getUserId($this->userName, $this->organization);
             
             // Create the authentication module
             $authMethod = $authInfo->getAuthenticationMethod();
@@ -80,8 +80,8 @@ class User
             if (is_a(func_get_arg(2), "ID"))
             {
                 // Set User id, userName, and organization
-                $this->id = new ID(func_get_arg(2));
-                $assocArray = $this->storage->loadUser($this->id->getId());
+                $this->id = func_get_arg(2);
+                $assocArray = $this->storage->loadUser($this->id);
                 $this->userName = $assocArray["userName"];
                 $this->organization = $assocArray["organization"];
                 
@@ -143,6 +143,19 @@ class User
     {
         return $this->organization;
     }
+    
+    /**
+     * Returns an associative array of the form:
+     * 
+     * userName String
+     * organization String
+     * 
+     * @return Mixed[]
+     */
+    public function getAssociativeArray()
+    {
+        return array('userName' => $this->userName, 'organization' => $this->organization);
+    }
 
     /**
      * Returns whether the user is an admin. For a regular user, is hardcoded
@@ -161,7 +174,7 @@ class User
      */
     public function save()
     {
-        $this->storage->saveUser($this->id->getId(), $this->userName, $this->organization, $this->isAdmin());
+        $this->storage->saveUser($this->id, $this->userName, $this->organization, $this->isAdmin());
         $this->authModule->saveNew();
     }
 }

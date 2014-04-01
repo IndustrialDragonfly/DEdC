@@ -258,17 +258,17 @@ class LinkTest extends PHPUnit_Framework_TestCase
         $node = new Process($this->storage, $this->testDiagram->getId());
         $node->setLabel('someNode');
         $node->setLocation(20, 20);
-        $node->setOriginator('Josh');
+        $node->setUser('Josh');
         //$node->save();
         
         $node2 = new Process($this->storage, $this->testDiagram->getId());
         $node2->setLabel('someNode2');
         $node2->setLocation(30, 20);
-        $node2->setOriginator('The Eugene');
+        $node2->setUser('The Eugene');
         //$node2->save();
         
         $this->object->setLabel('name');
-        $this->object->setOriginator('Josh');
+        $this->object->setUser('Josh');
         $this->object->setLocation(50, 50);
         $this->object->setOriginNode($node);
         $this->object->setDestinationNode($node2);
@@ -293,7 +293,7 @@ class LinkTest extends PHPUnit_Framework_TestCase
         $newLink->loadAssociativeArray($this->object->getAssociativeArray());
         //Variables from Entity
         $this->assertEquals($this->object->getAssociativeArray()['label'], $newLink->getAssociativeArray()['label']);
-        $this->assertEquals($this->object->getAssociativeArray()['originator'], $newLink->getAssociativeArray()['originator']);
+        $this->assertEquals($this->object->getAssociativeArray()['userId'], $newLink->getAssociativeArray()['userId']);
         $this->assertEquals($this->object->getAssociativeArray()['organization'], $newLink->getAssociativeArray()['organization']);
         $this->assertFalse($this->object->getAssociativeArray()['id'] == $newLink->getAssociativeArray()['id']);
         
@@ -324,7 +324,7 @@ class LinkTest extends PHPUnit_Framework_TestCase
         $testDestinationNode = new Process($this->storage, $this->testDiagram->getId());
         
         $assocArray['label'] = $testLabel;
-        $assocArray['originator'] = $testOrginator;
+        $assocArray['userId'] = $testOrginator;
         $assocArray['organization'] = $testOrganization;
         $assocArray['x'] = $testX;
         $assocArray['y'] = $testY;
@@ -334,7 +334,7 @@ class LinkTest extends PHPUnit_Framework_TestCase
         
         $this->object->loadAssociativeArray($assocArray);
         $this->assertTrue($this->object->getAssociativeArray()['label'] == $testLabel);
-        $this->assertTrue($this->object->getAssociativeArray()['originator'] == $testOrginator);
+        $this->assertTrue($this->object->getAssociativeArray()['userId'] == $testOrginator);
         $this->assertTrue($this->object->getAssociativeArray()['organization'] == $testOrganization);
         $this->assertTrue($this->object->getAssociativeArray()['x'] == $testX);
         $this->assertTrue($this->object->getAssociativeArray()['y'] == $testY);
@@ -358,7 +358,7 @@ class LinkTest extends PHPUnit_Framework_TestCase
         $testDestinationNode = new Process($this->storage, $this->testDiagram->getId());
         
         $assocArray['label'] = $testLabel;
-        $assocArray['originator'] = $testOrginator;
+        $assocArray['userId'] = $testOrginator;
         $assocArray['organization'] = $testOrganization;
         $assocArray['x'] = $testX;
         $assocArray['y'] = $testY;

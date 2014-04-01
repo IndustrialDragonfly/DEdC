@@ -15,15 +15,15 @@ interface WriteStorable
     /**
      * Saves a given node object into the data store
      * 
-     * @param String $resource
+     * @param String $id
      * @param String $label
      * @param String $type
-     * @param String $originator
+     * @param String $userId
      * @param int $x
      * @param int $y
      * @param String array $links
      */
-    public function saveNode($resource, $label, $type, $originator, $x, $y, $links, $numLinks, $parentId);
+    public function saveNode($id, $label, $type, $userId, $x, $y, $links, $numLinks, $parentId);
     
     /**
      * Deletes the node ID passed in from the data store
@@ -35,10 +35,10 @@ interface WriteStorable
     /**
      * Stores the mapping between a diaNode and its DFD into the data store
      * 
-     * @param String $dfd_resource
-     * @param String $mp_resource
+     * @param String $dfd_id
+     * @param String $mp_id
      */
-    public function saveDiaNode($dfd_resource, $subDFD_resource);
+    public function saveDiaNode($dfd_id, $subDFD_id);
     
      /**
      * Deletes the given diaNode from the diaNode to DFD mapping
@@ -49,16 +49,16 @@ interface WriteStorable
     /**
      * Stores a dataflow object into the data store
      * 
-     * @param string $resource
+     * @param string $id
      * @param string $label
      * @param string $type
-     * @param origin $originator
+     * @param origin $userId
      * @param int $x
      * @param int $y
-     * @param string $origin_resource
-     * @param string $dest_resource
+     * @param string $origin_id
+     * @param string $dest_id
      */
-    public function saveLink($resource, $label, $type, $originator, $x, $y, $origin_resource, $dest_resource, $parentId);
+    public function saveLink($id, $label, $type, $userId, $x, $y, $origin_id, $dest_id, $parentId);
     
     /**
      * Deletes the link from the data store.
@@ -70,7 +70,7 @@ interface WriteStorable
     /**
      * Saves the DFD to the database
      */
-   public function saveDiagram($id, $type, $label, $originator, $ancestry, 
+   public function saveDiagram($id, $type, $label, $userId, $ancestry, 
             $nodeList, $linkList, $DiaNodeList, $diaNode);   
     /**
      * Deletes the DFD from the database

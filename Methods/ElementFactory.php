@@ -5,10 +5,10 @@
  * @param Readable and Writable $storage
  * @return \elementType
  */
-function existingElementFactory($storage, $id)
+function existingElementFactory($storage, $user, $id)
 {
 	// Construct object that has been requested
 	$elementType = $storage->getTypeFromUUID($id);
-	$element = new $elementType($storage, $id);
+	$element = new $elementType($storage, $user, $id);
 	return $element;
 }

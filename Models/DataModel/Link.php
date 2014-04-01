@@ -30,88 +30,138 @@ abstract class Link extends Element
     //</editor-fold>
 //<editor-fold desc="Constructor" defaultstate="collapsed">
     /**
-     * This is the constructor for the Link Class.  It takes in 2 parameters; 
-     * the first is always a valid storage medium, the second one is either an 
-     * ID or an associative array.  If the second parameter is an id of a valid 
+     * This is the constructor for the Link Class.  It takes in 3 parameters; 
+     * the first is always a valid storage medium, the second one is a user 
+     * the third an ID or an associative array.  If the third parameter is an id of a valid 
      * Link subclass the Link is loaded in from the storage medium.  If the 
-     * second parameter was an ID of anything else it is passed to the 
-     * constructor for Element for it to handle.  If the second parameter is an 
+     * third parameter was an ID of anything else it is passed to the 
+     * constructor for Element for it to handle.  If the third parameter is an 
      * associative array it is likewise passed to the Element constructor for it
      *  to handle.  
-     * @param {ReadStorable,WriteStorable} $datastore
-     * @param string $id    the UUID of either the parent Diagram or the id of the 
+     * @param ReadStorable&WriteStorable $datastore
+     * @param User $user
+     * @param ID $id    the UUID of either the parent Diagram or the id of the 
      *                      Link to be loaded 
+     * 
+     * or
+     * 
+     * @param ReadStorable&WriteStorable $datastore
+     * @param User $user
      * @param Mixed[] $assocativeArray
      */
     public function __construct()
     {
         //check number of paramenters
-        if(func_num_args() == 2)
+        if(func_num_args() == 3)
         {
-            //check type of second parameter
-            if (is_string(func_get_arg(1)))
+            // Check if third parameter is a ID object
+            if (is_a(func_get_arg(2), "ID"))
             {
-                //if second parameter is an id of a link subclass object
-                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(1));
+                // If ID is of a Link type object, load from the ID
+                $type = func_get_arg(0)->getTypeFromUUID(func_get_arg(2));
                 if (is_subclass_of($type, "Link"))
                 {
-                    $this->id = func_get_arg(1);
-                    // Never calling parent, so must handle setting up the storage
-                    $this->storage = func_get_arg(0);
-                    if (!is_subclass_of($this->storage, "ReadStorable"))
-                    {
-                        throw new BadConstructorCallException("Passed storage object does not implement ReadStorable.");
-                    }
-                    if (!is_subclass_of($this->storage, "WriteStorable"))
-                    {
-                        throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
-                    }
-                    $assocativeArray = $this->storage->loadLink(func_get_arg(1));
-                    $this->loadAssociativeArray($assocativeArray);
+                    $this->ConstructLinkByID(func_get_arg(0), func_get_arg(1), func_get_arg(2));
                 }
-                //second parameter was an id of a Diagram object
+                // If ID is of a Diagram type object, create a new Link in the Diagram
                 else if (is_subclass_of($type, "Diagram"))
                 {
-                    //call the parent constructor and set the linkList to be an empty list
-                    parent::__construct(func_get_arg(0), func_get_arg(1));
-                    $this->originNode = NULL;
-                    $this->destinationNode = NULL;
-                    $this->save();
+                    $this->ConstructLinkWithDiagram(func_get_arg(0), func_get_arg(1), func_get_arg(2));
                 }
                 else
                 {
-                    throw new BadConstructorCallException("The id passed to the Link Constructor was neither a valid Link or Diagram decended object");
+                    throw new BadConstructorCallException("The id passed to the Link Constructor was neither a valid Link or Diagram descended object");
                 }
             }
-            //second parameter should be an associative array so pass it along to Element's constructor
-            // TODO Check if the Link is already in the database, and call save/update accordingly
+            // Third parameter should be an associative array so pass it along to Element's constructor
             else
             {
-                parent::__construct(func_get_arg(0), func_get_arg(1));
-				$associativeArray = $this->getAssociativeArray();
-				if ($associativeArray ['originNode'] != NULL) 
-				{
-					// New node
-					$newType = $this->storage->getTypeFromUUID ( $associativeArray ['originNode'] ['id'] );
-					$newNode = new $newType ( $this->storage, $associativeArray ['originNode'] ['id'] );
-					$newNode->addLink ( $this );
-				}
-				
-				if ($associativeArray ['destinationNode'] != NULL) 
-				{
-					// New node
-					$newType = $this->storage->getTypeFromUUID ( $associativeArray ['destinationNode'] ['id'] );
-					$newNode = new $newType ( $this->storage, $associativeArray ['destinationNode'] ['id'] );
-					$newNode->addLink ( $this );
-				}
-				
-				$this->save ();				
+                $this->ConstructLinkFromAssocArray(func_get_arg(0), func_get_arg(1), func_get_arg(2));		
             }
         }
         else
         {
             throw new BadConstructorCallException("An incorrect number of parameters were passed to the Link constructor");
         }
+    }
+    
+    /**
+     * "Constructor" for Link objects constructed with an ID for a link
+     * Link($storage, $user, $id)
+     * @param Readable,Writable $storage
+     * @param User $user
+     * @param ID $id
+     * @throws BadConstructorCallException
+     */
+    protected function ConstructLinkByID($storage, $user, $id)
+    {
+        // Never calling parent, so must handle setting up the storage
+        $this->storage = $storage;
+        if (!is_subclass_of($this->storage, "ReadStorable"))
+        {
+            throw new BadConstructorCallException("Passed storage object does not implement ReadStorable.");
+        }
+        if (!is_subclass_of($this->storage, "WriteStorable"))
+        {
+            throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
+        }
+        $assocativeArray = $this->storage->loadLink($id);
+        
+        $this->id = $id;
+        
+        // Authorization step
+        $this->verifyThenSetUser($user, $assocativeArray['userId']);
+        
+        $this->loadAssociativeArray($assocativeArray);
+
+    }
+    
+    /**
+     * "Constructor" for Link objects constructed with an ID for a diagram
+     * Link($storage, $user, $id)
+     * @param type $storage
+     * @param type $user
+     * @param type $id
+     */
+    protected function ConstructLinkWithDiagram($storage, $user, $id)
+    {
+        // Call the parent constructor and set the nodes to be empty
+        // Parent (Element) handles authorization
+        parent::__construct($storage, $user, $id);
+        $this->originNode = NULL;
+        $this->destinationNode = NULL;
+        $this->save();
+    }
+    
+    protected function ConstructLinkFromAssocArray($storage, $user, $associativeArray)
+    {
+        // TODO: Notice this does an __unsafe__ loadAssociativeArray call (for authorization)
+        // with respect to the nodes. Though this should be rectified here by the
+        // construction of the nodes, it would be good to add a setAssociative function
+        // which verfies them before loading
+        parent::__construct($storage, $user, $associativeArray);
+        // Grab "official" associative array
+        $associativeArray = $this->getAssociativeArray();
+        // TODO: Merge these functions into setNode functions (if possible)
+        if ($associativeArray ['originNode'] != NULL) 
+        {
+                // New node
+                $newType = $this->storage->getTypeFromUUID($associativeArray['originNode']['id'] );
+                // Provides implicit authorization since constructor fails if user is wrong
+                $newNode = new $newType ( $this->storage, $this->user, $associativeArray['originNode']['id'] );
+                $newNode->addLink ( $this );
+        }
+
+        if ($associativeArray ['destinationNode'] != NULL) 
+        {
+                // New node
+                $newType = $this->storage->getTypeFromUUID( $associativeArray['destinationNode']['id'] );
+                // Provides implicit authorization since constructor fails if user is wrong
+                $newNode = new $newType ( $this->storage, $this->user, $associativeArray ['destinationNode'] ['id'] );
+                $newNode->addLink ( $this );
+        }
+
+        $this->save ();	
     }
 
 
@@ -136,17 +186,16 @@ abstract class Link extends Element
     public function setOriginNode($aNode)
     {
         //make sure a Node object was passed
-        if ($aNode instanceof Node)
+        if (is_subclass_of($aNode, "Node"))
         {
             //if origin has not been set yet
             if ($this->originNode == NULL)
             {
                 //set the origin node and add this DataFlow to its list of Links
-                $this->originNode['id'] = $aNode->getId();
+                $this->originNode['id'] = $aNode;
                 $this->originNode['label'] = $aNode->getLabel();
                 
                 $aNode->addLink($this);
-                $aNode->update();
             }
             //if the origin node has already been set
             else
@@ -154,16 +203,16 @@ abstract class Link extends Element
                 //remove this DataFlow from the old origin nodes list of links and 
                 //thenset the origin node to the new node and add this DataFlow to 
                 //its list of Links
-                $type = $this->storage->getTypeFromUUID($this->originNode);
-                $node = new $type($this->storage, $this->originNode);
+                $type = $this->storage->getTypeFromUUID($this->originNode->getId);
+                // Provides implicit authorization since constructor fails if user is wrong
+                $node = new $type($this->storage, $this->user, $this->originNode);
                 $node->removeLink($this);
-                $node->update();
 
-                $this->originNode['id'] = $aNode->getId();
+                $this->originNode['id'] = $aNode;
                 $this->originNode['label'] = $aNode->getLabel();
                 $aNode->addLink($this);
-                $aNode->update();
             }
+            $this->update();
         }
         else
         {
@@ -179,10 +228,12 @@ abstract class Link extends Element
         if ($this->originNode != NULL)
         {
             $type = $this->storage->getTypeFromUUID($this->originNode['id']);
-            $node = new $type($this->storage, $this->originNode['id']);
+            // Provides implicit authorization since constructor fails if user is wrong
+            $node = new $type($this->storage, $this->user, $this->originNode['id']);
             $node->removeLink($this);
             $this->originNode = NULL;
-            $node->update();
+            //$node->update();remove link already did this
+            $this->update();
         }
     }
 
@@ -212,11 +263,10 @@ abstract class Link extends Element
             if ($this->destinationNode == NULL)
             {
                 //set the destination node and add this DataFlow to its list of Links
-                $this->destinationNode['id'] = $aNode->getId();
+                $this->destinationNode['id'] = $aNode;
                 $this->destinationNode['label'] = $aNode->getLabel();
                 
                 $aNode->addLink($this);
-                $aNode->update();
             }
             //if the destination node has already been set
             else
@@ -225,15 +275,14 @@ abstract class Link extends Element
                 //then set the destination node to the new node and add this DataFlow to 
                 //its list of Links
                 $type = $this->storage->getTypeFromUUID($this->destinationNode);
-                $node = new $type($this->storage, $this->destinationNode);
+                $node = new $type($this->storage, $this->user, $this->destinationNode);
                 $node->removeLink($this);
-                $node->update();
 
-                $this->destinationNode['id'] = $aNode->getId();
+                $this->destinationNode['id'] = $aNode;
                 $this->destinationNode['label'] = $aNode->getLabel();
                 $aNode->addLink($this);
-                $node->update();
             }
+            $this->update();
         }
         else
         {
@@ -249,10 +298,12 @@ abstract class Link extends Element
         if ($this->destinationNode != NULL)
         {
             $type = $this->storage->getTypeFromUUID($this->destinationNode['id']);
-            $node = new $type($this->storage, $this->destinationNode['id']);
+            // Provides implicit authorization since constructor fails if user is wrong
+            $node = new $type($this->storage, $this->user, $this->destinationNode['id']);
             $node->removeLink($this);
-            $node->update();
+            //$node->update(); remove link already did this
             $this->destinationNode = NULL;
+            $this->update();
         }
     }
 
@@ -268,7 +319,7 @@ abstract class Link extends Element
      */
     public function removeNode($node)
     {
-        if ($node->getId() == $this->getOriginNode()['id'])
+        if ($node == $this->getOriginNode()['id'])
         {
             $this->clearOriginNode();
             // Actually call back the node that just called and remove the node
@@ -276,7 +327,7 @@ abstract class Link extends Element
             //$node->removeLink($this);
             //$node->update();
         }
-        elseif ($node->getId() == $this->getDestinationNode()['id'])
+        elseif ($node == $this->getDestinationNode()['id'])
         {
             $this->clearDestinationNode();
             //$node->removeLink($this);
@@ -304,7 +355,7 @@ abstract class Link extends Element
      * assocative array has the following elements and types:
      * id String
      * label String
-     * originator String
+     * userId String
      * organization String 
      * type String
      * genericType String
@@ -358,33 +409,44 @@ abstract class Link extends Element
 
     public function setAssociativeArray($associativeArray)
     {
+        // TODO: Merge these functions into setNode functions (if possible)
+        // TODO: Wrap both ifs w/ a NULL and is_set check and handle appropriately
     	// TODO: Make new storage function to use fewer sql queries
     	// Temporary fix for checking origin and destination node changes
     	if ($associativeArray['originNode']['id'] != $this->originNode['id'])
     	{
-    		// Original node
-    		$type = $this->storage->getTypeFromUUID($this->originNode['id']);
-    		$originalNode = new $type($this->storage, $this->originNode['id']);
-    		$originalNode->removeLink($this);
-    	
-    		// New node
-    		$newType = $this->storage->getTypeFromUUID($associativeArray['originNode']['id']);
-    		$newNode = new $newType($this->storage, $associativeArray['originNode']['id']);
-    		$newNode->addLink($this);
+            // Original node
+            // Check if NULL
+            if ($this->originNode != NULL)
+            {
+                $type = $this->storage->getTypeFromUUID($this->originNode['id']);
+                $originalNode = new $type($this->storage, $this->originNode['id'], $this->user);
+                $originalNode->removeLink($this);
+            }
+
+            // New node
+            $newType = $this->storage->getTypeFromUUID($associativeArray['originNode']['id']);
+            // Construction of the node provides authorization, as it will fail if the user doesn't match
+            $newNode = new $newType($this->storage, $this->user, $associativeArray['originNode']['id']);
+            $newNode->addLink($this);
     	
     	}
     	 
     	if ($associativeArray['destinationNode']['id'] != $this->destinationNode['id'])
     	{
-    		// Original node
-    		$type = $this->storage->getTypeFromUUID($this->destinationNode['id']);
-    		$originalNode = new $type($this->storage, $this->destinationNode['id']);
-    		$originalNode->removeLink($this);
-    		 
-    		// New node
-    		$newType = $this->storage->getTypeFromUUID($associativeArray['destinationNode']['id']);
-    		$newNode = new $newType($this->storage, $associativeArray['destinationNode']['id']);
-    		$newNode->addLink($this);
+            // Original node
+            if ($this->destinationNode != NULL)
+            {
+                $type = $this->storage->getTypeFromUUID($this->destinationNode['id']);
+                // Construction of the node provides authorization, as it will fail if the user doesn't match
+                $originalNode = new $type($this->storage, $this->user, $this->destinationNode['id']);
+                $originalNode->removeLink($this);
+            }
+
+            // New node
+            $newType = $this->storage->getTypeFromUUID($associativeArray['destinationNode']['id']);
+            $newNode = new $newType($this->storage, $this->user, $associativeArray['destinationNode']['id']);
+            $newNode->addLink($this);
     	}
     	
     	parent::setAssociativeArray($associativeArray);
@@ -401,7 +463,7 @@ abstract class Link extends Element
     {
         // Send info required to save dataflow to the data store
         $this->storage->saveLink($this->id, $this->label, get_class($this), 
-                $this->originator, $this->x, $this->y, $this->originNode['id'], 
+                $this->user->getId(), $this->x, $this->y, $this->originNode['id'], 
                 $this->destinationNode['id'], $this->parent);
     }
 

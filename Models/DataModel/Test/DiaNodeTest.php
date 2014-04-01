@@ -113,7 +113,7 @@ class DiaNodeTest extends PHPUnit_Framework_TestCase
         $testParentID = $this->testDiagram->getId();
         
         $assocArray['label'] = $testLabel;
-        $assocArray['originator'] = $testOrginator;
+        $assocArray['userId'] = $testOrginator;
         $assocArray['organization'] = $testOrganization;
         $assocArray['x'] = $testX;
         $assocArray['y'] = $testY;
@@ -138,7 +138,7 @@ class DiaNodeTest extends PHPUnit_Framework_TestCase
         $testParentID = $this->testDiagram->getId();
         
         $assocArray['label'] = $testLabel;
-        $assocArray['originator'] = $testOrginator;
+        $assocArray['userId'] = $testOrginator;
         $assocArray['organization'] = $testOrganization;
         $assocArray['x'] = $testX;
         $assocArray['y'] = $testY;

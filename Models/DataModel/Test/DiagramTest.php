@@ -47,7 +47,7 @@ class DiagramTest extends PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        $this->object->refresh();
+        //$this->object->refresh();
         //$this->object->delete();
     }
 //
@@ -455,27 +455,49 @@ class DiagramTest extends PHPUnit_Framework_TestCase
 //        $this->assertEquals(0, $this->object->getNumberOfAncestors());
 //    }
     
+//    /**
+//     * @covers Diagram::getNumberOfAncestors
+//     * @todo   Implement testGetNumberOfAncestors().
+//     */
+//    public function testGetNumberOfAncestors_smoke()
+//    {
+//        $mp = new Multiprocess($this->storage, $this->object->getId());
+//        $childDiagram = new DataFlowDiagram($this->storage, $mp->getId());
+//        var_dump($this->object);
+//        $this->object->refresh();
+//        var_dump($this->object);
+//        //$childDiagram->refresh();
+//        
+//        $this->object->setLabel("parent DFD");
+//        //var_dump($this->object);
+//        //$this->object->update();
+//        //$childDiagram->setLabel("child DFD");
+//        //$childDiagram->update();
+//        //var_dump($this->object);
+//        //var_dump($childDiagram);
+//        $this->assertEquals(1, $childDiagram->getNumberOfAncestors());
+//    }
+    
     /**
-     * @covers Diagram::getNumberOfAncestors
-     * @todo   Implement testGetNumberOfAncestors().
+     * @covers Diagram::setLabel
      */
-    public function testGetNumberOfAncestors_smoke()
+    public function test_sometest()
     {
-        $mp = new Multiprocess($this->storage, $this->object->getId());
-        $childDiagram = new DataFlowDiagram($this->storage, $mp->getId());
+        //$p = new Process($this->storage, $this->object->getId());
+        //$ds = new DataStore($this->storage, $this->object->getId());
+        //$ei = new ExternalInteractor($this->storage, $this->object->getId());
+        //$mp = new Multiprocess($this->storage, $this->object->getId());
+        $df = new DataFlow($this->storage, $this->object->getId());
+        //$dfd = new DataFlowDiagram($this->storage, $mp->getId());
         $this->object->refresh();
-        $childDiagram->refresh();
-        
-        $this->object->setLabel("parent DFD");
-        var_dump($this->object);
-        $this->object->update();
-        $childDiagram->setLabel("child DFD");
-        $childDiagram->update();
-        var_dump($this->object);
-        //var_dump($childDiagram);
-        $this->assertEquals(1, $childDiagram->getNumberOfAncestors());
+        $this->object->setLabel("test");
+        $dfd->update();
+        //$this->object->update();
+        //$this->object->refresh();
+        $this->assertEquals("test", $this->object->getLabel());
+        //$this->object->delete();
     }
-//
+
 //    /**
 //     * @covers Diagram::getParent
 //     * @todo   Implement testGetParent().

@@ -21,15 +21,15 @@ abstract class Entity
 
     /**
      * This contains a universally unique identifier
-     * @var String
+     * @var ID
      */
     protected $id;
 
     /**
-     * UUID of the originator of this DFD
-     * @var String 
+     * UUID of the userId of this DFD
+     * @var ID 
      */
-    protected $originator;
+    protected $user;
 
     /**
      * This is a container for the organization that this object belongs to
@@ -40,7 +40,7 @@ abstract class Entity
     /**
      * Storage object, should be readable and/or writable (depending on whether
      * this is a normal data store, import data source, or export data format)
-     * @var Readable/Writable
+     * @var DatabaseStorage
      */
     protected $storage;
 
@@ -49,62 +49,67 @@ abstract class Entity
     /**
      * This is a constructor that creates an new entity.  This takes in a 
      * variable number of parameters, the first parameter is always a storage 
-     * medium, the second paramenter is optional and contains an associative 
-     * array.  If one parameter is passed the object creates and empty new 
-     * object.  In both cases a new ID is generated.
-     * @param {ReadStorable,WriteStorable} $datastore
-     * @param Mixed[] $assocativeArray 
+     * medium, the second paramenter is always a user, the third parameter is
+     * optional and contains an associative array.  If one parameter is passed 
+     * the object creates and empty new object.In both cases a new ID is generated.
+     * @param ReadStorable&WriteStorable $storage
+     * @param User $user
+     * @param Mixed[] $assocativeArray (optional)
      */
     public function __construct()
     {
-        $this->id = $this->generateId();
-        $this->storage = func_get_arg(0);
-        if (!is_subclass_of($this->storage, "ReadStorable"))
+        // Generate a fresh ID
+        $this->id = new ID();
+        $this->setStorage(func_get_arg(0));
+        
+        // Since this is a new object, no need for authorization, just set
+        // the user as the owner
+        $this->user = func_get_arg(1);
+        //if there was only 2 parameters, user and storage just create an empty object
+        if(func_num_args() == 2)
         {
-            throw new BadConstructorCallException("Passed storage object does not implement ReadStorable.");
-        }
-        if (!is_subclass_of($this->storage, "WriteStorable"))
-        {
-            throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
-        }
-        //if there was only 1 parameter just create an empty object
-        if(func_num_args() == 1)
-        {
-            $this->label = '';
-            $this->organization = '';
-            $this->originator = '';
+            $this->ConstructNewEntity();
             
         }
-        //if there was a second parameter load an associative array
-        else if (func_num_args() == 2)
+        // If there were three parameters, and the third was an associative array
+        else if (func_num_args() == 3)
         {
-            if (is_array(func_get_arg(1)))
-            {
-                $this->loadAssociativeArray(func_get_arg(1));
-            }
-            else
-            {
-                throw new BadConstructorCallException("Parameter 1 was not an associative array.");
-            }
+            $this->ConstructEntityFromAssocArray(func_get_arg(2));
         }
         else
         {
-            throw new BadConstructorCallException("An incorrect number of parmeters were passed to the Entity constructor.");
+            throw new BadConstructorCallException("An incorrect number of parameters were passed to the Entity constructor.");
         }
     }
 
     /**
-     * This is a function that generates a UUID String with a length of 265 bits
-     * @return String
+     * "Constructor" for Entity when Entity is only passed storage and user
+     * Entity($storage, $user)
      */
-    private function generateId()
+    protected function ConstructNewEntity()
     {
-        $length = 256;
-        $numberOfBytes = $length / 8;
-        // Replaces all instances of +, = or / in the Base64 string with x
-        return str_replace(array("+", "=", "/"), array("x", "x", "x"), base64_encode(openssl_random_pseudo_bytes($numberOfBytes)));
+        $this->label = '';
+        $this->organization = '';
     }
-
+    
+    /**
+     * "Constructor" for Entity when entity is passed storage, a user, and an associative array
+     * Entity($storage, $user, $associativeArray)
+     * @param Mixed[] $associativeArray
+     * @throws BadConstructorCallException
+     */
+    protected function ConstructEntityFromAssocArray($associativeArray)
+    {
+        if (is_array($associativeArray))
+            {
+                $this->loadAssociativeArray($associativeArray);
+            }
+            else
+            {
+                throw new BadConstructorCallException("Third parameter was not an associative array.");
+            }
+    }
+    
     //</editor-fold>
     //<editor-fold desc="Accessor functions" defaultstate="collapsed">
     //<editor-fold desc="label Accessors" defaultstate="collapsed">
@@ -134,7 +139,7 @@ abstract class Entity
     //<editor-fold desc="id Accessors" defaultstate="collapsed">
     /**
      * This function returns the UUID of this object
-     * @return String
+     * @return ID
      */
     public function getId()
     {
@@ -146,21 +151,83 @@ abstract class Entity
     //<editor-fold desc="owner Accessors" defaultstate="collapsed">
     /**
      * This is a function that sets the Originator of this object
-     * @param String $newOriginator
+     * @param User $newUser
      */
-    public function setOriginator($newOriginator)
+    protected function setUser($newUser)
     {
-        $this->originator = $newOriginator;
-        $this->update();
+        if (is_a($newUser, "User"))
+        {
+            $this->user = $newUser;
+        }
+        else
+        {
+            throw new BadConstructorCallException("Passed user object is not/does not inherit user.");
+        }
+    }
+    
+    /**
+     * Verifies that the user passed has the same ID as the user ID for 
+     * the object stored in the database.
+     * If it fails, throws an exception.
+     * @param User $user
+     * @param String|User $storedUser
+     */
+    protected function verifyThenSetUser($user, $storedUser)
+    {
+        // Ensure it is a user object
+        if (is_a($user, "User"))
+        {
+            // Compare $user's ID to the user stored in the database for the object
+            if ($this->verifyUser($user, $storedUser))
+            {
+                $this->setUser($user);
+            }
+            else
+            {
+                throw new BadFunctionCallException("Passed user object does not own object to modify.");
+            }
+        }
+        else
+        {
+            // TODO: Authorization exception
+            throw new BadFunctionCallException("Passed user object is not/does not inherit user.");
+        }
+    }
+    
+    /**
+     * Checks if the user passed in matches the string passed in (from Storage)
+     * @param User $user
+     * @param String|User $storedUser
+     * @returns bool
+     */
+    protected function verifyUser($user, $storedUser)
+    {
+        // If user matches the string, return true
+        if (is_a($storedUser, "User"))
+        {
+        	if ($user->getId() == $storedUser->getId())
+        	{
+        		return true;
+        	}
+        }
+        else if (is_string($storedUser))
+        {
+	        if ($user->getId()->getId() == $storedUser)
+	        {
+	         	return true;
+	        }
+        }
+        // Otherwise return false
+        return false;
     }
 
     /**
-     * This is a function that retrieves the Originator of this object
+     * This is a function that retrieves the userId of this object
      * @return String
      */
-    public function getOriginator()
+    public function getUser()
     {
-        return $this->originator;
+        return $this->user;
     }
 
     //</editor-fold>
@@ -191,28 +258,31 @@ abstract class Entity
     //</editor-fold>
     //<editor-fold desc="Storage Accessors" defaultstate="collapsed">
     /**
-     * This a a function that will set the storage object that is associated 
-     * with this object
-     * 
-     * should this function exist?
-     *   -nope
-     * 
-     * @param Readable/Writable $newStorage
-     */
-    /* disabled
-      public function setStorage($newStorage)
-      {
-      $this->storage = $newStorage;
-      } */
-
-    /**
      * This is a function that retrieves the Storage object that is associated 
      * with this object
-     * @return Readable/Writable
+     * @return Readable&Writable
      */
     public function getStorage()
     {
         return $this->storage;
+    }
+    
+    /**
+     * Sets the storage object, and checks that it is of the right types.
+     * @param Readable&Writable $storage
+     */
+    protected function setStorage($storage)
+    {
+        
+        if (!is_subclass_of($storage, "ReadStorable"))
+        {
+            throw new BadConstructorCallException("Passed storage object does not implement ReadStorable.");
+        }
+        if (!is_subclass_of($storage, "WriteStorable"))
+        {
+            throw new BadConstructorCallException("Passed storage object does not implement WriteStorable.");
+        }
+        $this->storage = $storage;
     }
 
     //</editor-fold>
@@ -221,9 +291,12 @@ abstract class Entity
     /**
      * Returns an assocative array representing the entity object. This 
      * assocative array has the following elements and types:
+     * 
      * id String
      * label String
-     * originator String
+     * user Mixed[]
+     *      userName String
+     *      organization String
      * organization String
      * type String
      * genericType String
@@ -236,8 +309,7 @@ abstract class Entity
 
         $entityArray['id'] = $this->id;
         $entityArray['label'] = $this->label;
-        $entityArray['originator'] = $this->originator;
-        $entityArray['organization'] = $this->organization;
+        $entityArray['user'] = $this->user->getAssociativeArray();
         $entityArray['type'] = get_class($this);
 
         $genericType = NULL;
@@ -271,7 +343,7 @@ abstract class Entity
 
     /**
      * Takes an assocative array representing an object and loads it into this
-     * object.
+     * object. Loads the label, and the organization;
      * @param Mixed[] $assocativeArray
      */
     public function loadAssociativeArray($associativeArray)
@@ -285,14 +357,16 @@ abstract class Entity
             $this->label = "";
         }
         
-        if(isset($associativeArray['originator']))
+        // No longer possible to load without having a user in the first place.
+        /*if(isset($associativeArray['userId']))
         {
-            $this->originator = $associativeArray['originator'];
+            $this->user = $associativeArray['userId'];
         }
         else
         {
-            $this->originator = "";
-        }
+            $this->user = "";
+        }*/
+        // TODO: Handle organization by grabbing it from user object
         if(isset($associativeArray['organization']))
         {
             $this->organization = $associativeArray['organization'];
@@ -303,6 +377,10 @@ abstract class Entity
         }
     }
     
+    /**
+     * Generic call to allow an element to be externally loaded by an assoc array
+     * @param Mixed[] $associativeArray
+     */
     public function setAssociativeArray($associativeArray)
     {
     	$this->loadAssociativeArray($associativeArray);
