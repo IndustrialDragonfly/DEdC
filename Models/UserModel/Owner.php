@@ -11,7 +11,7 @@ class Owner
 		$this->organization = $organization;
 	}
 	
-	public function getUser()
+	public function getUserName()
 	{
 		return $this->userName;
 	}
