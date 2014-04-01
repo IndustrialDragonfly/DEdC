@@ -289,18 +289,9 @@ abstract class Element extends Entity
         // TODO: Adder a getUserOwningID function to Storage bridge to do this in fewer queries
         // Note that constructing an object will fail anyhow, the next step is for after this TODO is done
         $Diagram = new $type($this->storage, $this->user, $associativeArray['diagramId']);
-
-        // Check if user is authorized to access the Diagram before
-        // adding this element to the diagram.
-        if ($this->verifyUser($this->user, $Diagram->getUser()))
-        {
-            $this->loadAssociativeArray($associativeArray);
-            $this->update();
-        } 
-        else
-        {
-            throw new BadFunctionCallException("User not authorized to access diagram to add element to.");
-        }
+        
+        $this->loadAssociativeArray($associativeArray);
+        $this->update();
     }
 
     //</editor-fold>
