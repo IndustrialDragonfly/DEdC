@@ -178,14 +178,14 @@ abstract class Diagram extends Entity
         $this->id = $id;
         $this->setStorage($storage);
         
-        $assocativeArray = $this->storage->loadDiagram($id);
+        $associativeArray = $this->storage->loadDiagram($id);
         
         // Perform authorization. Check that user authorizes with stored Owner for
         // this Diagram. Throws exception on failure.
         $this->owner = $associativeArray['owner'];
         $this->verifyThenSetUser($user);
         
-        $this->loadAssociativeArray($assocativeArray);
+        $this->loadAssociativeArray($associativeArray);
     }
     
     /**
