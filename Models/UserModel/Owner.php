@@ -33,6 +33,9 @@ class Owner
 	
 	public function getAssociativeArray()
 	{
-		return $this->user->getAssociativeArray();
+		return $array = array(
+		    "userName" => $this->userName,
+		    "organization" => $this->organization,
+		);
 	}
 }
