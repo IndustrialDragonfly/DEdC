@@ -64,7 +64,7 @@ abstract class Element extends Entity
             {
                 $this->ConstructElementWithDiagram(func_get_arg(0), func_get_arg(1), func_get_arg(2));
             }
-            // If the second parmeter is an associative array pass it along to the Entity constructor
+            // If the second parameter is an associative array pass it along to the Entity constructor
             else if(is_array(func_get_arg(2)))
             {
                 parent::__construct(func_get_arg(0), func_get_arg(1), func_get_arg(2));
@@ -100,20 +100,9 @@ abstract class Element extends Entity
                 $type = $this->storage->getTypeFromUUID($id);
                 if (is_subclass_of($type, "Diagram"))
                 {
-                    // TODO: Adder a getUserOwningID function to Storage bridge to do this in fewer queries
+                    // TODO: Adder a getUserOwningID function to Storage bridge to do this in fewer queries.
+                    // TODO: If it failed to construct, it failed to authorize with Owner (But this is very slow).
                     $Diagram = new $type($storage, $user, $id);
-                    
-                    // Check if user is authorized to access the Diagram before
-                    // adding this element to the diagram.
-                    if ($this->verifyUser($user, $Diagram->getUser()->getId()))
-                    {
-                        $this->parent = $id;
-                    }
-                    else
-                    {
-                        // TODO: Should throw an authorization exception
-                        throw new BadConstructorCallException("The user is not authorized to perform this operation.");
-                    }
                 }
                 else
                 {

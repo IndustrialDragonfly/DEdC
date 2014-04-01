@@ -86,7 +86,8 @@ class DiaNode extends Node
         
         // TODO: Consider placing auth step in a function at a high level as it repeats a lot
         // Authorization step
-        $this->verifyThenSetUser($user, $assocativeArray['userId']);
+        $this->owner = $assocativeArray['owner'];
+        $this->verifyThenSetUser($user);
         
         $this->loadAssociativeArray($assocativeArray);
     }
@@ -109,19 +110,8 @@ class DiaNode extends Node
             if (is_subclass_of($type, "Diagram"))
             {
                 // TODO: Adder a getUserOwningID function to Storage bridge to do this in fewer queries
+            	// TODO: If it failed to construct, it failed to authorize with Owner (But this is very slow).
                 $Diagram = new $type($storage, $user, $id);
-
-                // Check if user is authorized to access the Diagram before
-                // adding this element to the diagram.
-                if ($this->verifyUser($user, $Diagram->getUser()->getId()))
-                {
-                    $this->parent = $id;
-                }
-                else
-                {
-                    // TODO: Should throw an authorization exception
-                    throw new BadConstructorCallException("The user is not authorized to perform this operation.");
-                }
             }
         }
         // Third parameter was an array pass this constructor on to the parent constructor
@@ -151,17 +141,8 @@ class DiaNode extends Node
         if (is_subclass_of($type, "Diagram"))
         {
             $subDia = new $type($this->storage, $this->user, $aDiagramID);
-            // TODO: Update verifyUser to accept two users or a user and a string
-            if ($this->verifyUser($user, $subDia->getUser()->getId()))
-            {
-                $this->subDiagram = $aDiagramID;
-                $this->update();
-            }
-            else
-            {
-                // TODO: Make authentication error
-                throw new BadFunctionCallException("User not authorized for this operation.");
-            }
+            $this->subDiagram = $aDiagramID;
+            $this->update();
         }
         else
         {

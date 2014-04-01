@@ -100,7 +100,8 @@ abstract class Node extends Element
         $this->id = $id;
         
         // Authorization step, throws exception on fail
-        $this->verifyThenSetUser($user, $assocativeArray['userId']);
+        $this->owner = $assocativeArray['owner'];
+        $this->verifyThenSetUser($user);
         
         $this->loadAssociativeArray($assocativeArray);
 
@@ -188,12 +189,6 @@ abstract class Node extends Element
         // Check that it is a link
         if (is_subclass_of($newLink, "Link"))
         {
-            // Check that the users match before committing the operation
-            if (!$this->verifyUser($this->user, $newLink->getUser()))
-            {
-                // TODO: Authorization error
-                throw new BadFunctionCallException("User does not have access to a required object for this operation.");
-            }
             //create an new associative array and add it to the list
             $link['id']  = $newLink->getId();
             $link['label'] = $newLink->getLabel();
@@ -380,7 +375,7 @@ abstract class Node extends Element
      */
     public function save()
     {
-        $this->storage->saveNode($this->id, $this->label, get_class($this), $this->user->getId(), $this->x, $this->y, $this->linkList, $this->getNumberOfLinks(), $this->parent);
+        $this->storage->saveNode($this->id, $this->label, get_class($this), $this->owner, $this->x, $this->y, $this->linkList, $this->getNumberOfLinks(), $this->parent);
     }
 
     /**

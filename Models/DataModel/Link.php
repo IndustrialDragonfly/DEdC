@@ -110,7 +110,8 @@ abstract class Link extends Element
         $this->id = $id;
         
         // Authorization step
-        $this->verifyThenSetUser($user, $assocativeArray['userId']);
+        $this->owner = $assocativeArray['owner'];
+        $this->verifyThenSetUser($user);
         
         $this->loadAssociativeArray($assocativeArray);
 
@@ -463,7 +464,7 @@ abstract class Link extends Element
     {
         // Send info required to save dataflow to the data store
         $this->storage->saveLink($this->id, $this->label, get_class($this), 
-                $this->user->getId(), $this->x, $this->y, $this->originNode['id'], 
+                $this->owner, $this->x, $this->y, $this->originNode['id'], 
                 $this->destinationNode['id'], $this->parent);
     }
 

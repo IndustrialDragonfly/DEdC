@@ -180,9 +180,10 @@ abstract class Diagram extends Entity
         
         $assocativeArray = $this->storage->loadDiagram($id);
         
-        // Perform authorization. Check that user matches stored user ID for
+        // Perform authorization. Check that user authorizes with stored Owner for
         // this Diagram. Throws exception on failure.
-        $this->verifyThenSetUser($user, $assocativeArray['userId']);
+        $this->owner = $associativeArray['owner'];
+        $this->verifyThenSetUser($user);
         
         $this->loadAssociativeArray($assocativeArray);
     }
@@ -216,7 +217,8 @@ abstract class Diagram extends Entity
          
         // Perform authorization. If the diaNode doesn't belong to the user,
         // don't allow them access to it (throws exception on failure)
-        $this->verifyThenSetUser($user, $parentDiaNode->getUser->getId());
+        $this->owner = $associativeArray['owner'];
+        $this->verifyThenSetUser($user);
         
         //get the id of parent Diagram of the parentDiaNode
         $parentDiagramId = $parentDiaNode->getParent();
@@ -751,7 +753,7 @@ abstract class Diagram extends Entity
     public function save()
     {
         $this->storage->saveDiagram($this->id, get_class($this), $this->label, 
-                $this->user->getId(), $this->ancestry, $this->nodeList, 
+                $this->owner, $this->ancestry, $this->nodeList, 
                 $this->linkList, $this->diaNodeList, $this->parentDiaNode);
     }
 

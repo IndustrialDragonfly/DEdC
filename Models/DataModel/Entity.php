@@ -26,16 +26,16 @@ abstract class Entity
     protected $id;
 
     /**
-     * UUID of the userId of this DFD
-     * @var ID 
+     * User that constructs the Entity
+     * @var User 
      */
     protected $user;
 
     /**
-     * This is a container for the organization that this object belongs to
-     * @var String
+     * The Owner that orginally created the Entity
+     * @var Owner
      */
-    protected $organization;
+    protected $owner;
 
     /**
      * Storage object, should be readable and/or writable (depending on whether
@@ -89,7 +89,7 @@ abstract class Entity
     protected function ConstructNewEntity()
     {
         $this->label = '';
-        $this->organization = '';
+        $this->owner = new Owner($this->user->getUserName(), $this->user->getOrganization());
     }
     
     /**
@@ -103,6 +103,7 @@ abstract class Entity
         if (is_array($associativeArray))
             {
                 $this->loadAssociativeArray($associativeArray);
+                $this->owner = $associativeArray['owner'];                
             }
             else
             {
@@ -172,13 +173,13 @@ abstract class Entity
      * @param User $user
      * @param String|User $storedUser
      */
-    protected function verifyThenSetUser($user, $storedUser)
+    protected function verifyThenSetUser($user)
     {
         // Ensure it is a user object
         if (is_a($user, "User"))
         {
             // Compare $user's ID to the user stored in the database for the object
-            if ($this->verifyUser($user, $storedUser))
+            if ($this->owner->authorize($user))
             {
                 $this->setUser($user);
             }
@@ -193,33 +194,6 @@ abstract class Entity
             throw new BadFunctionCallException("Passed user object is not/does not inherit user.");
         }
     }
-    
-    /**
-     * Checks if the user passed in matches the string passed in (from Storage)
-     * @param User $user
-     * @param String|User $storedUser
-     * @returns bool
-     */
-    protected function verifyUser($user, $storedUser)
-    {
-        // If user matches the string, return true
-        if (is_a($storedUser, "User"))
-        {
-        	if ($user->getId() == $storedUser->getId())
-        	{
-        		return true;
-        	}
-        }
-        else if (is_string($storedUser))
-        {
-	        if ($user->getId()->getId() == $storedUser)
-	        {
-	         	return true;
-	        }
-        }
-        // Otherwise return false
-        return false;
-    }
 
     /**
      * This is a function that retrieves the userId of this object
@@ -229,33 +203,18 @@ abstract class Entity
     {
         return $this->user;
     }
-
-    //</editor-fold>
-    //<editor-fold desc="Organization Accessors" defaultstate="collapsed">
+    
     /**
-     * This is a function that sets the Organization that this object belongs to
-     * @param String $newOrg
+     * This function returns the Owner of the Entity
+     * @return Owner
      */
-    public function setOrganization($newOrg)
+    public function getOwner()
     {
-        if ($this->organization != $newOrg)
-        {
-            $this->organization = $newOrg;
-            $this->update();
-        }
-    }
-
-    /**
-     * This is a function that retrieves the Organization that this object 
-     * belongs to
-     * @return String
-     */
-    public function getOrganization()
-    {
-        return $this->organization;
+    	return $this->owner;
     }
 
     //</editor-fold>
+    
     //<editor-fold desc="Storage Accessors" defaultstate="collapsed">
     /**
      * This is a function that retrieves the Storage object that is associated 
@@ -309,7 +268,7 @@ abstract class Entity
 
         $entityArray['id'] = $this->id;
         $entityArray['label'] = $this->label;
-        $entityArray['user'] = $this->user->getAssociativeArray();
+        $entityArray['owner'] = $this->owner->getAssociativeArray();
         $entityArray['type'] = get_class($this);
 
         $genericType = NULL;
@@ -355,25 +314,6 @@ abstract class Entity
         else
         {
             $this->label = "";
-        }
-        
-        // No longer possible to load without having a user in the first place.
-        /*if(isset($associativeArray['userId']))
-        {
-            $this->user = $associativeArray['userId'];
-        }
-        else
-        {
-            $this->user = "";
-        }*/
-        // TODO: Handle organization by grabbing it from user object
-        if(isset($associativeArray['organization']))
-        {
-            $this->organization = $associativeArray['organization'];
-        }
-        else
-        {
-            $this->organization = "";
         }
     }
     
