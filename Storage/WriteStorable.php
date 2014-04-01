@@ -18,12 +18,12 @@ interface WriteStorable
      * @param String $id
      * @param String $label
      * @param String $type
-     * @param String $userId
+     * @param String $owner
      * @param int $x
      * @param int $y
      * @param String array $links
      */
-    public function saveNode($id, $label, $type, $userId, $x, $y, $links, $numLinks, $parentId);
+    public function saveNode($id, $label, $type, $owner, $x, $y, $links, $numLinks, $parentId);
     
     /**
      * Deletes the node ID passed in from the data store
@@ -58,7 +58,7 @@ interface WriteStorable
      * @param string $origin_id
      * @param string $dest_id
      */
-    public function saveLink($id, $label, $type, $userId, $x, $y, $origin_id, $dest_id, $parentId);
+    public function saveLink($id, $label, $type, $owner, $x, $y, $origin_id, $dest_id, $parentId);
     
     /**
      * Deletes the link from the data store.
@@ -70,7 +70,7 @@ interface WriteStorable
     /**
      * Saves the DFD to the database
      */
-   public function saveDiagram($id, $type, $label, $userId, $ancestry, 
+   public function saveDiagram($id, $type, $label, $owner, $ancestry, 
             $nodeList, $linkList, $DiaNodeList, $diaNode);   
     /**
      * Deletes the DFD from the database

@@ -58,6 +58,48 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
     
+    /**
+     * Return userName, and organization for a given User's id.
+     * @param String $userId Id of a user
+     * @throws BadFunctionCallException
+     * @return mixed
+     */
+    private function getUserAndOrgFromId($userId)
+    {
+    	$load = $this->dbh->prepare("SELECT userName, organization FROM users WHERE id=?");
+    	$load->bindParam(1, $userId);
+    	$load->execute();
+    	$userResult = $load->fetch(PDO::FETCH_ASSOC);
+    	if($userResult == FALSE )
+    	{
+    		throw new BadFunctionCallException("No matching user id found in users database.");
+    	}
+    	 
+    	return $userResult;
+    }
+    
+    /**
+     * Return id from userName and organization
+     * @param String $userName
+     * @param String $organization
+     * @throws BadFunctionCallException
+     * @return String User's id
+     */
+    private function getIdFromUserAndOrg($userName, $organization)
+    {
+    	$load = $this->dbh->prepare("SELECT id FROM users WHERE userName=? AND organization=?");
+    	$load->bindParam(1, $userName);
+    	$load->bindParam(2, $organization);
+    	$load->execute();
+    	$userResult = $load->fetch(PDO::FETCH_ASSOC);
+    	if($userResult == FALSE )
+    	{
+    		throw new BadFunctionCallException("No matching user id found in users database.");
+    	}
+    
+    	return $userResult['id'];
+    }
+    
     //<editor-fold desc="DFD Model" defaultstate="collapsed">
     /**
      * Given a resource UUID, returns its type (or throws an exception if that
@@ -124,8 +166,11 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     
 //<editor-fold desc="Node Related Functions" defaultstate="collapsed">
     
-    public function saveNode($id, $label, $type, $userId, $x, $y, $links, $numLinks, $parentId)
+    public function saveNode($id, $label, $type, $owner, $x, $y, $links, $numLinks, $parentId)
     {
+    	// Get the id of the owning User
+    	$userId = $this->getIdFromUserAndOrg($owner->getUserName(), $owner->getOrganization());
+    	
         //<editor-fold desc="save to Entity table" defaultstate="collapsed">
         // Prepare the statement
         $insert_stmt = $this->dbh->prepare("INSERT INTO entity (id, label, type, userId) VALUES(?,?,?,?)");
@@ -134,7 +179,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $insert_stmt->bindParam(1, $id->getId());
         $insert_stmt->bindParam(2, $label);
         $insert_stmt->bindParam(3, $type);
-        $insert_stmt->bindParam(4, $userId->getId());
+        $insert_stmt->bindParam(4, $userId);
 
         // Execute, catch any errors resulting
         $insert_stmt->execute();
@@ -192,6 +237,12 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          {
             throw new BadFunctionCallException("No matching id found in entity DB");
          }
+         
+         // Convert userId to Owner
+         $userResult = $this->getUserAndOrgFromId($node_vars['userId']);
+         // Remove the userId, as it will be replaced by Owner
+         unset($node_vars['userId']);
+         $node_vars['owner'] = new Owner($userResult['userName'], $userResult['organization']);
          
          // Get links list including their name and id
          $load = $this->dbh->prepare("
@@ -333,14 +384,16 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * @param ID $id
      * @param string $label
      * @param string $type
-     * @param origin $userId
+     * @param origin $owner
      * @param int $x
      * @param int $y
      * @param ID $origin_resource
      * @param ID $dest_resource
      */
-    public function saveLink($id, $label, $type, $userId, $x, $y, $origin_resource, $dest_resource, $parentId)
+    public function saveLink($id, $label, $type, $owner, $x, $y, $origin_resource, $dest_resource, $parentId)
     {
+    	// Get the Owner User id
+    	$userId = $this->getIdFromUserAndOrg($owner->getUserName(), $owner->getOrganization());
       //<editor-fold desc="save to Entity table" defaultstate="collapsed">
       // Prepare the statement
       $insert_stmt = $this->dbh->prepare("INSERT INTO entity (id, label, type, userId) VALUES(?,?,?,?)");
@@ -349,7 +402,7 @@ class DatabaseStorage implements ReadStorable, WriteStorable
       $insert_stmt->bindParam(1, $id->getId());
       $insert_stmt->bindParam(2, $label);
       $insert_stmt->bindParam(3, $type);
-      $insert_stmt->bindParam(4, $userId->getId());
+      $insert_stmt->bindParam(4, $userId);
 
       // Execute, catch any errors resulting
       $insert_stmt->execute();
@@ -448,6 +501,12 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          }
         
         $results['diagramId'] = new ID($parent['diagramId']);
+        
+        // Convert userId to Owner
+        $userResult = $this->getUserAndOrgFromId($results['userId']);
+        // Remove the userId, as it will be replaced by Owner
+        unset($results['userId']);
+        $results['owner'] = new Owner($userResult['userName'], $userResult['organization']);
         
         // Setup select statement to grab origin node info
         $select_stmt = $this->dbh->prepare('
@@ -599,6 +658,12 @@ class DatabaseStorage implements ReadStorable, WriteStorable
          // Convert id string to ID object
          $vars['id'] = new ID($vars['id']);
          
+         // Convert userId to Owner
+         $userResult = $this->getUserAndOrgFromId($vars['userId']);
+         // Remove userId
+         unset($vars['userId']);
+         $vars['owner'] = new Owner($userResult['userName'], $userResult['organization']);
+         
          // Get the nodes list from the database
          // This is performed by joining element list, entity and element, then 
          // filtering out all diaNodes and links from the list with a
@@ -716,17 +781,18 @@ class DatabaseStorage implements ReadStorable, WriteStorable
      * @param Mixed[] $DiaNodeList
      * @param ID $diaNode
      */
-    public function saveDiagram($id, $type, $label, $userId, $ancestry, 
+    public function saveDiagram($id, $type, $label, $owner, $ancestry, 
             $nodeList, $linkList, $DiaNodeList, $diaNode)
     {
-      // Prepare the statement
+		$userId = $this->getIdFromUserAndOrg($owner->getUserName(), $owner->getOrganization());
+    	      // Prepare the statement
       $insert_stmt = $this->dbh->prepare("INSERT INTO entity (id, label, type, userId) VALUES(?,?,?,?)");
 
       // Bind the parameters of the prepared statement
       $insert_stmt->bindParam(1, $id->getId());
       $insert_stmt->bindParam(2, $label);
       $insert_stmt->bindParam(3, $type);
-      $insert_stmt->bindParam(4, $userId->getId());
+      $insert_stmt->bindParam(4, $userId);
 
       // Execute, catch any errors resulting
       $insert_stmt->execute();
