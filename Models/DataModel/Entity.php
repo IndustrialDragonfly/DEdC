@@ -88,6 +88,7 @@ abstract class Entity
      */
     protected function ConstructNewEntity()
     {
+    	// TODO: Possibly not being called ever
         $this->label = '';
         $this->owner = new Owner($this->user->getUserName(), $this->user->getOrganization());
     }
@@ -103,7 +104,7 @@ abstract class Entity
         if (is_array($associativeArray))
             {
                 $this->loadAssociativeArray($associativeArray);
-                $this->owner = $associativeArray['owner'];                
+        		$this->owner = new Owner($this->user->getUserName(), $this->user->getOrganization());
             }
             else
             {
