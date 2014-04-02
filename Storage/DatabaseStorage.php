@@ -58,48 +58,6 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
     
-    /**
-     * Return userName, and organization for a given User's id.
-     * @param String $userId Id of a user
-     * @throws BadFunctionCallException
-     * @return mixed
-     */
-    private function getUserAndOrgFromId($userId)
-    {
-    	$load = $this->dbh->prepare("SELECT userName, organization FROM users WHERE id=?");
-    	$load->bindParam(1, $userId);
-    	$load->execute();
-    	$userResult = $load->fetch(PDO::FETCH_ASSOC);
-    	if($userResult == FALSE )
-    	{
-    		throw new BadFunctionCallException("No matching user id found in users database.");
-    	}
-    	 
-    	return $userResult;
-    }
-    
-    /**
-     * Return id from userName and organization
-     * @param String $userName
-     * @param String $organization
-     * @throws BadFunctionCallException
-     * @return String User's id
-     */
-    private function getIdFromUserAndOrg($userName, $organization)
-    {
-    	$load = $this->dbh->prepare("SELECT id FROM users WHERE userName=? AND organization=?");
-    	$load->bindParam(1, $userName);
-    	$load->bindParam(2, $organization);
-    	$load->execute();
-    	$userResult = $load->fetch(PDO::FETCH_ASSOC);
-    	if($userResult == FALSE )
-    	{
-    		throw new BadFunctionCallException("No matching user id found in users database.");
-    	}
-    
-    	return $userResult['id'];
-    }
-    
     //<editor-fold desc="DFD Model" defaultstate="collapsed">
     /**
      * Given a resource UUID, returns its type (or throws an exception if that
@@ -905,6 +863,47 @@ class DatabaseStorage implements ReadStorable, WriteStorable
         //</editor-fold>
 
     //<editor-fold desc="User Model" defaultstate="collapsed">
+       /**
+     * Return userName, and organization for a given User's id.
+     * @param String $userId Id of a user
+     * @throws BadFunctionCallException
+     * @return mixed
+     */
+    private function getUserAndOrgFromId($userId)
+    {
+    	$load = $this->dbh->prepare("SELECT userName, organization FROM users WHERE id=?");
+    	$load->bindParam(1, $userId);
+    	$load->execute();
+    	$userResult = $load->fetch(PDO::FETCH_ASSOC);
+    	if($userResult == FALSE )
+    	{
+    		throw new BadFunctionCallException("No matching user id found in users database.");
+    	}
+    	 
+    	return $userResult;
+    }
+    
+    /**
+     * Return id from userName and organization
+     * @param String $userName
+     * @param String $organization
+     * @throws BadFunctionCallException
+     * @return String User's id
+     */
+    private function getIdFromUserAndOrg($userName, $organization)
+    {
+    	$load = $this->dbh->prepare("SELECT id FROM users WHERE userName=? AND organization=?");
+    	$load->bindParam(1, $userName);
+    	$load->bindParam(2, $organization);
+    	$load->execute();
+    	$userResult = $load->fetch(PDO::FETCH_ASSOC);
+    	if($userResult == FALSE )
+    	{
+    		throw new BadFunctionCallException("No matching user id found in users database.");
+    	}
+    
+    	return $userResult['id'];
+    }
     
     /**
      * Save a User to the database
