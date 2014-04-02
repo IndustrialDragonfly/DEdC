@@ -20,7 +20,7 @@ function get($storage, $user, $request)
 		if ("elements" == $request->getResource())
 		{
 			// List of all elements
-			$elementArray = $storage->getListByType("*");
+			$elementArray = $storage->getListByType("*", $user);
 	
 			if ($elementArray)
 			{
@@ -43,7 +43,7 @@ function get($storage, $user, $request)
 			// TODO: Check to see if the type is valid
 			try
 			{
-				$elementArray = $storage->getListByType($request->getResource());
+				$elementArray = $storage->getListByType($request->getResource(), $user);
 			}
 			catch (Exception $ex)
 			{

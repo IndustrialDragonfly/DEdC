@@ -81,18 +81,24 @@ class DatabaseStorage implements ReadStorable, WriteStorable
     }
     
     /**
-     * Returns a list of of a given type by the given type from the datastore
+     * Returns a list of of a given type by the given type from the datastore.
+     * Only returns those items which the user has access to.
      * 
      * @param String $type
+     * @param User $user
      * @return String[]
      * @throws BadFunctionCallException
      */
-    public function getListByType($type)
+    public function getListByType($type, $user)
     {
         // TODO: Check for valid type (maybe)
         
-        $selectStatement = $this->dbh->prepare("SELECT id, label FROM entity WHERE type=?");
+        $selectStatement = $this->dbh->prepare("
+            SELECT (entity.id) AS id, label
+            FROM entity JOIN users ON (users.id=userId)
+            WHERE type=? AND organization=?");
         $selectStatement->bindParam(1, $type);
+        $selectStatement->bindParam(2, $user->getOrganization());
         $selectStatement->execute();
         
         $elementsArray = array();

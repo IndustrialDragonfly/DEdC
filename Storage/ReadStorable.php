@@ -22,10 +22,12 @@ interface ReadStorable
     
     /**
      * Returns a list of of a given type by the given type from the datastore
+     * based on what the given user has access to.
      * 
      * @param String $type
+     * @param User $user
      */
-    public function getListByType($type);
+    public function getListByType($type, $user);
     
     /**
      * Returns a list of types from the datastore
