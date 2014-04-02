@@ -209,6 +209,7 @@ define(["modules/response", "jquery"], function (Response, $) {
            // Request failed for some reason
            var response = new Response();
            
+           // Parse the JSON
            var jsonData = false;
            var exception = false;
            try {
@@ -216,10 +217,16 @@ define(["modules/response", "jquery"], function (Response, $) {
            } catch (e) {
                exception = e;
            }
+           
+           // If it's not JSON, just set the text
            if (exception) {
         	   response.setData(jqXHR.responseText);
            } else {
-               response.setData(jsonData.Error);
+        	   if (jsonData.Error) {
+        		   response.setData(jsonData.Error);
+        	   } else if (jsonData.Message) {
+        		   response.setData(jsonData.Message);
+        	   }
            }
 
            response.setStatus(textStatus);
