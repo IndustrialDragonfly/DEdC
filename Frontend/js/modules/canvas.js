@@ -420,7 +420,7 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
         * Get Canvas's label
         * @returns {String}
         */
-       this.getLabel = function () {
+       this.getText = function () {
            return myLabel;
        };
        
@@ -428,8 +428,11 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
         * Set the Canvas's label
         * @param {String} label New label
         */
-       this.setLabel = function (label) {
+       this.setText = function (label) {
            myLabel = label;
+           
+           // Update the containing tab's text
+           $('a[href=#' + myContainer + ']').text(label);
        };
        
        /**
@@ -462,7 +465,7 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
         */
        this.setId = function(id) {
            myId = id;
-       }
+       };
 
     };
 });

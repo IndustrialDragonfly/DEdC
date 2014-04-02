@@ -12,7 +12,7 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
 
             // Set the DFD view's datamodel
             canvas.setId(response.getData().id);
-            canvas.setLabel(response.getData().lable);
+            canvas.setText(response.getData().label);
             canvas.setOriginator(response.getData().originator);
         };
 

@@ -332,6 +332,20 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                 $( "#" + panelId ).remove();
                 tabs.tabs( "refresh" );
             });
+            
+            // close icon: removing the tab on click
+            tabs.delegate("a.ui-tabs-anchor", "dblclick", function() {
+                // Find the div id
+                var panelId = $( this ).closest( "li" ).attr( "aria-controls" );
+                // Find the canvas that was created in the div
+                canvases.forEach(function (entry) {
+                    if (panelId === entry.getContainer()) {
+                    	showElementDetails(entry);
+                    }
+                });
+
+
+            });
 
             // Update the tab view
             $(content).tabs("refresh");
@@ -476,7 +490,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                 type: "DataFlowDiagram",
                 genericType: "Diagram",
                 diagramId: "",
-                label: "Label 1" // TODO: Get from UI
+                label: canvas.getText()
             };
             
             // Execute the request

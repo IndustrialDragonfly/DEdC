@@ -112,7 +112,9 @@ define(["modules/response", "jquery"], function (Response, $) {
                 if (textStatus) {
                      response.setStatus(textStatus);
                 }
-                successCallback(response);
+                if (successCallback) {
+                	successCallback(response);
+                }
            } else {
                // JSON was not parsed successfully
                 var response = new Response();
@@ -125,7 +127,9 @@ define(["modules/response", "jquery"], function (Response, $) {
                 
                 // This is not a failure case because we don't expect anything 
                 // back from the request.
-                successCallback(response);
+                if (successCallback) {
+                	successCallback(response);
+                }
            }
        }).fail(function (jqXHR, textStatus, errorThrown) {
            // Request failed for some reason
@@ -135,7 +139,9 @@ define(["modules/response", "jquery"], function (Response, $) {
            response.setStatus(textStatus);
            response.setError("DELETE " + url + " " + jqXHR.status + " (" + jqXHR.statusText + ")");
 
-           failCallback(response);
+           if (failCallback) {
+        	   failCallback(response);
+           }
        });
    };
 
