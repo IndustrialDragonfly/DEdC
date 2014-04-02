@@ -209,10 +209,19 @@ define(["modules/response", "jquery"], function (Response, $) {
            // Request failed for some reason
            var response = new Response();
            
-           /*if (response.getData().Message) {
-               response.setData(response.getData().Message);
-           }*/
-           
+           var jsonData = false;
+           var exception = false;
+           try {
+               jsonData = JSON.parse(jqXHR.responseText);
+           } catch (e) {
+               exception = e;
+           }
+           if (exception) {
+        	   response.setData(jqXHR.responseText);
+           } else {
+               response.setData(jsonData.Error);
+           }
+
            response.setStatus(textStatus);
            response.setError("PUT " + url + " " + jqXHR.status + " (" + jqXHR.statusText + ")");
 

@@ -268,6 +268,16 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                     }
                 }
             });
+            
+            $("#error-dialog").dialog({
+                modal: true,
+                autoOpen: false,
+                buttons: {
+                    "OK": function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
 
             // New tab button
             $(newTab).button().click(function () {
@@ -412,6 +422,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             var onFail = function (response) {
                 // TODO: Handle error better
                 console.log("Request to get DFD failed. " + response.getError());
+                showErrorMessage(response.getError());
             };
 
             // Execute the GET request
@@ -483,6 +494,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             
             var onFail = function(response) {
                 console.log("Request to save DFD failed. " + response.getError() + " " + response.getData());
+                showErrorMessage(response.getData());
             };
             
             var data = {
@@ -497,10 +509,23 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             Connector.put("Controller.php/" + canvas.getId(), data, onSuccess, onFail);
         };
         
+        /**
+         * Show a dialog with the given element's label
+         * @param Element element
+         */
         var showElementDetails = function (element) {
             selectedElement = element;
             $("#label").val(element.getText());
             $("#info-dialog").dialog("open");
+        };
+        
+        /**
+         * Show an error message in a dialog
+         * @param String message
+         */
+        var showErrorMessage = function (message) {
+        	$("#error-message").text(message);
+        	$("#error-dialog").dialog("open");
         };
         
         // Expose methods to be public

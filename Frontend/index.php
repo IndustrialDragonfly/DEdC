@@ -31,13 +31,19 @@ echo <<<EOF
                 </form>
             </div>
             
-            <div id ="info-dialog" title="Details" style="display: none;">
+            <div id="info-dialog" title="Details" style="display: none;">
                 <form>
                     <fieldset>
                         <label for="label">Label</label>
                         <input type="text" name="label" id="label" class="text ui-widget-content ui-corner-all">
                     </fieldset>
                 </form>
+            </div>
+            
+            <div id ="error-dialog" title="Error" style="display: none;">
+                <p id="error-message">
+                	No message set.
+                </p>
             </div>
 
             <div id="header" class="ui-layout-north"><a href="#"><img src="${web_client_location}images/logo.png" width="144" height="57"/></a></div>
