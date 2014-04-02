@@ -13,11 +13,11 @@ echo <<<EOF
             <script data-main="${web_client_location}js/app" src="${web_client_location}js/require.js"></script>
     </head>
     <body>
-            <div id ="dialog-modal" title="DataFlowDiagram Chooser">
+            <div id ="dialog-modal" title="DataFlowDiagram Chooser" style="display: none;">
                 <ol id="selectable"></ol>
             </div>
             
-            <div id ="login-dialog" title="Login">
+            <div id ="login-dialog" title="Login" style="display: none;">
                 <p>All form fields are required.</p>
                 <form>
                     <fieldset>
@@ -31,7 +31,7 @@ echo <<<EOF
                 </form>
             </div>
             
-            <div id ="info-dialog" title="Details">
+            <div id ="info-dialog" title="Details" style="display: none;">
                 <form>
                     <fieldset>
                         <label for="label">Label</label>
