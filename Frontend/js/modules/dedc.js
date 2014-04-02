@@ -300,7 +300,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
         var createNewTab = function (name) {
             var tabTemplate = "<li><a href='#{href}'>#{label}</a><span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span></li>",
                 // Template for the tabs
-                label = "Tab" + ++tabCount,
+                label = "Untitled DFD " + ++tabCount,
                 // Name of the tab
                 id = "tab" + tabCount;
 
@@ -323,6 +323,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             canvases.push(c);
             c.setBackground('#A8A8A8');
             c.setElementDoubleClickedCallback(showElementDetails);
+            c.setText(label);
             
             // close icon: removing the tab on click
             tabs.delegate( "span.ui-icon-close", "click", function() {
