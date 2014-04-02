@@ -138,6 +138,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                             };
                             var onFail = function(response) {
                                 console.log("Removing element failed. " + response.getError());
+                                showErrorMessage("Removing element failed. " + response.getData());
                             };
                             
                             Connector.delete("Controller.php/" + entry.getId(), onSuccess, onFail);
@@ -156,6 +157,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                             };
                             var onFail = function(response) {
                                 console.log("Removing Dataflow failed. " + response.getError());
+                                showErrorMessage("Removing Dataflow failed. " + response.getData());
                             };
                             
                             Connector.delete("Controller.php/" + entry.getId(), onSuccess, onFail);
@@ -225,6 +227,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                     
                     var onFail = function (response) {
                         console.log("Error getting DataFlowDiagrams. " + response.getError());
+                        showErrorMessage("Error getting DataFlowDiagrams. " + response.getData());
                     };
                     Connector.get("Controller.php/DataFlowDiagram", onSuccess, onFail, false);
                 }
@@ -422,7 +425,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             var onFail = function (response) {
                 // TODO: Handle error better
                 console.log("Request to get DFD failed. " + response.getError());
-                showErrorMessage(response.getError());
+                showErrorMessage("Request to get DFD failed. " + response.getData());
             };
 
             // Execute the GET request
@@ -449,6 +452,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                     
                     var onFail = function (response) {
                         console.log("Failed to save an element. " + response.getError());
+                        showErrorMessage("Failed to save an element. " + response.getData());
                     };
                     
                     var data = {
@@ -472,6 +476,8 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                     
                     var onFail = function (response) {
                         console.log("Failed to save a Dataflow. " + response.getError());
+                        showErrorMessage("Failed to save a Dataflow. " + response.getData());
+
                     };
                     
                     var data = {
@@ -494,7 +500,7 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             
             var onFail = function(response) {
                 console.log("Request to save DFD failed. " + response.getError() + " " + response.getData());
-                showErrorMessage(response.getData());
+                showErrorMessage("Request to save DFD failed. " + response.getData());
             };
             
             var data = {
