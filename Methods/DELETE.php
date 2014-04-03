@@ -16,26 +16,38 @@ function delete($storage, $user, $request)
 	if (NULL != $request->getId())
 	{
 		// Start by loading then deleting the element
+	// Get an Entity
+		$element = false;
+		$locked = false;
 		try
 		{
-			// TODO: Check that element types are the same before deleting
-			$element = existingElementFactory($storage, $user,  $request->getId());
+		    $locked = $storage->isLocked($request->getId());
+		    if (!$locked)
+		    {
+			     $element = existingElementFactory($storage, $user,  $request->getId());
+		    }
 		}
-		catch (Exception $e)
+		catch (Exception $e) // TODO: Make more specific catch cases
 		{
-			// TODO: Narrow down exception to handle 404 case only
+			// Error response
+			$response = new SimpleResponse();
+			$response->setRawData($e->getMessage());
+			$response->setHeader(404);
+		}
+		
+		if ($locked)
+		{
+		    $response = new SimpleErrorResponse();
+		    $response->setError("Entity was locked.");
+		    $response->setHeader(409);
 		}
 	
 		// Delete element if it was found
 		if ($element)
 		{
 			$element->delete();
+			$storage->releaseLock($request->getId());
 			$response->setHeader(200);
-	
-		}
-		else
-		{
-			$response->setHeader(404);
 		}
 	}
 	
