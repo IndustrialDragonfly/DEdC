@@ -89,12 +89,6 @@ echo <<<EOF
                                     </div>
                             </li>
                     </ul>
-                    <h3>Layers</h3>
-                    <ul id="layers">
-                    </ul>
-                    <h3>Users</h3>
-                    <div id="users">
-                    </div>
             </div>
             </div>
 
