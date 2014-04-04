@@ -236,7 +236,7 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
        };
 
        /**
-        * Add a dataflow to the cavas between the two elements
+        * Add a dataflow to the canvas between the two elements
         * @param {Element} source - Source of the Dataflow
         * @param {Element} target - Target of the Dataflow
         * @return {Dataflow} Dataflow on the canvas
@@ -250,6 +250,12 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
            return d;
        };
 
+       /**
+        * Add a dataflow to the canvas using two Element ids
+        * @param {String} sourceId
+        * @param {String} targetId
+        * @return {Dataflow} Created dataflow if successful, null otherwise
+        */
        this.addDataflowById = function (sourceId, targetId) {
            var source = null,
                target = null;
