@@ -150,11 +150,13 @@ define(["modules/globals", "modules/element"], function (globals, Element) {
             // Connect Dataflow by the Elements' ids
             var d = canvas.addDataflowById(entry.originNode, entry.destinationNode);
             // Set the Dataflow's id and text label
-            d.setId(entry.id);
-            d.setOriginator(entry.originator);
-
-            // Set the text label
-            d.setText(entry.label);
+            if (d != null) {
+	            d.setId(entry.id);
+	            d.setOriginator(entry.originator);
+	
+	            // Set the text label
+	            d.setText(entry.label);
+    		}
         };
 
     return {

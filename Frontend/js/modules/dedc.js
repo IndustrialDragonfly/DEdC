@@ -129,6 +129,27 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
             $(deleteButton).button().click(function () {
                 var c = getCurrentCanvas();
                 if (c) {
+                	// Remove Dataflows
+                    c.getSelectedDataFlows().forEach(function (entry) {
+                        if (entry.getId()) {
+                            // Element exists in the backend because it has an id
+                            var onSuccess = function(response) {
+                                c.removeDataflowById(entry.getId());
+                            };
+                            
+                            var onFail = function(response) {
+                                console.log("Removing Dataflow failed. " + response.getError());
+                                showErrorMessage("Removing Dataflow failed. " + response.getData());
+                            };
+                            
+                            Connector.delete("Controller.php/" + entry.getId(), onSuccess, onFail, false);
+                        } else {
+                            // Element did not exist in the backend
+                            c.removeDataflow(entry);
+                        }
+
+                    });
+                    
                     // Remove Elements          
                     c.getSelection().forEach(function (entry) {
                         if (entry.getId()) {
@@ -141,31 +162,35 @@ define(["modules/globals", "modules/canvas", "modules/element-factory", "modules
                                 showErrorMessage("Removing element failed. " + response.getData());
                             };
                             
-                            Connector.delete("Controller.php/" + entry.getId(), onSuccess, onFail);
-                        } else {
-                            // Element did not exist in the backend
-                            c.removeElement(entry);
-                        }
-                    });
-                    
-                    // Remove Dataflows
-                    c.getSelectedDataFlows().forEach(function (entry) {
-                        if (entry.getId()) {
-                            // Element exists in the backend because it has an id
-                            var onSuccess = function(response) {
-                                c.removeDataflowById(entry.getId());
-                            };
-                            var onFail = function(response) {
-                                console.log("Removing Dataflow failed. " + response.getError());
-                                showErrorMessage("Removing Dataflow failed. " + response.getData());
-                            };
+                            // Find if a DataFlow is connected to the Element
+                            var dataflow = null;
+                            c.getDataflows().forEach(function (df) {
+                                if (df.getSource().getId() == entry.getId() || df.getTarget().getId() == entry.getId()) {
+                                    dataflow = df;
+                                }
+                            });
                             
-                            Connector.delete("Controller.php/" + entry.getId(), onSuccess, onFail);
+                            if (dataflow != null) {
+                            	showErrorMessage("Cannot delete an Element connected to a DataFlow.");
+                            } else {
+                            	Connector.delete("Controller.php/" + entry.getId(), onSuccess, onFail, false);
+                            }
                         } else {
                             // Element did not exist in the backend
-                            c.removeDataflow(entry);
+                        	// Find if a DataFlow is connected to the Element
+                            var dataflow = null;
+                            c.getDataflows().forEach(function (df) {
+                                if (df.getSource() == entry || df.getTarget() == entry) {
+                                    dataflow = df;
+                                }
+                            });
+                        
+	                        if (dataflow != null) {
+	                        	showErrorMessage("Cannot delete an Element connected to a DataFlow.");
+	                        } else {
+	                        	c.removeElement(entry);
+	                        }
                         }
-
                     });
                 } else {
                     console.log("No tab currently selected.");

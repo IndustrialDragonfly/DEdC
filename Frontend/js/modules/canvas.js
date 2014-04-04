@@ -251,8 +251,8 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
        };
 
        this.addDataflowById = function (sourceId, targetId) {
-           var source,
-               target;
+           var source = null,
+               target = null;
            
            elements.forEach(function (entry) {
                if (entry.getId() === sourceId) {
@@ -262,7 +262,15 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
                }
            });
            
-           return this.addDataflow(source, target);
+           if (source == null) {
+        	   console.log("DataFlow could not find source Element with id: " + sourceId);
+        	   return null;
+           } else if (target == null) {
+        	   console.log("DataFlow could not find target Element with id: " + targetId);
+        	   return null;
+           } else {
+        	   return this.addDataflow(source, target);
+           }
        };
 
        /**
@@ -295,6 +303,7 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
        this.removeElement = function (element) {
            var index = elements.indexOf(element);
            if (index > -1) {
+               this.unselectAllElements();
                element.remove();
                elements.splice(index, 1);
                return true;
@@ -352,6 +361,7 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
        this.removeDataflow = function (dataflow) {
            var index = dataflows.indexOf(dataflow);
            if (index > -1) {
+               this.unselectAllDataflows();
                dataflow.remove();
                dataflows.splice(index, 1);
                return true;
