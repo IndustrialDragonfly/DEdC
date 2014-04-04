@@ -53,7 +53,8 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
     return function Canvas(container, width, height) {
        // Create canvas with Raphael with given arguments
     	var myContainer = container,
-    		paper = Raphael(container, width, height);
+    		paper = Raphael(container, width, height),
+    		me = this;
 
        // Datamodel
        var myOriginator = "",
@@ -86,11 +87,22 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
        });
        
        /**
+        * Handle unselecting all of the elements/dataflows when the canvas background is clicked
+        */
+       $('#' + myContainer).click(function(e) {
+    	   if (e.target.nodeName == "svg" || e.target.nodeName == "DIV") {
+	    	   me.unselectAllElements();
+	    	   me.unselectAllDataflows();
+    	   }
+       });
+       
+       /**
         * Return the id of the container
         */
        this.getContainer = function () {
     	   return myContainer;
-       }
+       };
+       
        /**
         * Event called when an Element on the canvas is clicked
         * It handles the selection of elements;
@@ -135,7 +147,7 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
         */
        this.setElementDoubleClickedCallback = function (callback) {
            doubleClickCallback = callback;
-       }
+       };
        
        /**
         * Event called when an Dataflow on the canvas is clicked
@@ -294,7 +306,6 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
         * Remove an element from the canvas
         */
        this.removeElementFromSelection = function () {
-           // TODO: Handle floating dataflows
            for (var i = 0; i < selection.length; i++) {
                this.removeElement(selection[i]);
            }
