@@ -10,6 +10,7 @@ function idListConvert($idArray, $idLabel)
    return $idArray;   
 }
 
+
 /**
  * The Database Storage class implements the ReadStorabel and WriteStorable
  * classes to utilize a database as a storage mechanism for DEdC
@@ -17,14 +18,12 @@ function idListConvert($idArray, $idLabel)
  * @author eugene
  */
 
-require_once 'ReadStorable.php';
-require_once 'WriteStorable.php';
-
 // TODO: Catch PDO errors and rethrow exceptions
 
-class DatabaseStorage implements ReadStorable, WriteStorable
+class DatabaseStorage implements LockingStorable
 {
     protected $dbh;
+    protected  $lockTimeout = 60;
             
     public function __construct()
     {
@@ -78,6 +77,72 @@ class DatabaseStorage implements ReadStorable, WriteStorable
              throw new BadFunctionCallException("no matching id found in entity DB");
          }
          return $type['type'];
+    }
+    
+    /**
+     * @see LockingStorable::isLocked()
+     */
+    public function isLocked($id)
+    {
+        $lockedStatement = $this->dbh->prepare(
+	       "SELECT lockTime
+            FROM locks
+            WHERE entityId=?"
+        );
+        
+        $lockedStatement->bindParam(1, $id->getId());
+        $lockedStatement->execute();
+        
+        // Nothing in locks table
+        $locked = $lockedStatement->fetch(PDO::FETCH_ASSOC);
+        if ($locked === FALSE)
+        {
+            return false;
+        }
+        
+        // Lock has expired
+        $lockTime = new DateTime($locked['lockTime'], new DateTimeZone('UTC'));
+        $now = new DateTime("now", new DateTimeZone('UTC'));
+        $diffSeconds = $now->getTimestamp() - $lockTime->getTimestamp();
+        if ($diffSeconds > $this->lockTimeout)
+        {
+            $this->releaseLock($id);
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * @see LockingStorable::setLock()
+     */
+    public function setLock($id)
+    {
+        if ($this->isLocked($id))
+        {
+            throw new BadFunctionCallException("setLock failed to aquire lock.");
+        }
+        
+        $insert_stmt = $this->dbh->prepare(
+            "INSERT INTO locks (entityId, lockTime) 
+            VALUES(?,?)"
+        );
+        
+        $insert_stmt->bindParam(1, $id->getId());
+        
+        $now = new DateTime("now", new DateTimeZone('UTC'));
+        $insert_stmt->bindParam(2, $now->format("Y-m-d H:i:s"));
+        $insert_stmt->execute();
+    }
+    
+    /**
+     * @see LockingStorable::releaseLock()
+     */
+    public function releaseLock($id)
+    {
+        $deleteStatement = $this->dbh->prepare("DELETE FROM locks WHERE entityId=?");
+        $deleteStatement->bindParam(1, $id->getId());
+        $deleteStatement->execute();
     }
     
     /**
