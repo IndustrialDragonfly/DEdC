@@ -60,7 +60,7 @@ abstract class Element extends Entity
         if(func_num_args() == 3)
         {
             // Third parameter is an ID
-            if(is_a(func_get_arg(1), "ID"))
+            if(is_a(func_get_arg(2), "ID"))
             {
                 $this->ConstructElementWithDiagram(func_get_arg(0), func_get_arg(1), func_get_arg(2));
             }
