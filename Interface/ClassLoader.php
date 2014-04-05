@@ -6,20 +6,30 @@
  */
 function InterfaceClassLoader($classname)
 {
-    // Request
-    if (file_exists("Interface/Request/" . $classname . ".php"))
+    // Handle setting the path if there is one set - such as for PHPUnit
+    if (isset($GLOBALS['path']))
     {
-        require_once "Interface/Request/" . $classname . ".php";
+        $prefix = $GLOBALS['path'] . "/"; 
     }
-    elseif (file_exists("Interface/Request/AuthenticationHandlers/" . $classname . ".php"))
+    else
     {
-        require_once "Interface/Request/AuthenticationHandlers/" . $classname . ".php";
+        $prefix = "";
+    }
+    
+    // Request
+    if (file_exists($prefix . "Interface/Request/" . $classname . ".php"))
+    {
+        require_once $prefix . "Interface/Request/" . $classname . ".php";
+    }
+    elseif (file_exists($prefix . "Interface/Request/AuthenticationHandlers/" . $classname . ".php"))
+    {
+        require_once $prefix . "Interface/Request/AuthenticationHandlers/" . $classname . ".php";
     }
     
     // Response
-    elseif (file_exists("Interface/Response/" . $classname . ".php"))
+    elseif (file_exists($prefix . "Interface/Response/" . $classname . ".php"))
     {
-        require_once "Interface/Response/" . $classname . ".php";
+        require_once $prefix . "Interface/Response/" . $classname . ".php";
     }
 }
 

@@ -6,13 +6,23 @@
  */
 function UserModelClassLoader($classname)
 {
-// User Model
-    if (file_exists("Models/UserModel/" . $classname . ".php"))
+    // Handle setting the path if there is one set - such as for PHPUnit
+    if (isset($GLOBALS['path']))
     {
-        require_once "Models/UserModel/" . $classname . ".php";
+        $prefix = $GLOBALS['path'] . "/"; 
     }
-    elseif (file_exists("Models/UserModel/AuthenticationModules/" . $classname . ".php"))
+    else
     {
-        require_once "Models/UserModel/AuthenticationModules/" . $classname . ".php";
+        $prefix = "";
+    }
+    
+    // User Model
+    if (file_exists($prefix . "Models/UserModel/" . $classname . ".php"))
+    {
+        require_once $prefix . "Models/UserModel/" . $classname . ".php";
+    }
+    elseif (file_exists($prefix . "Models/UserModel/AuthenticationModules/" . $classname . ".php"))
+    {
+        require_once $prefix . "Models/UserModel/AuthenticationModules/" . $classname . ".php";
     }
  }

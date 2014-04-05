@@ -5,9 +5,19 @@
  * @param String $classname
  */
 function StorageClassLoader($classname)
-{
-    if (file_exists("Storage/" . $classname . ".php"))
+{    
+    // Handle setting the path if there is one set - such as for PHPUnit
+    if (isset($GLOBALS['path']))
     {
-        require_once "Storage/" . $classname . ".php";
+        $prefix = $GLOBALS['path'] . "/"; 
     }
+    else
+    {
+        $prefix = "";
+    }
+    
+    if (file_exists($prefix . "Storage/" . $classname . ".php"))
+     {
+        require_once $prefix . "Storage/" . $classname . ".php";
+     }
 }
