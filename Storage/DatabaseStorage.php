@@ -4,8 +4,12 @@ function idListConvert($idArray, $idLabel)
 {
     foreach ($idArray as &$id)
     {
-        // Convert each id string into an ID object
-        $id[$idLabel] = new ID($id[$idLabel]);
+        // Check if NULL (happens, for example, in Links)
+        if (!is_null($id[$idLabel]))
+        {
+            // Convert each id string into an ID object
+            $id[$idLabel] = new ID($id[$idLabel]);
+        }
     }
    return $idArray;   
 }
@@ -550,7 +554,6 @@ class DatabaseStorage implements LockingStorable
         //if the orgin is set set it otherwise set that field to null
         if($originNode === FALSE )
          {
-            //throw new BadFunctionCallException("No matching id found in link");
             $results['originNode'] = NULL;
          }
          else
