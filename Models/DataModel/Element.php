@@ -72,7 +72,7 @@ abstract class Element extends Entity
             // If the second paramenter wasn't an ID or an array throw an exception
             else
             {
-                throw new BadConstructorCallException("Invalid second parameter passed to Element constructor, can be either an ID or an assocative array");
+                throw new BadConstructorCallException("Invalid third parameter passed to Element constructor, can be either an ID or an assocative array");
             }
             
         }
