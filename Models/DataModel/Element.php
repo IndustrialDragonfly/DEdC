@@ -94,20 +94,21 @@ abstract class Element extends Entity
     protected function ConstructElementWithDiagram($storage, $user, $id)
     {
         parent::__construct($storage, $user);
-                $this->x = 0;
-                $this->y = 0;
-                // Find if the type of the second argument is an id of Diagram, if so, its a new node
-                $type = $this->storage->getTypeFromUUID($id);
-                if (is_subclass_of($type, "Diagram"))
-                {
-                    // TODO: Adder a getUserOwningID function to Storage bridge to do this in fewer queries.
-                    // TODO: If it failed to construct, it failed to authorize with Owner (But this is very slow).
-                    $Diagram = new $type($storage, $user, $id);
-                }
-                else
-                {
-                    throw new BadConstructorCallException("The Id passed to the Element constructor was not valid Diagram");
-                }
+        $this->parent = $id;
+        $this->x = 0;
+        $this->y = 0;
+        // Find if the type of the second argument is an id of Diagram, if so, its a new node
+        $type = $this->storage->getTypeFromUUID($id);
+        if (is_subclass_of($type, "Diagram"))
+        {
+            // TODO: Adder a getUserOwningID function to Storage bridge to do this in fewer queries.
+            // TODO: If it failed to construct, it failed to authorize with Owner (But this is very slow).
+            $Diagram = new $type($storage, $user, $id);
+        }
+        else
+        {
+            throw new BadConstructorCallException("The Id passed to the Element constructor was not valid Diagram");
+        }
     }
 
     //</editor-fold>
