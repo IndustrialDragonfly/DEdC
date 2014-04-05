@@ -73,7 +73,6 @@ define(["raphael", "modules/dataflow", "modules/globals", "jquery"], function(Ra
        // Register key events
        var ctrlState = globals.KEYSTATE.UP; // Default state for ctrl
        $("body").keydown(function (e) {
-    	   console.log(e.which);
            if (e.which === globals.KEYS.CTRL.value) {
                ctrlState = globals.KEYSTATE.DOWN;
            }
