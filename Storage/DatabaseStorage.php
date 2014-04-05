@@ -14,7 +14,6 @@ function idListConvert($idArray, $idLabel)
    return $idArray;   
 }
 
-
 /**
  * The Database Storage class implements the ReadStorabel and WriteStorable
  * classes to utilize a database as a storage mechanism for DEdC
