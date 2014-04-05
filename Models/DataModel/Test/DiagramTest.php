@@ -13,6 +13,11 @@ class DiagramTest extends PHPUnit_Framework_TestCase
      * @var DatabaseStorage
      */
     protected $storage;
+    /**
+     *
+     * @var User
+     */
+    protected $user;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -24,7 +29,10 @@ class DiagramTest extends PHPUnit_Framework_TestCase
         {
             $this->storage = new DatabaseStorage();
         }
-        $this->object = new DataFlowDiagram($this->storage);
+        // User setup
+        $authInfo = new PasswordAuthentication("InD/Geoff", "password1");
+        $this->user = new User($this->storage, $authInfo);
+        $this->object = new DataFlowDiagram($this->storage, $this->user);
     }
 
     /**
@@ -473,7 +481,7 @@ class DiagramTest extends PHPUnit_Framework_TestCase
         //$ds = new DataStore($this->storage, $this->object->getId());
         //$ei = new ExternalInteractor($this->storage, $this->object->getId());
         //$mp = new Multiprocess($this->storage, $this->object->getId());
-        $df = new DataFlow($this->storage, $this->object->getId());
+        $df = new DataFlow($this->storage, $this->user, $this->object->getId());
         //$dfd = new DataFlowDiagram($this->storage, $mp->getId());
         $this->object->refresh();
         $this->object->setLabel("test");
