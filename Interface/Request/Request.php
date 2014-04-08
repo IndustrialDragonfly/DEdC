@@ -125,8 +125,6 @@ abstract class Request implements Requestable {
     {
         if ($id !== NULL)
         {
-            $idLength = strlen($id);
-            $tagLength = strlen($this->uuidTag);
             $this->id = new ID($id);
         }
     }

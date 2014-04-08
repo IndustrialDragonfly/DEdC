@@ -302,7 +302,7 @@ abstract class Node extends Element
         for ($i = count($this->linkList)-1; $i >= 0; $i--)
         {
             $type = $this->storage->getTypeFromUUID($this->linkList[$i]['id']);
-            $link = new $type($this->storage, $this->linkList[$i]['id']);
+            $link = new $type($this->storage, $this->user, $this->linkList[$i]['id']);
             $link->removeNode($this);
             $link->update();
             // The call to link will actually call removeLink in this node
@@ -315,7 +315,10 @@ abstract class Node extends Element
         // have been updated to reflected
         unset($this->linkList);
         $this->linkList = array();
-        $this->update();
+        // Link object calls update on nodes that it disconnects - but this
+        // demonstrates where storing all the queries to make would make things
+        // simplier
+        //$this->update();
     }
     //</editor-fold>
     //<editor-fold desc="AssociativeArray functions" defaultstate="collapsed">

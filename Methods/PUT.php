@@ -17,17 +17,22 @@ function put($storage, $user,  $request) {
 	{ // Receiving an existing object
 		// TODO Use getTypeByUUID to find out if the entity exists thus saving an SQL query
 		if ($storage->entityExists($request->getId()))
-		{
+		{		    
 			// If the entity exists, load it and update it.
 			if ($storage->getTypeFromUUID($request->getId()) == $bodyArray['type'])
 			{
+			    // Lock the Entity, throws exception if it is already locked
+			    $storage->setLock($request->getId());
+			     
 				$element = existingElementFactory($storage, $user,  $request->getId());
 				$element->setAssociativeArray($bodyArray);
 				$response->setRawData($element->getAssociativeArray());
 				$response->setHeader(201);
+				
+				$storage->releaseLock($request->getId());
 			}
 			else
-			{
+			{			     
 				// The new element's type different from what was stored.
 				// TODO Send correct HTTP status code
 				throw new BadFunctionCallException("Requested type did not match stored type.");

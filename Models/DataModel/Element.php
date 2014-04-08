@@ -60,7 +60,7 @@ abstract class Element extends Entity
         if(func_num_args() == 3)
         {
             // Third parameter is an ID
-            if(is_a(func_get_arg(1), "ID"))
+            if(is_a(func_get_arg(2), "ID"))
             {
                 $this->ConstructElementWithDiagram(func_get_arg(0), func_get_arg(1), func_get_arg(2));
             }
@@ -72,7 +72,7 @@ abstract class Element extends Entity
             // If the second paramenter wasn't an ID or an array throw an exception
             else
             {
-                throw new BadConstructorCallException("Invalid second parameter passed to Element constructor, can be either an ID or an assocative array");
+                throw new BadConstructorCallException("Invalid third parameter passed to Element constructor, can be either an ID or an assocative array");
             }
             
         }
@@ -94,20 +94,21 @@ abstract class Element extends Entity
     protected function ConstructElementWithDiagram($storage, $user, $id)
     {
         parent::__construct($storage, $user);
-                $this->x = 0;
-                $this->y = 0;
-                // Find if the type of the second argument is an id of Diagram, if so, its a new node
-                $type = $this->storage->getTypeFromUUID($id);
-                if (is_subclass_of($type, "Diagram"))
-                {
-                    // TODO: Adder a getUserOwningID function to Storage bridge to do this in fewer queries.
-                    // TODO: If it failed to construct, it failed to authorize with Owner (But this is very slow).
-                    $Diagram = new $type($storage, $user, $id);
-                }
-                else
-                {
-                    throw new BadConstructorCallException("The Id passed to the Element constructor was not valid Diagram");
-                }
+        $this->parent = $id;
+        $this->x = 0;
+        $this->y = 0;
+        // Find if the type of the second argument is an id of Diagram, if so, its a new node
+        $type = $this->storage->getTypeFromUUID($id);
+        if (is_subclass_of($type, "Diagram"))
+        {
+            // TODO: Adder a getUserOwningID function to Storage bridge to do this in fewer queries.
+            // TODO: If it failed to construct, it failed to authorize with Owner (But this is very slow).
+            $Diagram = new $type($storage, $user, $id);
+        }
+        else
+        {
+            throw new BadConstructorCallException("The Id passed to the Element constructor was not valid Diagram");
+        }
     }
 
     //</editor-fold>

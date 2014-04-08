@@ -16,6 +16,13 @@ INSERT INTO types(type) VALUES('ExternalInteractor');
 INSERT INTO types(type) VALUES('DataFlow');
 INSERT INTO types(type) VALUES('DataFlowDiagram');
 
+CREATE TABLE locks
+(
+entityId CHAR(44) NOT NULL,
+lockTime DATETIME NOT NULL,
+PRIMARY KEY (entityId)
+) Engine InnoDB;
+
 CREATE TABLE users
 (
 id CHAR(44) NOT NULL,
@@ -130,6 +137,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.users TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON dedc.hash TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.element_list TO 'dedc_user'@'localhost';
 GRANT SELECT, INSERT, DELETE ON dedc.node TO 'dedc_user'@'localhost';
+GRANT SELECT, INSERT, DELETE ON dedc.locks TO 'dedc_user'@'localhost';
 GRANT DELETE ON dedc.entity TO 'dedc_user'@'localhost';
 
 #Grant proper privileges - don't use these on anything but testing DB

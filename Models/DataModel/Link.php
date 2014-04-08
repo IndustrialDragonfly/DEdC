@@ -320,19 +320,17 @@ abstract class Link extends Element
      */
     public function removeNode($node)
     {
-        if ($node == $this->getOriginNode()['id'])
+        if ($node->getId() == $this->getOriginNode()['id'])
         {
-            $this->clearOriginNode();
-            // Actually call back the node that just called and remove the node
-            // since Links ALWAYS break the connection off
-            //$node->removeLink($this);
-            //$node->update();
+            $node->removeLink($this);
+            $this->originNode = NULL;
+            $node->update();
         }
-        elseif ($node == $this->getDestinationNode()['id'])
+        elseif ($node->getId() == $this->getDestinationNode()['id'])
         {
-            $this->clearDestinationNode();
-            //$node->removeLink($this);
-            //$node->update();
+            $node->removeLink($this);
+            $this->destinationNode = NULL;
+            $node->update();
         }
         else
         {

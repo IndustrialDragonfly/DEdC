@@ -6,9 +6,19 @@
  */
 function DataModelClassLoader($classname)
 {
-    // Data (DFD) Model
-    if (file_exists("Models/DataModel/" . $classname . ".php"))
+    // Handle setting the path if there is one set - such as for PHPUnit
+    if (isset($GLOBALS['path']))
     {
-        require_once "Models/DataModel/" . $classname . ".php";
+        $prefix = $GLOBALS['path'] . "/"; 
+    }
+    else
+    {
+        $prefix = "";
+    }
+    
+    // Data (DFD) Model
+    if (file_exists($prefix . "Models/DataModel/" . $classname . ".php"))
+    {
+        require_once $prefix . "Models/DataModel/" . $classname . ".php";
     }
 }

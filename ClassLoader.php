@@ -10,8 +10,18 @@
  */
 function GeneralLoader($classname)
 {
-    if (file_exists($classname . ".php") )
+    // Handle setting the path if there is one set - such as for PHPUnit
+    if (isset($GLOBALS['path']))
     {
-        require_once $classname . ".php";
+        $prefix = $GLOBALS['path'] . "/"; 
+    }
+    else
+    {
+        $prefix = "";
+    }
+    
+    if (file_exists($prefix . $classname . ".php") )
+    {
+        require_once $prefix . $classname . ".php";
     }
 }

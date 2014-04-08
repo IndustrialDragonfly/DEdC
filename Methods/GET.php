@@ -65,10 +65,15 @@ function get($storage, $user, $request)
 	else if ($request->getId() != NULL)
 	{
 		// Get an Entity
-		$element;
+		$element = false;
+		$locked = false;
 		try
 		{
-			$element = existingElementFactory($storage, $user,  $request->getId());
+		    $locked = $storage->isLocked($request->getId());
+		    if (!$locked)
+		    {
+			     $element = existingElementFactory($storage, $user,  $request->getId());
+		    }
 		}
 		catch (Exception $e) // TODO: Make more specific catch cases
 		{
@@ -76,6 +81,13 @@ function get($storage, $user, $request)
 			$response = new SimpleResponse();
 			$response->setRawData($e->getMessage());
 			$response->setHeader(404);
+		}
+		
+		if ($locked)
+		{
+		    $response = new SimpleErrorResponse();
+		    $response->setError("Entity was locked.");
+		    $response->setHeader(409);
 		}
 	
 		// Successful Response
