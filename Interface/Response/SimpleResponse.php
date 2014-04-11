@@ -8,7 +8,7 @@ require_once 'DELETEResponsable.php';
  * @author eugene
  */
 
-final class SimpleResponse extends Response implements GETResponsable, DELETEResponsable
+final class SimpleResponse extends Response implements GETResponsable, DELETEResponsable, PUTResponsable
 {
     /**
      * Contains the raw (associative array) data for the body.
