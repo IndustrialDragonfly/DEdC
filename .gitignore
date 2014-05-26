@@ -1,3 +1,6 @@
 /Backend/nbproject/private/
 /nbproject/private/
 /Frontend/nbproject/private/
+.buildpath
+.project
+.settings/
